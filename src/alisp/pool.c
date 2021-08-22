@@ -26,7 +26,7 @@ bool a_pool_deref(struct a_pool *self) {
 
   a_ls_do(&self->pages, pls) {
     struct a_page *p = a_baseof(pls, struct a_page, pool_pages);
-    a_ls_remove(&p->pool_pages);
+    a_ls_pop(&p->pool_pages);
     
     if (self->source) {
       a_pool_free(self->source, p);
@@ -44,7 +44,7 @@ void *a_pool_malloc(struct a_pool *self, uint32_t size) {
     struct a_slot *s = a_baseof(sls, struct a_slot, pool_free);
 
     if (s->size == size) {
-      a_ls_remove(&s->pool_free);
+      a_ls_pop(&s->pool_free);
       return s->data;
     }
   }
@@ -70,11 +70,11 @@ void *a_pool_malloc(struct a_pool *self, uint32_t size) {
   if (new_offset > self->page_size) { a_fail("Malloc exceeds page size: %" PRIu32, size); }
   s->size = size;
   p->offset = new_offset;
-  a_ls_insert(&self->pages, &p->pool_pages);
+  a_ls_push(&self->pages, &p->pool_pages);
   return s->data;
 }
 
 void a_pool_free(struct a_pool *self, void *data) {
   struct a_slot *s = a_baseof(data, struct a_slot, data);
-  a_ls_insert(self->free.next, &s->pool_free);
+  a_ls_push(self->free.next, &s->pool_free);
 }

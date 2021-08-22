@@ -17,12 +17,9 @@ struct a_ls {
 };
 
 void a_ls_init(struct a_ls *self);
-bool a_ls_null(struct a_ls *self);
+bool a_ls_null(const struct a_ls *self);
 
-void a_ls_insert(struct a_ls *self, struct a_ls *it);
-struct a_ls *a_ls_remove(struct a_ls *self);
-
-struct a_ls *a_ls_pop_first(struct a_ls *self);
-struct a_ls *a_ls_pop_last(struct a_ls *self);
+void a_ls_push(struct a_ls *self, struct a_ls *it);
+struct a_ls *a_ls_pop(struct a_ls *self);
 
 #endif

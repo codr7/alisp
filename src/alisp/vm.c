@@ -10,7 +10,7 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_ls_init(&self->code);
   a_scope_init(&self->main, self, NULL);
   a_ls_init(&self->scopes);
-  a_ls_insert(&self->scopes, &self->main.vm_scopes);
+  a_ls_push(&self->scopes, &self->main.vm_scopes);
   a_ls_init(&self->stack);
   self->refs = 1;
   return self;
@@ -27,21 +27,21 @@ bool a_vm_deref(struct a_vm *self) {
 
   a_ls_do(&self->scopes, sls) {
     struct a_scope *s = a_baseof(sls, struct a_scope, vm_scopes);
-    a_ls_remove(sls);
+    a_ls_pop(sls);
     a_scope_deref(s);
     if (s != &self->main) { a_pool_free(&self->scope_pool, s); }
   }
 
   a_ls_do(&self->stack, vls) {
     struct a_val *v = a_baseof(vls, struct a_val, vm_stack);
-    a_ls_remove(vls);
+    a_ls_pop(vls);
     a_val_deref(v);
     a_pool_free(&self->val_pool, v);
   }
 
   a_ls_do(&self->code, ols) {
     struct a_op *o = a_baseof(ols, struct a_op, vm_code);
-    a_ls_remove(ols);
+    a_ls_pop(ols);
     a_op_deinit(o);
     a_pool_free(&self->op_pool, o);
   }
@@ -57,7 +57,7 @@ a_pc a_vm_pc(struct a_vm *self) { return self->code.next; }
 
 struct a_op *a_vm_emit(struct a_vm *self, enum a_op_type op_type) {
   struct a_op *op = a_op_init(a_pool_malloc(&self->op_pool, sizeof(struct a_op)), op_type);
-  a_ls_insert(&self->code, &op->vm_code);
+  a_ls_push(&self->code, &op->vm_code);
   return op;
 }
 
@@ -85,10 +85,10 @@ void a_vm_eval(struct a_vm *self, a_pc pc) {
 
 struct a_val *a_vm_push(struct a_vm *self, struct a_type *type) {
   struct a_val *v = a_val_init(a_pool_malloc(&self->val_pool, sizeof(struct a_val)), type);
-  a_ls_insert(&self->stack, &v->vm_stack);
+  a_ls_push(&self->stack, &v->vm_stack);
   return v;
 }
 
 struct a_val *a_vm_pop(struct a_vm *self) {
-  return a_ls_null(&self->stack) ? NULL : a_baseof(a_ls_remove(self->stack.prev), struct a_val, vm_stack);
+  return a_ls_null(&self->stack) ? NULL : a_baseof(a_ls_pop(self->stack.prev), struct a_val, vm_stack);
 }

@@ -1,18 +1,19 @@
 * add a_lset
 ** sorted ls
-** root/cmp
+** root/compare
 ** use for scope bindings
+* add a_string
+** flexible with uint32_t length
+** add vm.string_pool
+** add a_string_cmp
+** use for type name
+** a_string_compare size < ? : 
 * add libs/abc.h/c
 ** int_type
 ** add vm.abc
 ** use in tests
 * add stack_type
 ** use val/ls
-* add a_string
-** flexible with uint32_t length
-** add vm.string_pool
-** add a_string_cmp
-** use for type name
 * add parser
 * sort a_pool.free in size order
 ** bail out in malloc if > size
