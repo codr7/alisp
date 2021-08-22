@@ -56,9 +56,9 @@ bool a_vm_deref(struct a_vm *self) {
   return true;
 }
 
-a_pc a_vm_pc(struct a_vm *self) { return self->code.next; }
+a_pc a_next_pc(struct a_vm *self) { return self->code.next; }
 
-struct a_op *a_vm_emit(struct a_vm *self, enum a_op_type op_type) {
+struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
   struct a_op *op = a_op_init(a_pool_malloc(&self->op_pool, sizeof(struct a_op)), op_type);
   a_ls_push(&self->code, &op->vm_code);
   return op;
@@ -67,7 +67,7 @@ struct a_op *a_vm_emit(struct a_vm *self, enum a_op_type op_type) {
 #define A_DISPATCH(prev)						\
   goto *dispatch[a_baseof((pc = prev->next), struct a_op, vm_code)->type]
 
-void a_vm_eval(struct a_vm *self, a_pc pc) {
+void a_eval(struct a_vm *self, a_pc pc) {
   static const void* dispatch[] = {&&STOP, &&PUSH};
   A_DISPATCH(pc);
 
@@ -75,7 +75,7 @@ void a_vm_eval(struct a_vm *self, a_pc pc) {
     printf("PUSH\n");
     struct a_val
       *src = &a_baseof(pc, struct a_op, vm_code)->as_push.val,
-      *dst = a_vm_push(self, src->type);
+      *dst = a_push(self, src->type);
     a_val_copy(dst, src);
     A_DISPATCH(pc);
   }
@@ -86,12 +86,12 @@ void a_vm_eval(struct a_vm *self, a_pc pc) {
   }
 }
 
-struct a_val *a_vm_push(struct a_vm *self, struct a_type *type) {
+struct a_val *a_push(struct a_vm *self, struct a_type *type) {
   struct a_val *v = a_val_init(a_pool_malloc(&self->val_pool, sizeof(struct a_val)), type);
   a_ls_push(&self->stack, &v->ls);
   return v;
 }
 
-struct a_val *a_vm_pop(struct a_vm *self) {
+struct a_val *a_pop(struct a_vm *self) {
   return a_ls_null(&self->stack) ? NULL : a_baseof(a_ls_pop(self->stack.prev), struct a_val, ls);
 }

@@ -1,5 +1,6 @@
 * finish lset/scope bindings
 ** swifties
+** add store op
 * add libs/abc.h/c
 ** int_type
 ** add vm.abc
@@ -7,6 +8,10 @@
 * add stack_type
 ** use val/ls
 * add parser
+* ---
+* add a_pool.full_pages
+** rename pages to used_pages
+** rename free to free_slots
 * sort a_pool.free in size order
 ** bail out in malloc if > size
 ** insert where >=

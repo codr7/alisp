@@ -13,7 +13,7 @@ struct a_string *a_string(struct a_vm *vm, const char *data) {
   strncpy(s->data, data, length);
   s->data[length] = 0;
 
-  s->refs = 1;
+  s->refs = 0;
   return s;
 }
 

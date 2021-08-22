@@ -35,11 +35,11 @@ struct a_vm *a_vm_init(struct a_vm *self);
 struct a_vm *a_vm_ref(struct a_vm *self);
 bool a_vm_deref(struct a_vm *self);
 
-a_pc a_vm_pc(struct a_vm *self);
-struct a_op *a_vm_emit(struct a_vm *self, enum a_op_type op_type);
-void a_vm_eval(struct a_vm *self, a_pc pc);
+a_pc a_next_pc(struct a_vm *self);
+struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type);
+void a_eval(struct a_vm *self, a_pc pc);
 
-struct a_val *a_vm_push(struct a_vm *self, struct a_type *type);
-struct a_val *a_vm_pop(struct a_vm *self);
+struct a_val *a_push(struct a_vm *self, struct a_type *type);
+struct a_val *a_pop(struct a_vm *self);
 
 #endif
