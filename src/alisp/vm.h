@@ -6,12 +6,15 @@
 #include "alisp/pool.h"
 #include "alisp/scope.h"
 #include "alisp/types.h"
+#include "alisp/val.h"
 
 #define A_PAGE_SIZE 32000
 #define A_DEFAULT_PAGE_SIZE 32
 #define A_OP_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_SCOPE_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_VAL_PAGE_SIZE A_DEFAULT_PAGE_SIZE
+
+#define A_REGISTER_COUNT 64
 
 struct a_vm {
   struct a_pool pool;
@@ -22,6 +25,7 @@ struct a_vm {
   struct a_scope main;
   struct a_ls scopes;
 
+  struct a_val registers[A_REGISTER_COUNT];
   struct a_ls stack;
   a_refs refs;
 };

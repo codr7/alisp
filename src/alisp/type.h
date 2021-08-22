@@ -9,7 +9,8 @@ struct a_vm;
 
 struct a_type {
   struct a_vm *vm;
-  void (*deinit_val)(struct a_val *val);
+  void (*copy_val)(struct a_val *dst, struct a_val *src);
+  bool (*deref_val)(struct a_val *val);
   a_refs refs;
 };
 

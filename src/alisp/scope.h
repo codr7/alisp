@@ -10,6 +10,7 @@ struct a_scope {
   struct a_vm *vm;
   struct a_scope *outer;
   struct a_ls vm_scopes;
+  a_register next_register;
   a_refs refs;
 };
 

@@ -5,6 +5,7 @@ struct a_scope *a_scope_init(struct a_scope *self, struct a_vm *vm, struct a_sco
   self->vm = vm;
   self->outer = outer ? a_scope_ref(outer) : NULL;
   a_ls_init(&self->vm_scopes);
+  self->next_register = 0;
   self->refs = 1;
   return self;
 }

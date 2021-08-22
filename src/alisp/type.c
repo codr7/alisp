@@ -4,7 +4,8 @@
 
 struct a_type *a_type_init(struct a_type *self, struct a_vm *vm) {
   self->vm = vm;
-  self->deinit_val = NULL;
+  self->copy_val = NULL;
+  self->deref_val = NULL;
   self->refs = 1;
   return self;
 }

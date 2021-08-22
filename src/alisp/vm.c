@@ -35,7 +35,7 @@ bool a_vm_deref(struct a_vm *self) {
   a_ls_do(&self->stack, vls) {
     struct a_val *v = a_baseof(vls, struct a_val, vm_stack);
     a_ls_remove(vls);
-    a_val_deinit(v);
+    a_val_deref(v);
     a_pool_free(&self->val_pool, v);
   }
 
@@ -70,9 +70,10 @@ void a_vm_eval(struct a_vm *self, a_pc pc) {
 
  PUSH: {
     printf("PUSH\n");
-    struct a_val *v = a_pool_malloc(&self->val_pool, sizeof(struct a_val));
-    *v = a_baseof(pc, struct a_op, vm_code)->as_push.val;
-    a_ls_insert(&self->stack, &v->vm_stack);
+    struct a_val
+      *src = &a_baseof(pc, struct a_op, vm_code)->as_push.val,
+      *dst = a_vm_push(self, src->type);
+    a_val_copy(dst, src);
     A_DISPATCH(pc);
   }
   

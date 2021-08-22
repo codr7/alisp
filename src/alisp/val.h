@@ -10,11 +10,13 @@ struct a_val {
   struct a_type *type;
 
   union  {
+    bool as_bool;
     int as_int;
   };
 };
 
 struct a_val *a_val_init(struct a_val *self, struct a_type *type);
-void a_val_deinit(struct a_val *self);
+bool a_val_deref(struct a_val *self);
+void a_val_copy(struct a_val *self, struct a_val *source);
 
 #endif
