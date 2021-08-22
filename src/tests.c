@@ -1,8 +1,26 @@
+#include <assert.h>
+#include <stdio.h>
+#include "alisp/type.h"
 #include "alisp/vm.h"
 
-int main() {
+void test_push() {
   struct a_vm vm;
   a_vm_init(&vm);
+  a_pc pc = a_vm_pc(&vm);
+  struct a_type int_type;
+  a_type_init(&int_type, &vm);
+  a_val_init(&a_vm_emit(&vm, A_PUSH)->as_push.val, &int_type)->as_int = 42;
+  a_vm_emit(&vm, A_STOP);
+  a_vm_eval(&vm, pc);
+  struct a_val *v = a_vm_pop(&vm);
+  assert(v->type == &int_type);
+  assert(v->as_int == 42);
+  a_val_deinit(v);
+  a_pool_free(&vm.val_pool, v);
   a_vm_deref(&vm);
+}
+
+int main() {
+  test_push();
   return 0;
 }

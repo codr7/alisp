@@ -1,10 +1,15 @@
-* add push op
-* add a_eval(vm, pc)
-* add a_stack (vector)
-** add a_env.stack
-* add a_set
-** binary search
-** key_offset
-** add scope bindings
-
-cfu
+* add libs/abc.h/c
+** int_type
+** add vm.abc
+** use in tests
+* add stack_type
+** use val/ls
+* add a_lset
+** sorted ls
+** root/cmp
+** use for scope bindings
+* add a_string
+** flexible + uint32_t length
+** add vm.string_pool
+** add a_string_cmp
+** use for type name

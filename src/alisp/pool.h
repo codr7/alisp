@@ -12,7 +12,7 @@ struct a_slot {
 };
   
 struct a_page {
-  struct a_ls pool_items;
+  struct a_ls pool_pages;
   uint32_t offset;
   struct a_slot slots[];
 };
@@ -21,7 +21,7 @@ struct a_pool {
   struct a_pool *source;
   uint32_t page_size;
   struct a_ls pages, free;
-  a_refs_t refs;
+  a_refs refs;
 };
 
 
@@ -29,6 +29,6 @@ struct a_pool *a_pool_init(struct a_pool *self, struct a_pool *source, uint32_t 
 struct a_pool *a_pool_ref(struct a_pool *self);
 bool a_pool_deref(struct a_pool *self);
 void *a_pool_malloc(struct a_pool *self, uint32_t size);
-void a_pool_free(struct a_pool *self, void *slot);
+void a_pool_free(struct a_pool *self, void *data);
 
 #endif

@@ -4,11 +4,13 @@
 #include <stdbool.h>
 #include "alisp/types.h"
 
+struct a_val;
 struct a_vm;
 
 struct a_type {
   struct a_vm *vm;
-  a_refs_t refs;
+  void (*deinit_val)(struct a_val *val);
+  a_refs refs;
 };
 
 struct a_type *a_type_init(struct a_type *self, struct a_vm *vm);

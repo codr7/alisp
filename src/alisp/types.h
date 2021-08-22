@@ -3,6 +3,9 @@
 
 #include <stdint.h>
 
-typedef uint16_t a_refs_t;
+struct a_ls;
+
+typedef uint16_t a_refs;
+typedef struct a_ls *a_pc;
 
 #endif

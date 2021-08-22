@@ -10,7 +10,7 @@ struct a_scope {
   struct a_vm *vm;
   struct a_scope *outer;
   struct a_ls vm_scopes;
-  a_refs_t refs;
+  a_refs refs;
 };
 
 struct a_scope *a_scope_init(struct a_scope *self, struct a_vm *vm, struct a_scope *outer);

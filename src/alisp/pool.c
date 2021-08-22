@@ -23,8 +23,11 @@ bool a_pool_deref(struct a_pool *self) {
   assert(self->refs);
   if (--self->refs) { return false; }
 
+
   a_ls_do(&self->pages, pls) {
-    struct a_page *p = a_baseof(pls, struct a_page, pool_items);
+    struct a_page *p = a_baseof(pls, struct a_page, pool_pages);
+    a_ls_remove(&p->pool_pages);
+    
     if (self->source) {
       a_pool_free(self->source, p);
     } else {
@@ -37,8 +40,6 @@ bool a_pool_deref(struct a_pool *self) {
 }
 
 void *a_pool_malloc(struct a_pool *self, uint32_t size) {
-  if (size > self->page_size) { a_fail("Malloc exceeds page size: %" PRIu32, size); }
-
   a_ls_do(&self->free, sls) {
     struct a_slot *s = a_baseof(sls, struct a_slot, pool_free);
 
@@ -47,27 +48,33 @@ void *a_pool_malloc(struct a_pool *self, uint32_t size) {
       return s->data;
     }
   }
-  
+
+  uint32_t ss = sizeof(struct a_slot) + size;
+
   a_ls_do(&self->pages, pls) {
-    struct a_page *p = a_baseof(pls, struct a_page, pool_items);
+    struct a_page *p = a_baseof(pls, struct a_page, pool_pages);    
+    struct a_slot *s = (struct a_slot *)a_align((uint8_t *)p->slots + p->offset, ss);
+    uint32_t new_offset = (uint8_t *)s - (uint8_t *)p->slots + ss;
     
-    if (p->offset+size <= self->page_size) {
-      uint32_t ss = sizeof(struct a_slot) + size;
-      struct a_slot *s = (struct a_slot *)a_align((uint8_t *)p->slots + p->offset, ss);
+    if (new_offset <= self->page_size) {
       s->size = size;
-      p->offset = (uint8_t *)s - (uint8_t *)p->slots + ss;
+      p->offset = new_offset;
       return s->data;
     }
   }
 
   uint32_t ps = sizeof(struct a_page) + self->page_size;
   struct a_page *p = self->source ? a_pool_malloc(self->source, ps) : malloc(ps);
-  p->offset = size;
-  a_ls_prepend(&self->pages, &p->pool_items);
-  return p->slots;
+  struct a_slot *s = a_align(p->slots, ss);
+  uint32_t new_offset = (uint8_t *)s - (uint8_t *)p->slots + ss;
+  if (new_offset > self->page_size) { a_fail("Malloc exceeds page size: %" PRIu32, size); }
+  s->size = size;
+  p->offset = new_offset;
+  a_ls_insert(&self->pages, &p->pool_pages);
+  return s->data;
 }
 
-void a_pool_free(struct a_pool *self, void *slot) {
-  struct a_slot *s = a_baseof(slot, struct a_slot, data);
-  a_ls_prepend(&self->free, &s->pool_free);
+void a_pool_free(struct a_pool *self, void *data) {
+  struct a_slot *s = a_baseof(data, struct a_slot, data);
+  a_ls_insert(self->free.next, &s->pool_free);
 }
