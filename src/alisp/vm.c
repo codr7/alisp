@@ -1,11 +1,13 @@
 #include <assert.h>
 #include <stdio.h>
+#include "alisp/string.h"
 #include "alisp/vm.h"
 
 struct a_vm *a_vm_init(struct a_vm *self) {
   a_pool_init(&self->pool, NULL, A_PAGE_SIZE / A_MAX_ALIGN, A_MAX_ALIGN);
   a_pool_init(&self->op_pool, &self->pool, A_OP_PAGE_SIZE, sizeof(struct a_op));
   a_pool_init(&self->scope_pool, &self->pool, A_SCOPE_PAGE_SIZE, sizeof(struct a_scope));
+  a_pool_init(&self->string_pool, &self->pool, A_STRING_PAGE_SIZE, sizeof(struct a_string) + 10);
   a_pool_init(&self->val_pool, &self->pool, A_VAL_PAGE_SIZE, sizeof(struct a_val));
   a_ls_init(&self->code);
   a_scope_init(&self->main, self, NULL);
@@ -33,7 +35,7 @@ bool a_vm_deref(struct a_vm *self) {
   }
 
   a_ls_do(&self->stack, vls) {
-    struct a_val *v = a_baseof(vls, struct a_val, vm_stack);
+    struct a_val *v = a_baseof(vls, struct a_val, ls);
     a_ls_pop(vls);
     a_val_deref(v);
     a_pool_free(&self->val_pool, v);
@@ -47,6 +49,7 @@ bool a_vm_deref(struct a_vm *self) {
   }
 
   a_pool_deref(&self->val_pool);
+  a_pool_deref(&self->string_pool);
   a_pool_deref(&self->scope_pool);
   a_pool_deref(&self->op_pool);
   a_pool_deref(&self->pool);
@@ -85,10 +88,10 @@ void a_vm_eval(struct a_vm *self, a_pc pc) {
 
 struct a_val *a_vm_push(struct a_vm *self, struct a_type *type) {
   struct a_val *v = a_val_init(a_pool_malloc(&self->val_pool, sizeof(struct a_val)), type);
-  a_ls_push(&self->stack, &v->vm_stack);
+  a_ls_push(&self->stack, &v->ls);
   return v;
 }
 
 struct a_val *a_vm_pop(struct a_vm *self) {
-  return a_ls_null(&self->stack) ? NULL : a_baseof(a_ls_pop(self->stack.prev), struct a_val, vm_stack);
+  return a_ls_null(&self->stack) ? NULL : a_baseof(a_ls_pop(self->stack.prev), struct a_val, ls);
 }

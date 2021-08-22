@@ -12,13 +12,14 @@
 #define A_DEFAULT_PAGE_SIZE 32
 #define A_OP_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_SCOPE_PAGE_SIZE A_DEFAULT_PAGE_SIZE
+#define A_STRING_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_VAL_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 
 #define A_REGISTER_COUNT 64
 
 struct a_vm {
   struct a_pool pool;
-  struct a_pool op_pool, scope_pool, val_pool;
+  struct a_pool op_pool, scope_pool, string_pool, val_pool;
 
   struct a_ls code;
   

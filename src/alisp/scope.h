@@ -4,12 +4,15 @@
 #include <inttypes.h>
 #include <stdbool.h>
 #include "alisp/ls.h"
+#include "alisp/lset.h"
 #include "alisp/types.h"
 
 struct a_scope {
   struct a_vm *vm;
   struct a_scope *outer;
   struct a_ls vm_scopes;
+  struct a_lset bindings;
+  
   a_register next_register;
   a_refs refs;
 };

@@ -6,7 +6,7 @@
 struct a_type;
 
 struct a_val {
-  struct a_ls vm_stack;
+  struct a_ls ls;
   struct a_type *type;
 
   union  {
