@@ -28,7 +28,7 @@ struct a_pool {
 struct a_pool *a_pool_init(struct a_pool *self, struct a_pool *source, uint32_t page_size, uint32_t slot_size);
 struct a_pool *a_pool_ref(struct a_pool *self);
 bool a_pool_deref(struct a_pool *self);
-void *a_pool_malloc(struct a_pool *self, uint32_t size);
-void a_pool_free(struct a_pool *self, void *data);
+void *a_malloc(struct a_pool *self, uint32_t size);
+void a_free(struct a_pool *self, void *data);
 
 #endif

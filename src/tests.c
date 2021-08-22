@@ -18,7 +18,7 @@ void test_push() {
   assert(v->type == &int_type);
   assert(v->as_int == 42);
   a_val_deref(v);
-  a_pool_free(&vm.val_pool, v);
+  a_free(&vm.val_pool, v);
   a_vm_deref(&vm);
 }
 
