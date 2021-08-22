@@ -1,0 +1,10 @@
+* add push op
+* add a_eval(vm, pc)
+* add a_stack (vector)
+** add a_env.stack
+* add a_set
+** binary search
+** key_offset
+** add scope bindings
+
+cfu
