@@ -3,9 +3,11 @@
 
 #include <inttypes.h>
 #include <stdbool.h>
+#include "alisp/binding.h"
 #include "alisp/lset.h"
 #include "alisp/types.h"
-#include "alisp/val.h"
+
+struct a_string;
 
 struct a_scope {
   struct a_vm *vm;
@@ -14,12 +16,6 @@ struct a_scope {
   struct a_lset bindings;
   a_reg next_reg;
   a_ref_count ref_count;
-};
-
-struct a_binding {
-  struct a_ls ls;
-  struct a_string *key;
-  struct a_val val;
 };
 
 struct a_scope *a_scope_init(struct a_scope *self, struct a_vm *vm, struct a_scope *outer);

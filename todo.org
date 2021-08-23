@@ -1,5 +1,13 @@
+* add math lib with add func
+** add a_lib_bind_func
+** add a_peek()
+*** use in add func
+* fib
+* ---
+* add a_pos type
 * add stack_type
 ** use val/ls
+** add ls_pool
 * add parser
 * ---
 * add a_pool.full_pages
@@ -8,3 +16,7 @@
 * sort a_pool.free in size order
 ** bail out in malloc if > size
 ** insert where >=
+* use data as ls for slots
+** add slot data struct 
+*** move ls field
+

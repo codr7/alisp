@@ -29,12 +29,10 @@ struct a_vm {
   struct a_ls scopes;
   struct a_val regs[A_REG_COUNT];
   struct a_ls stack;
-  a_ref_count ref_count;
 };
 
 struct a_vm *a_vm_init(struct a_vm *self);
-struct a_vm *a_vm_ref(struct a_vm *self);
-bool a_vm_deref(struct a_vm *self);
+void a_vm_deinit(struct a_vm *self);
 
 a_pc a_next_pc(struct a_vm *self);
 struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type);

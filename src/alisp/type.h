@@ -11,6 +11,7 @@ struct a_vm;
 struct a_type {
   struct a_vm *vm;
   struct a_string *name;
+  a_pc (*call_val)(struct a_val *val, a_pc ret, bool check);
   void (*copy_val)(struct a_val *dst, struct a_val *src);
   bool (*deref_val)(struct a_val *val);
   a_ref_count ref_count;

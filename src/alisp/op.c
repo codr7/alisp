@@ -7,6 +7,9 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
 
 void a_op_deinit(struct a_op *self) {
   switch (self->type) {
+  case A_CALL:
+    a_val_deref(&self->as_call.target);
+    break;
   case A_PUSH:
     a_val_deref(&self->as_push.val);
     break;

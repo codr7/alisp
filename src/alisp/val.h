@@ -4,6 +4,7 @@
 #include "alisp/ls.h"
 #include "alisp/types.h"
 
+struct a_func;
 struct a_type;
 
 struct a_val {
@@ -12,13 +13,17 @@ struct a_val {
 
   union  {
     bool as_bool;
+    struct a_func *as_func;
     int as_int;
+    struct a_type *as_meta;
     a_reg as_reg;
   };
 };
 
 struct a_val *a_val_init(struct a_val *self, struct a_type *type);
 bool a_val_deref(struct a_val *self);
+
+a_pc a_call(struct a_val *self, a_pc ret, bool check);
 void a_copy(struct a_val *self, struct a_val *source);
 
 #endif

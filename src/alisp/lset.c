@@ -4,16 +4,22 @@ struct a_lset *a_lset_init(struct a_lset *self, a_lset_key key, a_compare compar
   self->key = key;
   self->compare = compare;
   a_ls_init(&self->items);
+  self->count = 0;
   return self;
 }
 
-struct a_ls *a_lset_insert(struct a_lset *self, struct a_ls *item) {
+struct a_ls *a_lset_insert(struct a_lset *self, struct a_ls *item, bool force) {
   const void *key = self->key(item);
   
   a_ls_do(&self->items, ils) {
-    if (self->compare(key, self->key ? self->key(ils) : ils) != A_LT) {
+    switch (self->compare(key, self->key ? self->key(ils) : ils)) { 
+    case A_GT:
       a_ls_push(ils, item);
       return item;
+    case A_EQ:
+      if (!force) { return NULL; }
+    case A_LT:
+      break;
     }
   }
 

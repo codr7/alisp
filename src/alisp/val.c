@@ -11,6 +11,11 @@ bool a_val_deref(struct a_val *self) {
   return self->type->deref_val ? self->type->deref_val(self) : true;
 }
 
+a_pc a_call(struct a_val *self, a_pc ret, bool check) {
+  assert(self->type->call_val);
+  return self->type->call_val(self, ret, check);
+}
+
 void a_copy(struct a_val *self, struct a_val *source) {
   assert(self->type->copy_val);
   self->type->copy_val(self, source);
