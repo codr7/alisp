@@ -4,13 +4,16 @@
 #include "alisp/compare.h"
 #include "alisp/ls.h"
 
-typedef enum a_order (*a_lset_compare)(const struct a_ls *x, const struct a_ls *y);
+typedef const void *(*a_lset_key)(const struct a_ls *x);
 
 struct a_lset {
-  a_lset_compare compare;
+  a_lset_key key;
+  a_compare compare;
   struct a_ls items;
 };
 
-struct a_lset *a_lset_init(struct a_lset *self, a_lset_compare compare);
+struct a_lset *a_lset_init(struct a_lset *self, a_lset_key key, a_compare compare);
+struct a_ls *a_lset_insert(struct a_lset *self, struct a_ls *item);
+struct a_ls *a_lset_find(struct a_lset *self, const void *key);
 
 #endif

@@ -2,6 +2,7 @@
 #define ALISP_VAL_H
 
 #include "alisp/ls.h"
+#include "alisp/types.h"
 
 struct a_type;
 
@@ -12,6 +13,7 @@ struct a_val {
   union  {
     bool as_bool;
     int as_int;
+    a_register as_register;
   };
 };
 

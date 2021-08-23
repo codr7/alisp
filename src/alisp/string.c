@@ -29,6 +29,6 @@ bool a_string_deref(struct a_string *self) {
   return true;
 }
 
-enum a_order a_string_compare(struct a_string *self, struct a_string *other) {
+enum a_order a_string_compare(const struct a_string *self, const struct a_string *other) {
   return strcmp(self->data, other->data);
 }
