@@ -13,12 +13,12 @@ struct a_val {
   union  {
     bool as_bool;
     int as_int;
-    a_register as_register;
+    a_reg as_reg;
   };
 };
 
 struct a_val *a_val_init(struct a_val *self, struct a_type *type);
 bool a_val_deref(struct a_val *self);
-void a_val_copy(struct a_val *self, struct a_val *source);
+void a_copy(struct a_val *self, struct a_val *source);
 
 #endif

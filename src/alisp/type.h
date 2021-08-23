@@ -13,7 +13,7 @@ struct a_type {
   struct a_string *name;
   void (*copy_val)(struct a_val *dst, struct a_val *src);
   bool (*deref_val)(struct a_val *val);
-  a_refs refs;
+  a_ref_count ref_count;
 };
 
 struct a_type *a_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name);

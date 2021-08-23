@@ -4,18 +4,28 @@
 #include "alisp/ls.h"
 #include "alisp/val.h"
 
-enum a_op_type {A_STOP=0, A_PUSH};
+enum a_op_type {A_STOP=0, A_LOAD, A_PUSH, A_STORE};
+
+struct a_load {
+  a_reg reg;
+};
 
 struct a_push {
   struct a_val val;
 };
 
+struct a_store {
+  a_reg reg;
+};
+
 struct a_op {
+  struct a_ls ls;
   enum a_op_type type;
-  struct a_ls vm_code;
   
   union {
+    struct a_load as_load;
     struct a_push as_push;
+    struct a_store as_store;
   };
 };
 

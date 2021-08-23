@@ -8,7 +8,7 @@ struct a_lset *a_lset_init(struct a_lset *self, a_lset_key key, a_compare compar
 }
 
 struct a_ls *a_lset_insert(struct a_lset *self, struct a_ls *item) {
-  const void *key = self->key ? self->key(item) : item;
+  const void *key = self->key(item);
   
   a_ls_do(&self->items, ils) {
     if (self->compare(key, self->key ? self->key(ils) : ils) != A_LT) {
@@ -23,7 +23,7 @@ struct a_ls *a_lset_insert(struct a_lset *self, struct a_ls *item) {
 
 struct a_ls *a_lset_find(struct a_lset *self, const void *key) {
   a_ls_do(&self->items, ils) {
-    switch (self->compare(key, self->key ? self->key(ils) : ils)) {
+    switch (self->compare(key, self->key(ils))) {
     case A_LT:
       break;
     case A_EQ:

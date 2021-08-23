@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
+#include "alisp/fail.h"
 #include "alisp/scope.h"
 #include "alisp/string.h"
 #include "alisp/vm.h"
@@ -17,18 +18,18 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_ls_init(&self->scopes);
   a_ls_push(&self->scopes, &self->main.ls);
   a_ls_init(&self->stack);
-  self->refs = 1;
+  self->ref_count = 1;
   return self;
 }
 
 struct a_vm *a_vm_ref(struct a_vm *self) {
-  self->refs++;
+  self->ref_count++;
   return self;
 }
 
 bool a_vm_deref(struct a_vm *self) {  
-  assert(self->refs);
-  if (--self->refs) { return false; }
+  assert(self->ref_count);
+  if (--self->ref_count) { return false; }
 
   a_ls_do(&self->scopes, sls) {
     struct a_scope *s = a_baseof(sls, struct a_scope, ls);
@@ -45,7 +46,7 @@ bool a_vm_deref(struct a_vm *self) {
   }
 
   a_ls_do(&self->code, ols) {
-    struct a_op *o = a_baseof(ols, struct a_op, vm_code);
+    struct a_op *o = a_baseof(ols, struct a_op, ls);
     a_ls_pop(ols);
     a_op_deinit(o);
     a_free(&self->op_pool, o);
@@ -64,23 +65,39 @@ a_pc a_next_pc(struct a_vm *self) { return self->code.next; }
 
 struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
   struct a_op *op = a_op_init(a_malloc(&self->op_pool, sizeof(struct a_op)), op_type);
-  a_ls_push(&self->code, &op->vm_code);
+  a_ls_push(&self->code, &op->ls);
   return op;
 }
 
 #define A_DISPATCH(prev)						\
-  goto *dispatch[a_baseof((pc = prev->next), struct a_op, vm_code)->type]
+  goto *dispatch[a_baseof((pc = prev->next), struct a_op, ls)->type]
 
 void a_eval(struct a_vm *self, a_pc pc) {
-  static const void* dispatch[] = {&&STOP, &&PUSH};
+  static const void* dispatch[] = {&&STOP, &&LOAD, &&PUSH, &&STORE};
   A_DISPATCH(pc);
 
+ LOAD: {
+    printf("LOAD\n");
+    struct a_val *v = self->regs + a_baseof(pc, struct a_op, ls)->as_load.reg;
+    a_copy(a_push(self, v->type), v);
+    A_DISPATCH(pc);
+  }
+  
  PUSH: {
     printf("PUSH\n");
     struct a_val
-      *src = &a_baseof(pc, struct a_op, vm_code)->as_push.val,
+      *src = &a_baseof(pc, struct a_op, ls)->as_push.val,
       *dst = a_push(self, src->type);
-    a_val_copy(dst, src);
+    a_copy(dst, src);
+    A_DISPATCH(pc);
+  }
+
+ STORE: {
+    printf("STORE\n");
+    struct a_val *v = a_pop(self);
+    if (!v) { a_fail("Missing value to store"); }
+    self->regs[a_baseof(pc, struct a_op, ls)->as_load.reg] = *v;
+    a_free(&self->val_pool, v);
     A_DISPATCH(pc);
   }
   
@@ -104,9 +121,9 @@ struct a_val *a_pop(struct a_vm *self) {
   return a_ls_null(&self->stack) ? NULL : a_baseof(a_ls_pop(self->stack.prev), struct a_val, ls);
 }
 
-a_register a_bind_register(struct a_vm *self, struct a_string *key) {
+a_reg a_bind_reg(struct a_vm *self, struct a_string *key) {
   struct a_scope *s = a_scope(self);
-  a_register r = s->next_register++;
-  a_scope_bind(s, key, &self->abc.register_type)->as_register = r;
+  a_reg r = s->next_reg++;
+  a_scope_bind(s, key, &self->abc.reg_type)->as_reg = r;
   return r;
 }

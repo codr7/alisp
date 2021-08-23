@@ -18,7 +18,7 @@
 #define A_STRING_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_VAL_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 
-#define A_REGISTER_COUNT 64
+#define A_REG_COUNT 64
 
 struct a_vm {
   struct a_pool pool;
@@ -27,9 +27,9 @@ struct a_vm {
   struct a_ls code;  
   struct a_scope main;
   struct a_ls scopes;
-  struct a_val registers[A_REGISTER_COUNT];
+  struct a_val regs[A_REG_COUNT];
   struct a_ls stack;
-  a_refs refs;
+  a_ref_count ref_count;
 };
 
 struct a_vm *a_vm_init(struct a_vm *self);
@@ -45,6 +45,6 @@ struct a_scope *a_scope(struct a_vm *self);
 struct a_val *a_push(struct a_vm *self, struct a_type *type);
 struct a_val *a_pop(struct a_vm *self);
 
-a_register a_bind_register(struct a_vm *self, struct a_string *key);
+a_reg a_bind_reg(struct a_vm *self, struct a_string *key);
 
 #endif

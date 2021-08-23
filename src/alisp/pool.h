@@ -9,7 +9,7 @@ struct a_pool {
   struct a_pool *source;
   uint32_t page_size;
   struct a_ls pages, free;
-  a_refs refs;
+  a_ref_count ref_count;
 };
 
 struct a_slot {

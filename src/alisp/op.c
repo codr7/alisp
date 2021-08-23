@@ -10,7 +10,9 @@ void a_op_deinit(struct a_op *self) {
   case A_PUSH:
     a_val_deref(&self->as_push.val);
     break;
+  case A_LOAD:
   case A_STOP:
+  case A_STORE:
     break;
   }
 }

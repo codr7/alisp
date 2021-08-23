@@ -12,12 +12,12 @@ struct a_scope {
   struct a_scope *outer;
   struct a_ls ls;
   struct a_lset bindings;
-  a_register next_register;
-  a_refs refs;
+  a_reg next_reg;
+  a_ref_count ref_count;
 };
 
 struct a_binding {
-  struct a_ls set_items;
+  struct a_ls ls;
   struct a_string *key;
   struct a_val val;
 };
@@ -27,5 +27,7 @@ struct a_scope *a_scope_ref(struct a_scope *self);
 bool a_scope_deref(struct a_scope *self);
 
 struct a_val *a_scope_bind(struct a_scope *self, struct a_string *key, struct a_type *type);
+
+struct a_val *a_scope_find(struct a_scope *self, const struct a_string *key);
 
 #endif

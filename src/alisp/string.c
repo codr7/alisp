@@ -13,18 +13,18 @@ struct a_string *a_string(struct a_vm *vm, const char *data) {
   strncpy(s->data, data, length);
   s->data[length] = 0;
 
-  s->refs = 0;
+  s->ref_count = 0;
   return s;
 }
 
 struct a_string *a_string_ref(struct a_string *self) {
-  self->refs++;
+  self->ref_count++;
   return self;
 }
 
 bool a_string_deref(struct a_string *self) {
-  assert(self->refs);
-  if (--self->refs) { return false; }
+  assert(self->ref_count);
+  if (--self->ref_count) { return false; }
   a_free(&self->vm->string_pool, self);
   return true;
 }

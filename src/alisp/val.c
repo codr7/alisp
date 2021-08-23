@@ -11,7 +11,7 @@ bool a_val_deref(struct a_val *self) {
   return self->type->deref_val ? self->type->deref_val(self) : true;
 }
 
-void a_val_copy(struct a_val *self, struct a_val *source) {
+void a_copy(struct a_val *self, struct a_val *source) {
   assert(self->type->copy_val);
   self->type->copy_val(self, source);
 }

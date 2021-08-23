@@ -5,8 +5,8 @@
 
 struct a_ls;
 
-typedef uint16_t a_refs;
-typedef uint16_t a_register;
+typedef uint16_t a_ref_count;
+typedef uint16_t a_reg;
 typedef struct a_ls *a_pc;
 
 #endif

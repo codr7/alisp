@@ -12,7 +12,7 @@ typedef uint32_t a_string_length;
 struct a_string {
   struct a_vm *vm;
   a_string_length length;
-  a_refs refs;
+  a_ref_count ref_count;
   char data[];
 };
 

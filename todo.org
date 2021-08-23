@@ -1,11 +1,3 @@
-* finish scope bindings
-** swifties
-** add store/load op
-** add test
-* add libs/abc.h/c
-** int_type
-** add vm.abc
-** use in tests
 * add stack_type
 ** use val/ls
 * add parser

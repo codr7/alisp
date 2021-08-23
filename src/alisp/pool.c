@@ -10,18 +10,18 @@ struct a_pool *a_pool_init(struct a_pool *self, struct a_pool *source, uint32_t 
   self->page_size = a_align(0, slot_size) + page_size*(a_align(0, slot_size) + sizeof(struct a_slot) + slot_size);
   a_ls_init(&self->pages);
   a_ls_init(&self->free);
-  self->refs = 1;
+  self->ref_count = 1;
   return self;
 }
 
 struct a_pool *a_pool_ref(struct a_pool *self) {
-  self->refs++;
+  self->ref_count++;
   return self;
 }
 
 bool a_pool_deref(struct a_pool *self) {
-  assert(self->refs);
-  if (--self->refs) { return false; }
+  assert(self->ref_count);
+  if (--self->ref_count) { return false; }
 
 
   a_ls_do(&self->pages, pls) {

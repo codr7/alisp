@@ -10,18 +10,18 @@ struct a_type *a_type_init(struct a_type *self, struct a_vm *vm, struct a_string
   self->copy_val = NULL;
   self->deref_val = NULL;
 
-  self->refs = 1;
+  self->ref_count = 1;
   return self;
 }
 
 struct a_type *a_type_ref(struct a_type *self) {
-  self->refs++;
+  self->ref_count++;
   return self;
 }
 
 bool a_type_deref(struct a_type *self) {
-  assert(self->refs);
-  if (--self->refs) { return false; }
+  assert(self->ref_count);
+  if (--self->ref_count) { return false; }
   a_string_deref(self->name);
   return true;
 }
