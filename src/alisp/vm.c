@@ -12,6 +12,7 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_pool_init(&self->scope_pool, &self->pool, A_SCOPE_PAGE_SIZE, sizeof(struct a_scope));
   a_pool_init(&self->string_pool, &self->pool, A_STRING_PAGE_SIZE, sizeof(struct a_string) + 10);
   a_pool_init(&self->val_pool, &self->pool, A_VAL_PAGE_SIZE, sizeof(struct a_val));
+  self->next_type_id = 0;
   a_abc_lib_init(&self->abc, self);
   a_ls_init(&self->code);
   a_scope_init(&self->main, self, NULL);
@@ -67,6 +68,7 @@ void a_eval(struct a_vm *self, a_pc pc) {
   A_DISPATCH(pc);
 
  CALL: {
+    printf("CALL\n");
     struct a_val *t = &a_baseof(pc, struct a_op, ls)->as_call.target;
     A_DISPATCH(a_call(t, pc, true));
   }

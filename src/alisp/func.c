@@ -10,7 +10,8 @@ struct a_func *a_func_init(struct a_func *self,
 			   struct a_type *rets[]) {
   self->vm = vm;
   self->name = a_string_ref(name);
-
+  self->arg_count = arg_count;
+  
   if (arg_count) {
     self->args = a_malloc(&vm->pool, sizeof(struct a_arg) * arg_count);
     for (int i = 0; i < arg_count; i++) { self->args[i] = args[i]; }
@@ -18,12 +19,12 @@ struct a_func *a_func_init(struct a_func *self,
     self->args = NULL;
   }
 
-  int ret_count = 0;
-  for (struct a_type **t = rets; *t; t++, ret_count++);
+  self->ret_count = 0;
+  for (struct a_type **t = rets; *t; t++, self->ret_count++);
 
-  if (ret_count) {
-    self->rets = a_malloc(&vm->pool, sizeof(struct a_type *) * ret_count);
-    for (int i = 0; i < ret_count; i++) { self->rets[i] = rets[i]; }
+  if (self->ret_count) {
+    self->rets = a_malloc(&vm->pool, sizeof(struct a_type *) * self->ret_count);
+    for (int i = 0; i < self->ret_count; i++) { self->rets[i] = rets[i]; }
   } else {
     self->rets = NULL;
   }
@@ -52,7 +53,15 @@ bool a_func_deref(struct a_func *self) {
 }
 
 bool a_func_applicable(struct a_func *self) {
-  //TODO check stack
+  struct a_ls *s = self->vm->stack.prev;
+  if (!self->args) { return true; }
+  
+  for (int i = self->arg_count-1; i >= 0; i--, s = s->prev) {
+    if (s == &self->vm->stack) { return false; }
+    struct a_val *v = a_baseof(s, struct a_val, ls);
+    if (!a_isa(v->type, self->args[i].type)) { return false; }
+  }
+  
   return true;
 }
 

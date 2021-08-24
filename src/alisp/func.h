@@ -7,6 +7,7 @@
 struct a_func {
   struct a_vm *vm;
   struct a_string *name;
+  uint8_t arg_count, ret_count;
   struct a_arg *args;
   struct a_type **rets;
   a_pc (*body)(struct a_func *self, a_pc ret);

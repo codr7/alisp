@@ -23,7 +23,10 @@
 struct a_vm {
   struct a_pool pool;
   struct a_pool binding_pool, op_pool, scope_pool, string_pool, val_pool;
+
+  a_type_id next_type_id;
   struct a_abc_lib abc;
+  
   struct a_ls code;  
   struct a_scope main;
   struct a_ls scopes;

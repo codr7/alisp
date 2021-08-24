@@ -1,22 +1,33 @@
-* add math lib with add func
+* add forms
+* add inc/dec funcs to core lib
 ** add a_lib_bind_func
 ** add a_peek()
-*** use in add func
+* add math lib with add/sub/ funcs
+* add a_lib_import(lib)
+** bind all in current scope
+* add a_prim
+* add parser
+* add repl
+* add a_dump()
+** add a_stream
+** add type.dump_val
+*** implement for all types
+** add a_stack_dump(ls *self, stream *out);
+*** add stack.h/c
+*** extract push/pop/peek
 * fib
 * ---
 * add a_pos type
 * add stack_type
 ** use val/ls
 ** add ls_pool
-* add parser
 * ---
 * add a_pool.full_pages
 ** rename pages to used_pages
 ** rename free to free_slots
-* sort a_pool.free in size order
+* sort a_pool.free_slots in size order
 ** bail out in malloc if > size
 ** insert where >=
 * use data as ls for slots
 ** add slot data struct 
 *** move ls field
-
