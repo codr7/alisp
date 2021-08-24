@@ -1,5 +1,10 @@
+* remove type pool
+** allocate fixed array of A_MAX_TYPE_COUNT
+** add vm.type_count
+*** use instead of next_type_id
 * add a_pos
 * add forms
+* --
 * add inc/dec funcs to core lib
 ** add a_lib_bind_func
 * add math lib with add/sub/ funcs

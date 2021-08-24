@@ -56,10 +56,10 @@ static void test_func() {
   struct a_func f;
   
   a_func_init(&f, &vm, a_string(&vm, "foo"),
-	      2, (struct a_arg[]){
-		a_arg(a_string(&vm, "x"), &vm.abc.int_type),
-		a_arg(a_string(&vm, "y"), &vm.abc.int_type)},
-	      (struct a_type *[]){&vm.abc.int_type, NULL});
+	      A_ARG(&vm,
+		    {a_string(&vm, "x"), &vm.abc.int_type},
+		    {a_string(&vm, "y"), &vm.abc.int_type}),
+	      A_RET(&vm, &vm.abc.int_type));
 
   f.body = test_func_foo_body;
   a_val_init(&a_emit(&vm, A_CALL)->as_call.target, &vm.abc.func_type)->as_func = a_func_ref(&f);
