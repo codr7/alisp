@@ -27,21 +27,18 @@ void a_vm_deinit(struct a_vm *self) {
     struct a_scope *s = a_baseof(sls, struct a_scope, ls);
     a_ls_pop(sls);
     a_scope_deref(s);
-    if (s != &self->main) { a_free(&self->scope_pool, s); }
   }
 
   a_ls_do(&self->stack, vls) {
     struct a_val *v = a_baseof(vls, struct a_val, ls);
     a_ls_pop(vls);
     a_val_deref(v);
-    a_free(&self->val_pool, v);
   }
 
   a_ls_do(&self->code, ols) {
     struct a_op *o = a_baseof(ols, struct a_op, ls);
     a_ls_pop(ols);
     a_op_deinit(o);
-    a_free(&self->op_pool, o);
   }
 
   a_pool_deref(&self->val_pool);

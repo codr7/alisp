@@ -10,7 +10,7 @@ struct a_string;
 struct a_val;
 struct a_vm;
 
-typedef uint64_t a_type_id;
+typedef uint16_t a_type_id;
 
 struct a_type {
   struct a_vm *vm;
@@ -20,13 +20,9 @@ struct a_type {
   a_pc (*call_val)(struct a_val *val, a_pc ret, bool check);
   void (*copy_val)(struct a_val *dst, struct a_val *src);
   bool (*deref_val)(struct a_val *val);
-  a_ref_count ref_count;
 };
 
 struct a_type *a_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super_types[]);
-struct a_type *a_type_ref(struct a_type *self);
-bool a_type_deref(struct a_type *self);
-
 bool a_isa(struct a_type *self, struct a_type *super);
 
 #endif

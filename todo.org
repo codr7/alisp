@@ -1,3 +1,4 @@
+* add a_pos
 * add forms
 * add inc/dec funcs to core lib
 ** add a_lib_bind_func

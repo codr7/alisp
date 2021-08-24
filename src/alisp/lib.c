@@ -18,7 +18,7 @@ void a_lib_deinit(struct a_lib *self) {
 
 struct a_val *a_lib_bind(struct a_lib *self, struct a_string *key, struct a_type *type) {
   struct a_binding *b = a_malloc(&self->vm->binding_pool, sizeof(struct a_binding));
-  b->key = a_string_ref(key);
+  b->key = key;
 
   if (!a_lset_insert(&self->bindings, &b->val.ls, false)) {
     a_free(&self->vm->binding_pool, b);

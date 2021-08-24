@@ -1,6 +1,5 @@
 #include <assert.h>
 #include "alisp/func.h"
-#include "alisp/string.h"
 #include "alisp/vm.h"
 
 struct a_func *a_func_init(struct a_func *self,
@@ -9,7 +8,7 @@ struct a_func *a_func_init(struct a_func *self,
 			   int arg_count, struct a_arg args[],
 			   struct a_type *rets[]) {
   self->vm = vm;
-  self->name = a_string_ref(name);
+  self->name = name;
   self->arg_count = arg_count;
   
   if (arg_count) {
@@ -42,19 +41,13 @@ struct a_func *a_func_ref(struct a_func *self) {
 bool a_func_deref(struct a_func *self) {
   assert(self->ref_count);
   if (--self->ref_count) { return false; }
-  a_string_deref(self->name);
-
-  if (self->args) {
-    //TODO deinit args
-    a_free(&self->vm->pool, self->args);
-  }
-  
+  if (self->args) { a_free(&self->vm->pool, self->args); }
   return true;
 }
 
 bool a_func_applicable(struct a_func *self) {
-  struct a_ls *s = self->vm->stack.prev;
   if (!self->args) { return true; }
+  struct a_ls *s = self->vm->stack.prev;
   
   for (struct a_arg *a = self->args + self->arg_count-1; a >= self->args; a--) {
     if (s == &self->vm->stack) { return false; }
@@ -70,5 +63,5 @@ a_pc a_func_call(struct a_func *self, a_pc ret) {
 }
 
 struct a_arg a_arg(struct a_string *name, struct a_type *type) {
-  return (struct a_arg){.name=a_string_ref(name), .type=type};
+  return (struct a_arg){.name=name, .type=type};
 }

@@ -2,7 +2,6 @@
 #include "alisp/string.h"
 
 void a_binding_deinit(struct a_binding *self) {
-    a_string_deref(self->key);
     a_val_deref(&self->val);
 }
 
