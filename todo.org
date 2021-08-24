@@ -1,7 +1,6 @@
 * add forms
 * add inc/dec funcs to core lib
 ** add a_lib_bind_func
-** add a_peek()
 * add math lib with add/sub/ funcs
 * add a_lib_import(lib)
 ** bind all in current scope

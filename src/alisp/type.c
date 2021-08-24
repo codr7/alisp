@@ -7,6 +7,7 @@
 
 struct a_type *a_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super_types[]) {
   self->vm = vm;
+  assert(vm->next_type_id < A_MAX_TYPE_ID);
   self->id = vm->next_type_id++;
   self->name = a_string_ref(name);
   memset(self->super_types, 0, sizeof(self->super_types));

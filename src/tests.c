@@ -41,10 +41,8 @@ static void test_bind() {
 }
 
 static a_pc test_func_foo_body(struct a_func *self, a_pc ret) {
-  struct a_val *y = a_pop(self->vm), *x = a_pop(self->vm);
-  a_push(self->vm, &self->vm->abc.int_type)->as_int = x->as_int + y->as_int;
-  a_val_deref(x);
-  a_free(&self->vm->val_pool, x);
+  struct a_val *y = a_pop(self->vm), *x = a_peek(self->vm);
+  x->as_int += y->as_int;
   a_val_deref(y);
   a_free(&self->vm->val_pool, y);
   return ret;

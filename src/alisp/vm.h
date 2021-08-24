@@ -44,6 +44,7 @@ void a_eval(struct a_vm *self, a_pc pc);
 struct a_scope *a_scope(struct a_vm *self);
 
 struct a_val *a_push(struct a_vm *self, struct a_type *type);
+struct a_val *a_peek(struct a_vm *self);
 struct a_val *a_pop(struct a_vm *self);
 
 a_reg a_bind_reg(struct a_vm *self, struct a_string *key);

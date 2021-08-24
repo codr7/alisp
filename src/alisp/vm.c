@@ -114,6 +114,10 @@ struct a_val *a_push(struct a_vm *self, struct a_type *type) {
   return v;
 }
 
+struct a_val *a_peek(struct a_vm *self) {
+  return a_ls_null(&self->stack) ? NULL : a_baseof(self->stack.prev, struct a_val, ls);
+}
+
 struct a_val *a_pop(struct a_vm *self) {
   return a_ls_null(&self->stack) ? NULL : a_baseof(a_ls_pop(self->stack.prev), struct a_val, ls);
 }
