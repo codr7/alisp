@@ -56,10 +56,9 @@ bool a_func_applicable(struct a_func *self) {
   struct a_ls *s = self->vm->stack.prev;
   if (!self->args) { return true; }
   
-  for (int i = self->arg_count-1; i >= 0; i--, s = s->prev) {
+  for (struct a_arg *a = self->args + self->arg_count-1; a >= self->args; a--) {
     if (s == &self->vm->stack) { return false; }
-    struct a_val *v = a_baseof(s, struct a_val, ls);
-    if (!a_isa(v->type, self->args[i].type)) { return false; }
+    if (!a_isa(a_baseof(s, struct a_val, ls)->type, a->type)) { return false; }
   }
   
   return true;
