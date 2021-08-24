@@ -11,8 +11,8 @@ static void test_push() {
   struct a_vm vm;
   a_vm_init(&vm);
   a_pc pc = a_next_pc(&vm);
-  a_val_init(&a_emit(&vm, A_PUSH)->as_push.val, &vm.abc.int_type)->as_int = 42;
-  a_emit(&vm, A_STOP);
+  a_val_init(&a_emit(&vm, A_PUSH_OP)->as_push.val, &vm.abc.int_type)->as_int = 42;
+  a_emit(&vm, A_STOP_OP);
   a_eval(&vm, pc);
   struct a_val *v = a_pop(&vm);
   assert(v->type == &vm.abc.int_type);
@@ -27,10 +27,10 @@ static void test_bind() {
   a_vm_init(&vm);
   a_pc pc = a_next_pc(&vm);
   a_reg reg = a_bind_reg(&vm, a_string(&vm, "foo"));
-  a_val_init(&a_emit(&vm, A_PUSH)->as_push.val, &vm.abc.int_type)->as_int = 42;
-  a_emit(&vm, A_STORE)->as_store.reg = reg;
-  a_emit(&vm, A_LOAD)->as_load.reg = reg;
-  a_emit(&vm, A_STOP);
+  a_val_init(&a_emit(&vm, A_PUSH_OP)->as_push.val, &vm.abc.int_type)->as_int = 42;
+  a_emit(&vm, A_STORE_OP)->as_store.reg = reg;
+  a_emit(&vm, A_LOAD_OP)->as_load.reg = reg;
+  a_emit(&vm, A_STOP_OP);
   a_eval(&vm, pc);
   struct a_val *v = a_pop(&vm);
   assert(v->type == &vm.abc.int_type);
@@ -62,8 +62,8 @@ static void test_func() {
 	      A_RET(&vm, &vm.abc.int_type));
 
   f.body = test_func_foo_body;
-  a_val_init(&a_emit(&vm, A_CALL)->as_call.target, &vm.abc.func_type)->as_func = a_func_ref(&f);
-  a_emit(&vm, A_STOP);
+  a_val_init(&a_emit(&vm, A_CALL_OP)->as_call.target, &vm.abc.func_type)->as_func = a_func_ref(&f);
+  a_emit(&vm, A_STOP_OP);
 
   a_push(&vm, &vm.abc.int_type)->as_int = 35;
   a_push(&vm, &vm.abc.int_type)->as_int = 7;
