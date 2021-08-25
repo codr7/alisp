@@ -1,15 +1,9 @@
-* remove type pool
-** allocate fixed array of A_MAX_TYPE_COUNT
-** add vm.type_count
-*** use instead of next_type_id
-* --
-* add a
+* add if-prim
+* add vm.form_pool
 * add inc/dec funcs to core lib
-** add a_lib_bind_func
 * add math lib with add/sub/ funcs
 * add a_lib_import(lib)
 ** bind all in current scope
-* add a_prim
 * add parser
 * add repl
 * add a_dump()
@@ -21,7 +15,6 @@
 *** extract push/pop/peek
 * fib
 * ---
-* add a_pos type
 * add stack_type
 ** use val/ls
 ** add ls_pool
@@ -35,3 +28,13 @@
 * use data as ls for slots
 ** add slot data struct 
 *** move ls field
+
+Jag kommer aldrig kunna glömma dig, vackra underbara; aldrig kunna glömma vår kärlek.
+Och det gör ont att se dig fångad i din rädsla, jag vet vart den vägen leder.
+Men det är som det är, alla har rätt att göra sina egna val.
+
+Du kommer aldrig vinna Sara; det finns inga vinnare i din lek, alla har redan förlorat.
+
+Det går inte att kontrollera riktig kärlek, det är som eld och vatten, det var alltid där bråket startade.
+
+

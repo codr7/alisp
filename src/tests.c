@@ -62,7 +62,9 @@ static void test_func() {
 	      A_RET(&vm, &vm.abc.int_type));
 
   f.body = test_func_foo_body;
-  a_val_init(&a_emit(&vm, A_CALL_OP)->as_call.target, &vm.abc.func_type)->as_func = a_func_ref(&f);
+  struct a_val *t = a_val_init(a_malloc(&vm.val_pool, sizeof(struct a_val)), &vm.abc.func_type);
+  t->as_func = a_func_ref(&f);
+  a_emit(&vm, A_CALL_OP)->as_call.target = t;
   a_emit(&vm, A_STOP_OP);
 
   a_push(&vm, &vm.abc.int_type)->as_int = 35;
@@ -75,7 +77,6 @@ static void test_func() {
   assert(v->as_int == 42);
   a_val_deref(v);
   a_free(&vm.val_pool, v);
-
   a_func_deref(&f);
   a_vm_deinit(&vm);
 }

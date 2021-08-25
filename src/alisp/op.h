@@ -7,7 +7,7 @@
 enum a_op_type {A_STOP_OP=0, A_CALL_OP, A_LOAD_OP, A_PUSH_OP, A_STORE_OP};
 
 struct a_call_op {
-  struct a_val target;
+  struct a_val *target;
 };
 
 struct a_load_op {

@@ -60,14 +60,29 @@ struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
 #define A_DISPATCH(prev)						\
   goto *dispatch[a_baseof((pc = prev->next), struct a_op, ls)->type]
 
-void a_eval(struct a_vm *self, a_pc pc) {
+bool a_eval(struct a_vm *self, a_pc pc) {
   static const void* dispatch[] = {&&STOP, &&CALL, &&LOAD, &&PUSH, &&STORE};
   A_DISPATCH(pc);
 
  CALL: {
     printf("CALL\n");
-    struct a_val *t = &a_baseof(pc, struct a_op, ls)->as_call.target;
-    A_DISPATCH(a_call(t, pc, true));
+    struct a_call_op *call = &a_baseof(pc, struct a_op, ls)->as_call;
+    struct a_val *t = call->target;
+    if (t == NULL) { t = a_pop(self); }
+
+    if (t == NULL) {
+      a_fail("Missing call target");
+      return false;
+    }
+
+    pc = a_call(t, pc, true);
+
+    if (!call->target) {
+      a_val_deref(t);
+      a_free(&self->val_pool, t);
+    }
+    
+    A_DISPATCH(pc);
   }
   
  LOAD: {
@@ -99,6 +114,8 @@ void a_eval(struct a_vm *self, a_pc pc) {
     printf("STOP\n");
     // Done!
   }
+
+  return true;
 }
 
 struct a_scope *a_scope(struct a_vm *self) {

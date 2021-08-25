@@ -39,7 +39,7 @@ void a_vm_deinit(struct a_vm *self);
 
 a_pc a_next_pc(struct a_vm *self);
 struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type);
-void a_eval(struct a_vm *self, a_pc pc);
+bool a_eval(struct a_vm *self, a_pc pc);
 
 struct a_scope *a_scope(struct a_vm *self);
 
