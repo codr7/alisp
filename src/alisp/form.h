@@ -15,6 +15,7 @@ enum a_form_type {A_CALL_FORM, A_ID_FORM, A_LITERAL_FORM};
 struct a_call_form {
   struct a_form *target;
   struct a_ls args;
+  uint8_t arg_count;
 };
 
 struct a_id_form {

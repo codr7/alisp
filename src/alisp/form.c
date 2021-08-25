@@ -80,7 +80,7 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
     }
 
     if (t->type == &vm->abc.prim_type) {
-      return a_prim_call(t->as_prim, vm, &self->as_call.args); 
+      return a_prim_call(t->as_prim, vm, &self->as_call.args, self->as_call.arg_count); 
     } else {
       a_ls_do(&self->as_call.args, als) {
 	if (!a_form_emit(a_baseof(als, struct a_form, ls), vm)) { return false; }
