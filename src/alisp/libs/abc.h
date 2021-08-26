@@ -6,7 +6,7 @@
 
 struct a_abc_lib {
   struct a_lib lib;
-  struct a_type func_type, int_type, meta_type, prim_type, reg_type;
+  struct a_type func_type, ls_type, int_type, meta_type, prim_type, reg_type;
 };
 
 struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm);

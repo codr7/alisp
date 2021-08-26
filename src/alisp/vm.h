@@ -14,6 +14,7 @@
 
 #define A_BINDING_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_OP_PAGE_SIZE A_DEFAULT_PAGE_SIZE
+#define A_PRIM_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_SCOPE_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_STRING_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_VAL_PAGE_SIZE A_DEFAULT_PAGE_SIZE
@@ -22,7 +23,7 @@
 
 struct a_vm {
   struct a_pool pool;
-  struct a_pool binding_pool, op_pool, scope_pool, string_pool, val_pool;
+  struct a_pool binding_pool, op_pool, prim_pool, scope_pool, string_pool, val_pool;
 
   a_type_id next_type_id;
   struct a_abc_lib abc;

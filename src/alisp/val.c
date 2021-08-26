@@ -20,3 +20,9 @@ void a_copy(struct a_val *self, struct a_val *source) {
   assert(self->type->copy_val);
   self->type->copy_val(self, source);
 }
+
+bool a_true(struct a_val *self) {
+  assert(self->type->true_val);
+  return self->type->true_val(self);
+}
+

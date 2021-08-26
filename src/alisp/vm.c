@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include "alisp/fail.h"
+#include "alisp/prim.h"
 #include "alisp/scope.h"
 #include "alisp/string.h"
 #include "alisp/vm.h"
@@ -9,6 +10,7 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_pool_init(&self->pool, NULL, 1, A_PAGE_SIZE);
   a_pool_init(&self->binding_pool, &self->pool, A_BINDING_PAGE_SIZE, sizeof(struct a_binding));
   a_pool_init(&self->op_pool, &self->pool, A_OP_PAGE_SIZE, sizeof(struct a_op));
+  a_pool_init(&self->prim_pool, &self->pool, A_PRIM_PAGE_SIZE, sizeof(struct a_prim));
   a_pool_init(&self->scope_pool, &self->pool, A_SCOPE_PAGE_SIZE, sizeof(struct a_scope));
   a_pool_init(&self->string_pool, &self->pool, A_STRING_PAGE_SIZE, sizeof(struct a_string) + 10);
   a_pool_init(&self->val_pool, &self->pool, A_VAL_PAGE_SIZE, sizeof(struct a_val));
@@ -44,12 +46,13 @@ void a_vm_deinit(struct a_vm *self) {
   a_pool_deref(&self->val_pool);
   a_pool_deref(&self->string_pool);
   a_pool_deref(&self->scope_pool);
+  a_pool_deref(&self->prim_pool);
   a_pool_deref(&self->op_pool);
   a_pool_deref(&self->binding_pool);
   a_pool_deref(&self->pool);
 }
 
-a_pc a_next_pc(struct a_vm *self) { return self->code.next; }
+a_pc a_next_pc(struct a_vm *self) { return self->code.prev; }
 
 struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
   struct a_op *op = a_op_init(a_malloc(&self->op_pool, sizeof(struct a_op)), op_type);
@@ -61,9 +64,21 @@ struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
   goto *dispatch[a_baseof((pc = prev->next), struct a_op, ls)->type]
 
 bool a_eval(struct a_vm *self, a_pc pc) {
-  static const void* dispatch[] = {&&STOP, &&CALL, &&LOAD, &&PUSH, &&STORE};
+  static const void* dispatch[] = {&&STOP, &&BRANCH, &&CALL, &&GOTO, &&LOAD, &&PUSH, &&STORE};
   A_DISPATCH(pc);
 
+ BRANCH: {
+    printf("BRANCH\n");
+    struct a_val *c = a_pop(self);
+
+    if (c == NULL) {
+      a_fail("Missing branch condition");
+      return false;
+    }
+
+    return a_true(c) ? pc : a_baseof(pc, struct a_op, ls)->as_branch.right_pc;
+  }
+  
  CALL: {
     printf("CALL\n");
     struct a_call_op *call = &a_baseof(pc, struct a_op, ls)->as_call;
@@ -83,6 +98,11 @@ bool a_eval(struct a_vm *self, a_pc pc) {
     }
     
     A_DISPATCH(pc);
+  }
+
+ GOTO: {
+    printf("GOTO\n");
+    A_DISPATCH(a_baseof(pc, struct a_op, ls)->as_goto.pc);
   }
   
  LOAD: {

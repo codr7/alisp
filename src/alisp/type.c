@@ -4,6 +4,8 @@
 #include "alisp/type.h"
 #include "alisp/vm.h"
 
+static bool true_val(struct a_val *val) { return true; }
+
 struct a_type *a_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super_types[]) {
   self->vm = vm;
   assert(vm->next_type_id < A_MAX_TYPE_ID);
@@ -24,6 +26,7 @@ struct a_type *a_type_init(struct a_type *self, struct a_vm *vm, struct a_string
   self->call_val = NULL;
   self->copy_val = NULL;
   self->deref_val = NULL;
+  self->true_val = true_val;
   return self;
 }
 

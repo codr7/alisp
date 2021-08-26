@@ -15,6 +15,8 @@ void a_op_deinit(struct a_op *self) {
   case A_PUSH_OP:
     a_val_deref(&self->as_push.val);
     break;
+  case A_BRANCH_OP:
+  case A_GOTO_OP:
   case A_LOAD_OP:
   case A_STOP_OP:
   case A_STORE_OP:

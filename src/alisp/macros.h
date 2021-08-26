@@ -12,7 +12,7 @@
     })								\
 
 #define a_baseof(p, t, m) ({			\
-      uint8_t *_p = (uint8_t *)p;		\
+      uint8_t *_p = (uint8_t *)(p);		\
       _p ? ((t *)(_p - offsetof(t, m))) : NULL;	\
     })
 

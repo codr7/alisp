@@ -27,5 +27,6 @@ bool a_val_deref(struct a_val *self);
 
 a_pc a_call(struct a_val *self, a_pc ret, bool check);
 void a_copy(struct a_val *self, struct a_val *source);
+bool a_true(struct a_val *self);
 
 #endif

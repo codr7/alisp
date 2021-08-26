@@ -1,9 +1,3 @@
-* add if-prim
-* add vm.form_pool
-* add inc/dec funcs to core lib
-* add math lib with add/sub/ funcs
-* add a_lib_import(lib)
-** bind all in current scope
 * add parser
 * add repl
 * add a_dump()
@@ -13,6 +7,18 @@
 ** add a_stack_dump(ls *self, stream *out);
 *** add stack.h/c
 *** extract push/pop/peek
+* --
+* add a_frame struct
+** add vm.frames ls
+** add return op
+*** pop frame
+* remove a_func.vm field
+** pass args instead
+* add vm.form_pool
+* add inc/dec funcs to core lib
+* add math lib with add/sub/ funcs
+* add a_lib_import(lib)
+** bind all in current scope
 * fib
 * ---
 * add stack_type
@@ -29,12 +35,5 @@
 ** add slot data struct 
 *** move ls field
 
-Jag kommer aldrig kunna glömma dig, vackra underbara; aldrig kunna glömma vår kärlek.
-Och det gör ont att se dig fångad i din rädsla, jag vet vart den vägen leder.
-Men det är som det är, alla har rätt att göra sina egna val.
-
-Du kommer aldrig vinna Sara; det finns inga vinnare i din lek, alla har redan förlorat.
-
-Det går inte att kontrollera riktig kärlek, det är som eld och vatten, det var alltid där bråket startade.
-
-
+(func fibrec [n:Int] [Int]
+  (if (< $n 2) $n (+ (fibrec (dec $n)) (fibrec (- $n 2)))))
