@@ -20,6 +20,7 @@ struct a_type {
   a_pc (*call_val)(struct a_val *val, a_pc ret, bool check);
   void (*copy_val)(struct a_val *dst, struct a_val *src);
   bool (*deref_val)(struct a_val *val);
+  void (*dump_val)(struct a_val *val);
   bool (*true_val)(struct a_val *val);
 };
 

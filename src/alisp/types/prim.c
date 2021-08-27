@@ -9,6 +9,8 @@ static void copy_val(struct a_val *dst, struct a_val *src) {
   dst->as_prim = a_prim_ref(src->as_prim);
 }
 
+static void dump_val(struct a_val *val) { printf("Prim(%p)", val->as_prim); }
+
 static bool deref_val(struct a_val *val) {
   return a_prim_deref(val->as_prim);
 }
@@ -19,6 +21,7 @@ struct a_type *a_prim_type_init(struct a_type *self,
 				struct a_type *super_types[]) {
   a_type_init(self, vm, name, super_types);
   self->copy_val = copy_val;
+  self->dump_val = dump_val;
   self->deref_val = deref_val;
   return self;
 }

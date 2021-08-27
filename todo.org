@@ -1,29 +1,20 @@
-* add parser
-* add repl
-* add a_dump()
-** add a_stream
-** add type.dump_val
-*** implement for all types
-** add a_stack_dump(ls *self, stream *out);
-*** add stack.h/c
-*** extract push/pop/peek
-* --
-* add a_frame struct
-** add vm.frames ls
-** add return op
-*** pop frame
+* finish repl
+** add literal form / int parser
+** add (reset) prim
+** commit
 * remove a_func.vm field
 ** pass args instead
-* add vm.form_pool
+* add func prim
+** add ls form / parser
+** add return op
+*** pop frame
+** add a_frame struct
+*** add vm.frames ls
 * add inc/dec funcs to core lib
 * add math lib with add/sub/ funcs
-* add a_lib_import(lib)
-** bind all in current scope
+* add bench prim
 * fib
 * ---
-* add stack_type
-** use val/ls
-** add ls_pool
 * ---
 * add a_pool.full_pages
 ** rename pages to used_pages

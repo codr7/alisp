@@ -1,4 +1,5 @@
 #include "alisp/binding.h"
+#include "alisp/fail.h"
 #include "alisp/func.h"
 #include "alisp/lib.h"
 #include "alisp/prim.h"
@@ -43,4 +44,22 @@ struct a_prim *a_lib_bind_prim(struct a_lib *self, struct a_prim *prim) {
 struct a_type *a_lib_bind_type(struct a_lib *self, struct a_type *type) {
   a_lib_bind(self, type->name, &self->vm->abc.meta_type)->as_meta = type;
   return type;
+}
+
+bool a_lib_import(struct a_lib *self) {
+  struct a_scope *s = a_scope(self->vm);
+
+  a_ls_do(&self->bindings.items, ls) {
+    struct a_binding *src = a_baseof(a_baseof(ls, struct a_val, ls), struct a_binding, val);
+    struct a_val *dst = a_scope_bind(s, src->key, src->val.type);
+
+    if (!dst) {
+      a_fail("Failed importing: %s", src->key->data);
+      return false;
+    }
+
+    a_copy(dst, &src->val);
+  }
+
+  return true;
 }

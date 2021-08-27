@@ -10,7 +10,7 @@ struct a_form;
 struct a_string;
 struct a_vm;
 
-enum a_form_type {A_CALL_FORM, A_ID_FORM, A_LITERAL_FORM};
+enum a_form_type {A_CALL_FORM, A_ID_FORM, A_LITERAL_FORM, A_NOP_FORM};
  
 struct a_call_form {
   struct a_form *target;

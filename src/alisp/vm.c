@@ -1,26 +1,30 @@
 #include <assert.h>
 #include <stdio.h>
 #include "alisp/fail.h"
+#include "alisp/form.h"
 #include "alisp/prim.h"
 #include "alisp/scope.h"
+#include "alisp/stack.h"
 #include "alisp/string.h"
 #include "alisp/vm.h"
 
 struct a_vm *a_vm_init(struct a_vm *self) {
   a_pool_init(&self->pool, NULL, 1, A_PAGE_SIZE);
   a_pool_init(&self->binding_pool, &self->pool, A_BINDING_PAGE_SIZE, sizeof(struct a_binding));
+  a_pool_init(&self->form_pool, &self->pool, A_FORM_PAGE_SIZE, sizeof(struct a_form));
   a_pool_init(&self->op_pool, &self->pool, A_OP_PAGE_SIZE, sizeof(struct a_op));
   a_pool_init(&self->prim_pool, &self->pool, A_PRIM_PAGE_SIZE, sizeof(struct a_prim));
   a_pool_init(&self->scope_pool, &self->pool, A_SCOPE_PAGE_SIZE, sizeof(struct a_scope));
   a_pool_init(&self->string_pool, &self->pool, A_STRING_PAGE_SIZE, sizeof(struct a_string) + 10);
   a_pool_init(&self->val_pool, &self->pool, A_VAL_PAGE_SIZE, sizeof(struct a_val));
   self->next_type_id = 0;
-  a_abc_lib_init(&self->abc, self);
   a_ls_init(&self->code);
   a_scope_init(&self->main, self, NULL);
   a_ls_init(&self->scopes);
   a_ls_push(&self->scopes, &self->main.ls);
   a_ls_init(&self->stack);
+  a_abc_lib_init(&self->abc, self);
+  a_lib_import(&self->abc.lib);
   return self;
 }
 
@@ -48,6 +52,7 @@ void a_vm_deinit(struct a_vm *self) {
   a_pool_deref(&self->scope_pool);
   a_pool_deref(&self->prim_pool);
   a_pool_deref(&self->op_pool);
+  a_pool_deref(&self->form_pool);
   a_pool_deref(&self->binding_pool);
   a_pool_deref(&self->pool);
 }
@@ -60,100 +65,8 @@ struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
   return op;
 }
 
-#define A_DISPATCH(prev)						\
-  goto *dispatch[a_baseof((pc = prev->next), struct a_op, ls)->type]
-
-bool a_eval(struct a_vm *self, a_pc pc) {
-  static const void* dispatch[] = {&&STOP, &&BRANCH, &&CALL, &&GOTO, &&LOAD, &&PUSH, &&STORE};
-  A_DISPATCH(pc);
-
- BRANCH: {
-    printf("BRANCH\n");
-    struct a_val *c = a_pop(self);
-
-    if (c == NULL) {
-      a_fail("Missing branch condition");
-      return false;
-    }
-
-    return a_true(c) ? pc : a_baseof(pc, struct a_op, ls)->as_branch.right_pc;
-  }
-  
- CALL: {
-    printf("CALL\n");
-    struct a_call_op *call = &a_baseof(pc, struct a_op, ls)->as_call;
-    struct a_val *t = call->target;
-    if (t == NULL) { t = a_pop(self); }
-
-    if (t == NULL) {
-      a_fail("Missing call target");
-      return false;
-    }
-
-    pc = a_call(t, pc, true);
-
-    if (!call->target) {
-      a_val_deref(t);
-      a_free(&self->val_pool, t);
-    }
-    
-    A_DISPATCH(pc);
-  }
-
- GOTO: {
-    printf("GOTO\n");
-    A_DISPATCH(a_baseof(pc, struct a_op, ls)->as_goto.pc);
-  }
-  
- LOAD: {
-    printf("LOAD\n");
-    struct a_val *v = self->regs + a_baseof(pc, struct a_op, ls)->as_load.reg;
-    a_copy(a_push(self, v->type), v);
-    A_DISPATCH(pc);
-  }
-  
- PUSH: {
-    printf("PUSH\n");
-    struct a_val
-      *src = &a_baseof(pc, struct a_op, ls)->as_push.val,
-      *dst = a_push(self, src->type);
-    a_copy(dst, src);
-    A_DISPATCH(pc);
-  }
-
- STORE: {
-    printf("STORE\n");
-    struct a_val *v = a_pop(self);
-    if (!v) { a_fail("Missing value to store"); }
-    self->regs[a_baseof(pc, struct a_op, ls)->as_load.reg] = *v;
-    a_free(&self->val_pool, v);
-    A_DISPATCH(pc);
-  }
-  
- STOP: {
-    printf("STOP\n");
-    // Done!
-  }
-
-  return true;
-}
-
 struct a_scope *a_scope(struct a_vm *self) {
   return a_baseof(self->scopes.next, struct a_scope, ls);
-}
-
-struct a_val *a_push(struct a_vm *self, struct a_type *type) {
-  struct a_val *v = a_val_init(a_malloc(&self->val_pool, sizeof(struct a_val)), type);
-  a_ls_push(&self->stack, &v->ls);
-  return v;
-}
-
-struct a_val *a_peek(struct a_vm *self) {
-  return a_ls_null(&self->stack) ? NULL : a_baseof(self->stack.prev, struct a_val, ls);
-}
-
-struct a_val *a_pop(struct a_vm *self) {
-  return a_ls_null(&self->stack) ? NULL : a_baseof(a_ls_pop(self->stack.prev), struct a_val, ls);
 }
 
 a_reg a_bind_reg(struct a_vm *self, struct a_string *key) {

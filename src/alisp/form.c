@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <ctype.h>
 #include "alisp/fail.h"
 #include "alisp/form.h"
 #include "alisp/prim.h"
@@ -15,10 +16,11 @@ struct a_form *a_form_init(struct a_form *self, enum a_form_type type, struct a_
     self->as_call.target = NULL;
     a_ls_init(&self->as_call.args);
     break;
-  case A_LITERAL_FORM:
-    break;
   case A_ID_FORM:
     self->as_id.name = NULL;
+    break;
+  case A_LITERAL_FORM:
+  case A_NOP_FORM:
     break;
   }
 
@@ -43,6 +45,7 @@ bool a_form_deref(struct a_form *self) {
     a_val_deref(&self->as_literal.val);
     break;
   case A_ID_FORM:
+  case A_NOP_FORM:
     break;
   }
 
@@ -53,13 +56,15 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
   switch (self->type) {
   case A_LITERAL_FORM:
     return &self->as_literal.val;
-  case A_CALL_FORM:
-    break;
   case A_ID_FORM: {
     struct a_val *v = a_scope_find(a_scope(vm), self->as_id.name);
     if (v != NULL && v->type != &vm->abc.reg_type) { return v; }
     break;
-  }}
+  }
+  case A_CALL_FORM:
+  case A_NOP_FORM:
+    break;
+  }
 
   return NULL;
 }
@@ -101,27 +106,41 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
     
     break;
   }
+
   case A_ID_FORM: {
-    struct a_val *v = a_scope_find(a_scope(vm), self->as_id.name);
+    struct a_string *id = self->as_id.name;
+
+    if (id->length == 2 && id->data[0] == '$' && isdigit(id->data[1])) {
+      a_emit(vm, A_COPY_OP)->as_copy.offset = id->data[1] - '0';
+      break;
+    }
     
+    struct a_val *v = a_scope_find(a_scope(vm), id);
+
     if (v == NULL) {
-      a_fail("Unknown symbol: %s", self->as_id.name->data);
+      a_fail("Unknown symbol: %s", id->data);
       return false;
     }
-
+    
     if (v->type == &vm->abc.reg_type) {
       a_emit(vm, A_LOAD_OP)->as_load.reg = v->as_reg;
     } else {
-      a_copy(&a_emit(vm, A_PUSH_OP)->as_push.val, v);
+      struct a_val *dst = a_val_init(&a_emit(vm, A_PUSH_OP)->as_push.val, v->type);
+      a_copy(dst, v);
     }
-    
-    break;
-  }
-  case A_LITERAL_FORM:
-    a_copy(&a_emit(vm, A_PUSH_OP)->as_push.val, &self->as_literal.val);
+
     break;
   }
 
+  case A_LITERAL_FORM:
+    a_copy(&a_emit(vm, A_PUSH_OP)->as_push.val, &self->as_literal.val);
+    break;
+
+  case A_NOP_FORM:
+    break;
+  }
+
+    
   return true;
 }
 

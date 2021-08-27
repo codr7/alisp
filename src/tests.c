@@ -2,6 +2,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include "alisp/func.h"
+#include "alisp/stack.h"
 #include "alisp/string.h"
 #include "alisp/type.h"
 #include "alisp/types/int.h"

@@ -12,7 +12,6 @@ struct a_lset {
   a_lset_key key;
   a_compare compare;
   struct a_ls items;
-  a_lset_count count;
 };
 
 struct a_lset *a_lset_init(struct a_lset *self, a_lset_key key, a_compare compare);

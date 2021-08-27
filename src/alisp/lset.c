@@ -4,7 +4,6 @@ struct a_lset *a_lset_init(struct a_lset *self, a_lset_key key, a_compare compar
   self->key = key;
   self->compare = compare;
   a_ls_init(&self->items);
-  self->count = 0;
   return self;
 }
 

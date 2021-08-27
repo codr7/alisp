@@ -9,10 +9,13 @@
 #include "alisp/types.h"
 #include "alisp/val.h"
 
+#define A_VERSION 1
+
 #define A_PAGE_SIZE 32000
 #define A_DEFAULT_PAGE_SIZE 32
 
 #define A_BINDING_PAGE_SIZE A_DEFAULT_PAGE_SIZE
+#define A_FORM_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_OP_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_PRIM_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_SCOPE_PAGE_SIZE A_DEFAULT_PAGE_SIZE
@@ -23,7 +26,7 @@
 
 struct a_vm {
   struct a_pool pool;
-  struct a_pool binding_pool, op_pool, prim_pool, scope_pool, string_pool, val_pool;
+  struct a_pool binding_pool, form_pool, op_pool, prim_pool, scope_pool, string_pool, val_pool;
 
   a_type_id next_type_id;
   struct a_abc_lib abc;
@@ -43,10 +46,6 @@ struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type);
 bool a_eval(struct a_vm *self, a_pc pc);
 
 struct a_scope *a_scope(struct a_vm *self);
-
-struct a_val *a_push(struct a_vm *self, struct a_type *type);
-struct a_val *a_peek(struct a_vm *self);
-struct a_val *a_pop(struct a_vm *self);
 
 a_reg a_bind_reg(struct a_vm *self, struct a_string *key);
 

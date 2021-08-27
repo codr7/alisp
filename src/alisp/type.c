@@ -26,10 +26,9 @@ struct a_type *a_type_init(struct a_type *self, struct a_vm *vm, struct a_string
   self->call_val = NULL;
   self->copy_val = NULL;
   self->deref_val = NULL;
+  self->dump_val = NULL;
   self->true_val = true_val;
   return self;
 }
 
-bool a_isa(struct a_type *self, struct a_type *super) {
-  return self->super_types[super->id];
-}
+bool a_isa(struct a_type *self, struct a_type *super) { return self->super_types[super->id]; }

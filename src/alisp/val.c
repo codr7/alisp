@@ -17,8 +17,13 @@ a_pc a_call(struct a_val *self, a_pc ret, bool check) {
 }
 
 void a_copy(struct a_val *self, struct a_val *source) {
-  assert(self->type->copy_val);
-  self->type->copy_val(self, source);
+  assert(source->type->copy_val);
+  source->type->copy_val(self, source);
+}
+
+void a_dump(struct a_val *self) {
+  assert(self->type->dump_val);
+  self->type->dump_val(self);
 }
 
 bool a_true(struct a_val *self) {
