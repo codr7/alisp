@@ -6,7 +6,7 @@ aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom 
 ### the stack
 aLisp exposes the stack to a greater extent than what in common among Lisps.
 
-Atoms are pushed on the stack.
+Values are pushed on the stack.
 
 ```
   1 2 3
@@ -16,7 +16,7 @@ Atoms are pushed on the stack.
 `_` may be specified where values are expected to pop the stack.
 
 ```
-  42 if _ 1 2
+  42 (if _ 1 2)
 ```
 
 `$0-9` may be used to copy the value at specified offset from the top.
