@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "alisp/fail.h"
 #include "alisp/stack.h"
+#include "alisp/string.h"
 #include "alisp/vm.h"
 
 #define A_DISPATCH(prev)						\
@@ -62,8 +63,25 @@ bool a_eval(struct a_vm *self, a_pc pc) {
  DROP: {
     printf("DROP\n");
     struct a_ls *vls = self->stack.prev;				   
+    int count = a_baseof(pc, struct a_op, ls)->as_drop.count;
 
-    for (int i = a_baseof(pc, struct a_op, ls)->as_drop.count; i > 0; vls = vls->prev, i--) {
+    if (count == -1) {
+      struct a_val *v = a_pop(self);
+
+      if (!v) {
+	a_fail("Missing drop count");
+	return false;
+      }
+
+      if (v->type != &self->abc.int_type) {
+	a_fail("Invalid drop count: %s", v->type->name->data);
+	return false;
+      }
+
+      count = v->as_int;
+    }
+    
+    for (int i = count; i > 0; vls = vls->prev, i--) {
       if (vls == &self->stack) {
 	a_fail("Not enough values on stack: %d", i);
 	return false;

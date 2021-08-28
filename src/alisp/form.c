@@ -20,6 +20,10 @@ struct a_form *a_form_init(struct a_form *self, enum a_form_type type, struct a_
   case A_ID_FORM:
     self->as_id.name = NULL;
     break;
+  case A_LS_FORM:
+    a_ls_init(&self->as_ls.items);
+    self->as_ls.val = NULL;
+    break;
   case A_LITERAL_FORM:
   case A_NOP_FORM:
     break;
@@ -33,17 +37,26 @@ struct a_form *a_form_ref(struct a_form *self) {
   return self;
 }
 
-bool a_form_deref(struct a_form *self) {
+bool a_form_deref(struct a_form *self, struct a_vm *vm) {
   assert(self->ref_count);
   if (--self->ref_count) { return false; }  
 
   switch (self->type) {
   case A_CALL_FORM:
-    a_form_deref(self->as_call.target);
-    a_ls_do(&self->as_call.args, als) { a_form_deref(a_baseof(als, struct a_form, ls)); }
+    a_form_deref(self->as_call.target, vm);
+    a_ls_do(&self->as_call.args, ls) { a_form_deref(a_baseof(ls, struct a_form, ls), vm); }
     break;
   case A_LITERAL_FORM:
     a_val_deref(&self->as_literal.val);
+    break;
+  case A_LS_FORM:    
+    a_ls_do(&self->as_ls.items, ls) { a_form_deref(a_baseof(ls, struct a_form, ls), vm); }
+
+    if (self->as_ls.val) {
+      a_val_deref(self->as_ls.val);
+      a_free(&vm->ls_pool, self->as_ls.val);
+    }
+
     break;
   case A_ID_FORM:
   case A_NOP_FORM:
@@ -57,11 +70,44 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
   switch (self->type) {
   case A_LITERAL_FORM:
     return &self->as_literal.val;
+
   case A_ID_FORM: {
     struct a_val *v = a_scope_find(a_scope(vm), self->as_id.name);
     if (v != NULL && v->type != &vm->abc.reg_type) { return v; }
     break;
   }
+    
+  case A_LS_FORM: {
+    if (self->as_ls.val) { return self->as_ls.val; }
+    bool literal = true;
+
+    a_ls_do(&self->as_ls.items, ls) {
+      if (!a_form_val(a_baseof(ls, struct a_form, ls), vm)) {
+	literal = false;
+	break;
+      }
+    }
+
+    if (literal) {
+      struct a_ls *out = a_malloc(&vm->ls_pool, sizeof(struct a_ls));
+      a_ls_init(out);
+
+      a_ls_do(&self->as_ls.items, ls) {
+	struct a_val *src = a_form_val(a_baseof(ls, struct a_form, ls), vm);
+	struct a_val *dst = a_val(vm, src->type);
+	a_copy(dst, src);
+	a_ls_push(out, &dst->ls);
+      }
+	
+      struct a_val *v = a_val(vm, &vm->abc.ls_type);
+      v->as_ls = out;
+      self->as_ls.val = v;
+      return v;
+    }
+
+    break;
+  }
+    
   case A_CALL_FORM:
   case A_NOP_FORM:
     break;
@@ -139,6 +185,18 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
   case A_LITERAL_FORM: {
     struct a_val *v = &self->as_literal.val;
     a_copy(a_val_init(&a_emit(vm, A_PUSH_OP)->as_push.val, v->type), v);
+    break;
+  }
+
+  case A_LS_FORM: {
+    struct a_val *v = a_form_val(self, vm);
+
+    if (v) {
+      a_copy(a_val_init(&a_emit(vm, A_PUSH_OP)->as_push.val, v->type), v);
+    } else {
+      a_fail("Dynamic ls emit is not implemented yet");
+    }
+    
     break;
   }
     

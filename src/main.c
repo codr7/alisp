@@ -19,6 +19,7 @@ int main() {
   a_parser_add_prefix(&parser, a_skip_space);
   a_parser_add_prefix(&parser, a_parse_int);
   a_parser_add_prefix(&parser, a_parse_call);
+  a_parser_add_prefix(&parser, a_parse_ls);
   a_parser_add_prefix(&parser, a_parse_id);
   
   while (!feof(stdin)) {
@@ -35,7 +36,7 @@ int main() {
     
     while ((f = a_parser_pop(&parser))) {
       a_form_emit(f, &vm);
-      a_form_deref(f);
+      a_form_deref(f, &vm);
     }
     
     if (a_next_pc(&vm) != pc) {

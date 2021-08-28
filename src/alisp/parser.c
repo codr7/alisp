@@ -23,7 +23,7 @@ void a_parser_deinit(struct a_parser *self) {
 
   a_ls_do(&self->forms, ls) {
     struct a_form *f = a_baseof(ls, struct a_form, ls);
-    if (a_form_deref(f)) { a_free(&self->vm->form_pool, f); }
+    if (a_form_deref(f, self->vm)) { a_free(&self->vm->form_pool, f); }
   }
 }
 

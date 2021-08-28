@@ -1,6 +1,12 @@
 #include <assert.h>
+#include "alisp/pool.h"
 #include "alisp/type.h"
 #include "alisp/val.h"
+#include "alisp/vm.h"
+
+struct a_val *a_val(struct a_vm *vm, struct a_type *type) {
+  return a_val_init(a_malloc(&vm->val_pool, sizeof(struct a_val)), type);
+}
 
 struct a_val *a_val_init(struct a_val *self, struct a_type *type) {
   self->type = type;

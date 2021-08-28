@@ -12,6 +12,7 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_pool_init(&self->pool, NULL, 1, A_PAGE_SIZE);
   a_pool_init(&self->binding_pool, &self->pool, A_BINDING_PAGE_SIZE, sizeof(struct a_binding));
   a_pool_init(&self->form_pool, &self->pool, A_FORM_PAGE_SIZE, sizeof(struct a_form));
+  a_pool_init(&self->ls_pool, &self->pool, A_LS_PAGE_SIZE, sizeof(struct a_ls));
   a_pool_init(&self->op_pool, &self->pool, A_OP_PAGE_SIZE, sizeof(struct a_op));
   a_pool_init(&self->prim_pool, &self->pool, A_PRIM_PAGE_SIZE, sizeof(struct a_prim));
   a_pool_init(&self->scope_pool, &self->pool, A_SCOPE_PAGE_SIZE, sizeof(struct a_scope));
@@ -52,6 +53,7 @@ void a_vm_deinit(struct a_vm *self) {
   a_pool_deref(&self->scope_pool);
   a_pool_deref(&self->prim_pool);
   a_pool_deref(&self->op_pool);
+  a_pool_deref(&self->ls_pool);
   a_pool_deref(&self->form_pool);
   a_pool_deref(&self->binding_pool);
   a_pool_deref(&self->pool);

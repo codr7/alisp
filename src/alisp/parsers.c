@@ -62,7 +62,7 @@ struct a_form *a_parse_call(struct a_parser *self) {
     struct a_form *f = a_parser_pop_next(self);
       
     if (!f) {
-      a_form_deref(cf);
+      a_form_deref(cf, self->vm);
       a_free(&self->vm->form_pool, cf);
       a_fail("Open call form");
       return NULL;
@@ -143,6 +143,46 @@ struct a_form *a_parse_int(struct a_parser *self) {
 
    if (self->pos.column == fpos.column) { return NULL; }
    struct a_form *f = a_parser_push(self, A_LITERAL_FORM, fpos);
-   a_val_init(&f->as_literal.val, &self->vm->abc.int_type)->as_int = v;
+   a_val_init(&f->as_literal.val, &self->vm->abc.int_type)->as_int = neg ? -v : v;
    return f;
+}
+
+struct a_form *a_parse_ls(struct a_parser *self) {
+  struct a_pos fpos = self->pos;
+  char c = a_stream_getc(&self->in);
+  if (!c) { return NULL; }
+
+  if (c != '[') {
+    a_stream_ungetc(&self->in);
+    return NULL;
+  }
+
+  self->pos.column++;
+  struct a_form *lsf = a_malloc(&self->vm->form_pool, sizeof(struct a_form));
+  a_form_init(lsf, A_LS_FORM, fpos);
+
+  while (true) {
+    a_skip_space(self);
+    c = a_stream_getc(&self->in);
+
+    if (c == ']') {
+      self->pos.column++;
+      break;
+    }
+
+    if (c) { a_stream_ungetc(&self->in); }
+    struct a_form *f = a_parser_pop_next(self);
+      
+    if (!f) {
+      a_form_deref(lsf, self->vm);
+      a_free(&self->vm->form_pool, lsf);
+      a_fail("Open ls form");
+      return NULL;
+    }
+
+    a_ls_push(&lsf->as_ls.items, &f->ls);
+  }
+
+  a_ls_push(&self->forms, &lsf->ls);
+  return lsf;
 }

@@ -7,6 +7,7 @@
 struct a_func;
 struct a_prim;
 struct a_type;
+struct a_vm;
 
 struct a_val {
   struct a_ls ls;
@@ -23,6 +24,7 @@ struct a_val {
   };
 };
 
+struct a_val *a_val(struct a_vm *vm, struct a_type *type);
 struct a_val *a_val_init(struct a_val *self, struct a_type *type);
 bool a_val_deref(struct a_val *self);
 
