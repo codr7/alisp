@@ -6,8 +6,6 @@
 *** add vm.frames ls
 ** add return op
 *** pop frame
-* add inc/dec funcs to core lib
-* add math lib with add/sub/ funcs
 * add bench prim
 * fib
 * ---

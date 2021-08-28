@@ -65,7 +65,8 @@ The stack may be thought of as the default list, separate lists may be created b
 Values may be bound to identifiers using `let`, literals are automagically bound at compile time.
 
 ```
-  (let [x 35 y 7] (+ x y))
+  (let [x 35 y 7]
+    (+ x y))
 [42]
 ```
 
