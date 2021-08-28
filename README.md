@@ -61,7 +61,6 @@ The stack may be thought of as the default list, separate lists may be created b
 ```
 
 ### bindings
-
 Values may be bound to identifiers using `let`, literals are automagically bound at compile time.
 
 ```
@@ -83,8 +82,22 @@ Bindings may be aliased at compile time using `alias`.
 [Int Int]
 ```
 
-### types
+### booleans
+The boolean type has two values, `T` and `F`.
 
+```
+  (if F 1 2)
+[2]
+```
+
+Every value has a boolean representation; most are true but zero, empty lists etc. are false.
+
+```
+  (if [] 1 2)
+[2]
+```
+
+### types
 The following types are provided out of the box, adding more is trivial.
 
 - Bool - Boolean values
