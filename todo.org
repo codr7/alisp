@@ -1,3 +1,6 @@
+* add let prim
+** bind immediately if a_form_val
+** add bindings to readme
 * add func prim
 ** add ls form / parser
 ** add return op

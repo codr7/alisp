@@ -25,3 +25,14 @@ Values are pushed on the stack.
   1 2 3 $1
 [1 2 3 2]
 ```
+
+`d` may be used to drop values.
+
+```
+  1 2 3 (d)
+
+[1 2]
+
+  (d 2)
+[]
+```

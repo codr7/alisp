@@ -7,7 +7,7 @@
   goto *dispatch[a_baseof((pc = (prev)->next), struct a_op, ls)->type]
 
 bool a_eval(struct a_vm *self, a_pc pc) {
-  static const void* dispatch[] = {&&STOP, &&BRANCH, &&CALL, &&COPY, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&STORE};
+  static const void* dispatch[] = {&&STOP, &&BRANCH, &&CALL, &&COPY, &&DROP, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&STORE};
   A_DISPATCH(pc);
 
  BRANCH: {
@@ -56,6 +56,25 @@ bool a_eval(struct a_vm *self, a_pc pc) {
 
     struct a_val *v = a_baseof(vls, struct a_val, ls);
     a_copy(a_push(self, v->type), v);
+    A_DISPATCH(pc);    
+  }
+
+ DROP: {
+    printf("DROP\n");
+    struct a_ls *vls = self->stack.prev;				   
+
+    for (int i = a_baseof(pc, struct a_op, ls)->as_drop.count; i > 0; vls = vls->prev, i--) {
+      if (vls == &self->stack) {
+	a_fail("Not enough values on stack: %d", i);
+	return false;
+      }
+
+      a_ls_pop(vls);
+      struct a_val *v = a_baseof(vls, struct a_val, ls);
+      a_val_deref(v);
+      a_free(&self->val_pool, v);
+    }
+    
     A_DISPATCH(pc);    
   }
   

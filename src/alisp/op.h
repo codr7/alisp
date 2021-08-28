@@ -8,7 +8,7 @@ enum a_op_type {
   A_STOP_OP=0,
   A_BRANCH_OP,
   A_CALL_OP, A_COPY_OP,
-  A_GOTO_OP, A_LOAD_OP, A_PUSH_OP, A_RESET_OP, A_STORE_OP};
+  A_DROP_OP, A_GOTO_OP, A_LOAD_OP, A_PUSH_OP, A_RESET_OP, A_STORE_OP};
 
 struct a_branch_op {
   a_pc right_pc;
@@ -19,7 +19,11 @@ struct a_call_op {
 };
 
 struct a_copy_op {
-  int offset;
+  int8_t offset;
+};
+
+struct a_drop_op {
+  int8_t count;
 };
 
 struct a_goto_op {
@@ -46,6 +50,7 @@ struct a_op {
     struct a_branch_op as_branch;
     struct a_call_op as_call;
     struct a_copy_op as_copy;
+    struct a_drop_op as_drop;
     struct a_goto_op as_goto;
     struct a_load_op as_load;
     struct a_push_op as_push;

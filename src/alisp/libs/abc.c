@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "alisp/fail.h"
 #include "alisp/form.h"
 #include "alisp/libs/abc.h"
 #include "alisp/prim.h"
@@ -11,6 +12,39 @@
 #include "alisp/types/prim.h"
 #include "alisp/types/reg.h"
 #include "alisp/vm.h"
+
+static bool d_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  int count = 1;
+  
+  if (!a_ls_null(args)) {
+    struct a_form *a = a_baseof(args->next, struct a_form, ls);
+
+    if (a->type == A_LITERAL_FORM) {
+      struct a_val *v = &a->as_literal.val;
+
+      if (v->type != &vm->abc.int_type) {
+	a_fail("Invalid drop count: %s", v->type->name->data);
+	return false;
+      }
+
+      count = v->as_int;
+    } else {
+      a_form_emit(a, vm);
+      count = -1;
+    }
+  }
+  
+  a_emit(vm, A_DROP_OP)->as_drop.count = count;
+  return true;
+}
+
+static bool do_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  a_ls_do(args, a) {
+    if (!a_form_emit(a_baseof(a, struct a_form, ls), vm)) { return false; }
+  }
+
+  return true;
+}
 
 static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   struct a_ls *a = args->next;
@@ -29,14 +63,6 @@ static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uin
     skip_right->pc = a_next_pc(vm);
   } else {
     branch->right_pc = a_next_pc(vm);
-  }
-
-  return true;
-}
-
-static bool do_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
-  a_ls_do(args, a) {
-    if (!a_form_emit(a_baseof(a, struct a_form, ls), vm)) { return false; }
   }
 
   return true;
@@ -62,6 +88,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind(&self->lib, a_string(vm, "T"), &self->bool_type)->as_bool = true;
   a_lib_bind(&self->lib, a_string(vm, "F"), &self->bool_type)->as_bool = false;
 
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "d"), 0, 1))->body = d_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "do"), 0, -1))->body = do_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "if"), 2, 3))->body = if_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "reset"), 0, 0))->body = reset_body;
