@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include "alisp/fail.h"
 #include "alisp/form.h"
+#include "alisp/func.h"
 #include "alisp/libs/abc.h"
 #include "alisp/prim.h"
+#include "alisp/stack.h"
 #include "alisp/string.h"
 #include "alisp/types/bool.h"
 #include "alisp/types/func.h"
@@ -73,6 +75,36 @@ static bool do_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uin
   return true;
 }
 
+static a_pc equals_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
+  struct a_val *y = a_pop(vm), *x = a_pop(vm);
+  a_push(vm, &vm->abc.bool_type)->as_bool = a_equals(x, y);
+  a_val_deref(x);
+  a_free(&vm->val_pool, x);
+  a_val_deref(y);
+  a_free(&vm->val_pool, y);
+  return ret;
+}
+
+static a_pc lt_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
+  struct a_val *y = a_pop(vm), *x = a_pop(vm);
+  a_push(vm, &vm->abc.bool_type)->as_bool = a_compare(x, y) == A_LT;
+  a_val_deref(x);
+  a_free(&vm->val_pool, x);
+  a_val_deref(y);
+  a_free(&vm->val_pool, y);
+  return ret;
+}
+
+static a_pc gt_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
+  struct a_val *y = a_pop(vm), *x = a_pop(vm);
+  a_push(vm, &vm->abc.bool_type)->as_bool = a_compare(x, y) == A_GT;
+  a_val_deref(x);
+  a_free(&vm->val_pool, x);
+  a_val_deref(y);
+  a_free(&vm->val_pool, y);
+  return ret;
+}
+
 static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   struct a_ls *a = args->next;
   struct a_form *cond = a_baseof(a, struct a_form, ls);
@@ -93,6 +125,16 @@ static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uin
   }
 
   return true;
+}
+
+static a_pc is_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
+  struct a_val *y = a_pop(vm), *x = a_pop(vm);
+  a_push(vm, &vm->abc.bool_type)->as_bool = a_is(x, y);
+  a_val_deref(x);
+  a_free(&vm->val_pool, x);
+  a_val_deref(y);
+  a_free(&vm->val_pool, y);
+  return ret;
 }
 
 static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
@@ -156,23 +198,66 @@ static bool reset_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, 
 
 struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_init(&self->lib, vm, a_string(vm, "abc"));
+  a_lib_bind_type(&self->lib, a_type_init(&self->any_type, vm, a_string(vm, "Any"), (struct a_type *[]){NULL}));
   
-  a_lib_bind_type(&self->lib, a_bool_type_init(&self->bool_type, vm, a_string(vm, "Bool"), (struct a_type *[]){NULL}));
-  a_lib_bind_type(&self->lib, a_int_type_init(&self->int_type, vm, a_string(vm, "Int"), (struct a_type *[]){NULL}));
-  a_lib_bind_type(&self->lib, a_ls_type_init(&self->ls_type, vm, a_string(vm, "Ls"), (struct a_type *[]){NULL}));
-  a_lib_bind_type(&self->lib, a_meta_type_init(&self->meta_type, vm, a_string(vm, "Meta"), (struct a_type *[]){NULL}));
-  a_lib_bind_type(&self->lib, a_func_type_init(&self->func_type, vm, a_string(vm, "Func"), (struct a_type *[]){NULL}));
-  a_lib_bind_type(&self->lib, a_reg_type_init(&self->reg_type, vm, a_string(vm, "Reg"), (struct a_type *[]){NULL}));
-  a_lib_bind_type(&self->lib, a_prim_type_init(&self->prim_type, vm, a_string(vm, "Prim"), (struct a_type *[]){NULL}));
+  a_lib_bind_type(&self->lib, a_bool_type_init(&self->bool_type, vm, a_string(vm, "Bool"),
+					       A_SUPER(&self->any_type)));
+  
+  a_lib_bind_type(&self->lib, a_int_type_init(&self->int_type, vm, a_string(vm, "Int"),
+					      A_SUPER(&self->any_type)));
+  
+  a_lib_bind_type(&self->lib, a_ls_type_init(&self->ls_type, vm, a_string(vm, "Ls"),
+					     A_SUPER(&self->any_type)));
+  
+  a_lib_bind_type(&self->lib, a_meta_type_init(&self->meta_type, vm, a_string(vm, "Meta"),
+					       A_SUPER(&self->any_type)));
+  
+  a_lib_bind_type(&self->lib, a_func_type_init(&self->func_type, vm, a_string(vm, "Func"),
+					       A_SUPER(&self->any_type)));
+  
+  a_lib_bind_type(&self->lib, a_reg_type_init(&self->reg_type, vm, a_string(vm, "Reg"),
+					      A_SUPER(&self->any_type)));
+  
+  a_lib_bind_type(&self->lib, a_prim_type_init(&self->prim_type, vm, a_string(vm, "Prim"),
+					       A_SUPER(&self->any_type)));
   
   a_lib_bind(&self->lib, a_string(vm, "ALISP-VERSION"), &self->int_type)->as_int = A_VERSION;
   a_lib_bind(&self->lib, a_string(vm, "T"), &self->bool_type)->as_bool = true;
   a_lib_bind(&self->lib, a_string(vm, "F"), &self->bool_type)->as_bool = false;
 
+  a_lib_bind_func(&self->lib,
+		  a_func(vm, a_string(vm, "="),
+			 A_ARG(vm,
+			       {a_string(vm, "x"), &vm->abc.any_type},
+			       {a_string(vm, "y"), &vm->abc.any_type}),
+			 A_RET(vm, &vm->abc.bool_type)))->body = equals_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func(vm, a_string(vm, "<"),
+			 A_ARG(vm,
+			       {a_string(vm, "x"), &vm->abc.any_type},
+			       {a_string(vm, "y"), &vm->abc.any_type}),
+			 A_RET(vm, &vm->abc.bool_type)))->body = lt_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func(vm, a_string(vm, ">"),
+			 A_ARG(vm,
+			       {a_string(vm, "x"), &vm->abc.any_type},
+			       {a_string(vm, "y"), &vm->abc.any_type}),
+			 A_RET(vm, &vm->abc.bool_type)))->body = gt_body;
+
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "alias"), 2, 2))->body = alias_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "d"), 0, 1))->body = d_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "do"), 0, -1))->body = do_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "if"), 2, 3))->body = if_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func(vm, a_string(vm, "is"),
+			 A_ARG(vm,
+			       {a_string(vm, "x"), &vm->abc.any_type},
+			       {a_string(vm, "y"), &vm->abc.any_type}),
+			 A_RET(vm, &vm->abc.bool_type)))->body = is_body;
+
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "let"), 1, -1))->body = let_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "reset"), 0, 0))->body = reset_body;
   return self;

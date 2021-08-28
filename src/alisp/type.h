@@ -2,9 +2,13 @@
 #define ALISP_TYPE_H
 
 #include <stdbool.h>
+#include "alisp/compare.h"
 #include "alisp/types.h"
 
 #define A_MAX_TYPE_ID 32
+
+#define A_SUPER(...)				\
+  (struct a_type *[]){__VA_ARGS__}
 
 struct a_string;
 struct a_val;
@@ -18,9 +22,12 @@ struct a_type {
   struct a_string *name;
   struct a_type *super_types[A_MAX_TYPE_ID]; 
   a_pc (*call_val)(struct a_val *val, a_pc ret, bool check);
+  enum a_order (*compare_val)(struct a_val *x, struct a_val *y);
   void (*copy_val)(struct a_val *dst, struct a_val *src);
   bool (*deref_val)(struct a_val *val);
   void (*dump_val)(struct a_val *val);
+  bool (*equals_val)(struct a_val *x, struct a_val *y);
+  bool (*is_val)(struct a_val *x, struct a_val *y);
   bool (*true_val)(struct a_val *val);
 };
 

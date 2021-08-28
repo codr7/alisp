@@ -29,8 +29,11 @@ struct a_val *a_val_init(struct a_val *self, struct a_type *type);
 bool a_val_deref(struct a_val *self);
 
 a_pc a_call(struct a_val *self, a_pc ret, bool check);
+enum a_order a_compare(struct a_val *self, struct a_val *other);
 void a_copy(struct a_val *self, struct a_val *source);
 void a_dump(struct a_val *self);
+bool a_equals(struct a_val *self, struct a_val *other);
+bool a_is(struct a_val *self, struct a_val *other);
 bool a_true(struct a_val *self);
 
 #endif

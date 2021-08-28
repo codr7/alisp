@@ -18,6 +18,12 @@ Welcome to aLisp v2
 Return evaluates completed forms,
 (reset) clears the stack and Ctrl+D exits.
 
+  (func fibrec [n:Int] [Int]
+    (if (< n 2) n (+ (fibrec (- n 1)) (fibrec (- n 2)))))
+[]
+
+  (fibrec 10)
+[55]
 ```
 
 ### the stack
@@ -80,6 +86,21 @@ Bindings may be aliased at compile time using `alias`.
 
   foo
 [Int Int]
+```
+
+### equality
+`is` returns `T` if both arguments are the same value.
+
+```
+  (is [] [])
+[F]
+```
+
+`=` returns `T` if both arguments are equal.
+
+```
+  (is [] [])
+[T]
 ```
 
 ### booleans

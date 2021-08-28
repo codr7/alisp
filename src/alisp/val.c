@@ -22,6 +22,11 @@ a_pc a_call(struct a_val *self, a_pc ret, bool check) {
   return self->type->call_val(self, ret, check);
 }
 
+enum a_order a_compare(struct a_val *self, struct a_val *other) {
+  assert(self->type->compare_val);
+  return self->type->compare_val(self, other);
+}
+
 void a_copy(struct a_val *self, struct a_val *source) {
   assert(source->type->copy_val);
   source->type->copy_val(self, source);
@@ -30,6 +35,16 @@ void a_copy(struct a_val *self, struct a_val *source) {
 void a_dump(struct a_val *self) {
   assert(self->type->dump_val);
   self->type->dump_val(self);
+}
+
+bool a_equals(struct a_val *self, struct a_val *other) {
+  assert(self->type->equals_val);
+  return self->type->equals_val(self, other);
+}
+
+bool a_is(struct a_val *self, struct a_val *other) {
+  assert(self->type->is_val);
+  return self->type->is_val(self, other);
 }
 
 bool a_true(struct a_val *self) {

@@ -1,5 +1,3 @@
-* add math.lt/gt
-** add type.compare_vals/a_compare
 * add func prim
 ** add pair form / parser
 ** add a_frame struct

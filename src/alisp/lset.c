@@ -1,6 +1,6 @@
 #include "alisp/lset.h"
 
-struct a_lset *a_lset_init(struct a_lset *self, a_lset_key key, a_compare compare) {
+struct a_lset *a_lset_init(struct a_lset *self, a_lset_key key, a_compare_t compare) {
   self->key = key;
   self->compare = compare;
   a_ls_init(&self->items);

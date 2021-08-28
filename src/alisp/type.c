@@ -4,6 +4,8 @@
 #include "alisp/type.h"
 #include "alisp/vm.h"
 
+static bool equals_val(struct a_val *x, struct a_val *y) { return a_is(x, y); }
+
 static bool true_val(struct a_val *val) { return true; }
 
 struct a_type *a_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super_types[]) {
@@ -24,9 +26,12 @@ struct a_type *a_type_init(struct a_type *self, struct a_vm *vm, struct a_string
   }
   
   self->call_val = NULL;
+  self->compare_val = NULL;
   self->copy_val = NULL;
   self->deref_val = NULL;
   self->dump_val = NULL;
+  self->equals_val = equals_val;
+  self->is_val = NULL;
   self->true_val = true_val;
   return self;
 }
