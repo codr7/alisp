@@ -20,6 +20,7 @@ void a_op_deinit(struct a_op *self) {
   case A_GOTO_OP:
   case A_LOAD_OP:
   case A_STOP_OP:
+  case A_RESET_OP:
   case A_STORE_OP:
     break;
   }

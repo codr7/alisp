@@ -17,7 +17,8 @@ int main() {
   struct a_parser parser;
   a_parser_init(&parser, &vm, a_string(&vm, "repl"));
   a_parser_add_prefix(&parser, a_skip_space);
-  a_parser_add_prefix(&parser, a_parse_id_form);
+  a_parser_add_prefix(&parser, a_parse_int);
+  a_parser_add_prefix(&parser, a_parse_id);
   
   while (!feof(stdin)) {
     printf("  ");

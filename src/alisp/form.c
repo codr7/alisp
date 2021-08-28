@@ -132,10 +132,12 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
     break;
   }
 
-  case A_LITERAL_FORM:
-    a_copy(&a_emit(vm, A_PUSH_OP)->as_push.val, &self->as_literal.val);
+  case A_LITERAL_FORM: {
+    struct a_val *v = &self->as_literal.val;
+    a_copy(a_val_init(&a_emit(vm, A_PUSH_OP)->as_push.val, v->type), v);
     break;
-
+  }
+    
   case A_NOP_FORM:
     break;
   }

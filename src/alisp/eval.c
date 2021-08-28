@@ -7,7 +7,7 @@
   goto *dispatch[a_baseof((pc = prev->next), struct a_op, ls)->type]
 
 bool a_eval(struct a_vm *self, a_pc pc) {
-  static const void* dispatch[] = {&&STOP, &&BRANCH, &&CALL, &&COPY, &&GOTO, &&LOAD, &&PUSH, &&STORE};
+  static const void* dispatch[] = {&&STOP, &&BRANCH, &&CALL, &&COPY, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&STORE};
   A_DISPATCH(pc);
 
  BRANCH: {
@@ -80,6 +80,19 @@ bool a_eval(struct a_vm *self, a_pc pc) {
 
     a_copy(dst, src);
     A_DISPATCH(pc);
+  }
+
+ RESET: {
+    printf("RESET\n");
+
+    a_ls_do(&self->stack, ls) {
+      struct a_val *v = a_baseof(ls, struct a_val, ls);
+      a_val_deref(v);
+      a_free(&self->val_pool, v);
+    }
+
+    a_ls_init(&self->stack);
+    A_DISPATCH(pc);    
   }
 
  STORE: {
