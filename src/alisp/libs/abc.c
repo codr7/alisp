@@ -18,10 +18,9 @@ static bool d_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint
   
   if (!a_ls_null(args)) {
     struct a_form *a = a_baseof(args->next, struct a_form, ls);
+    struct a_val *v = a_form_val(a, vm);
 
-    if (a->type == A_LITERAL_FORM) {
-      struct a_val *v = &a->as_literal.val;
-
+    if (v) {
       if (v->type != &vm->abc.int_type) {
 	a_fail("Invalid drop count: %s", v->type->name->data);
 	return false;

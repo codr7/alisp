@@ -11,8 +11,8 @@ $ cd alisp
 $ mkdir build
 $ cd build
 $ cmake ..
-$ sudo make install
-$ alisp
+$ make
+$ ./alisp
 Welcome to aLisp v2
 
 Return evaluates completed forms,

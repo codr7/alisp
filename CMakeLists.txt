@@ -25,4 +25,4 @@ file(GLOB types_headers src/alisp/types/*.h)
 install(FILES ${types_headers} DESTINATION include/alisp/types)
 
 install(FILES build/libalisp.a DESTINATION lib)
-install(FILES build/alisp DESTINATION bin PERMISSIONS WORLD_EXECUTE) 
+install(FILES build/alisp DESTINATION bin PERMISSIONS WORLD_EXECUTE)
