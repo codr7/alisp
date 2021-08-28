@@ -7,8 +7,8 @@
 
 static a_pc call_val(struct a_val *val, a_pc ret, bool check) {
   struct a_func *f = val->as_func;
-  if (check && !a_func_applicable(f)) { a_fail("Func not applicable: %s", f->name->data); }
-  return a_func_call(f, ret);
+  if (check && !a_func_applicable(f, val->type->vm)) { a_fail("Func not applicable: %s", f->name->data); }
+  return a_func_call(f, val->type->vm, ret);
 }
 
 static void copy_val(struct a_val *dst, struct a_val *src) {
@@ -18,7 +18,7 @@ static void copy_val(struct a_val *dst, struct a_val *src) {
 static void dump_val(struct a_val *val) { printf("Func(%p)", val->as_func); }
 
 static bool deref_val(struct a_val *val) {
-  return a_func_deref(val->as_func);
+  return a_func_deref(val->as_func, val->type->vm);
 }
 
 struct a_type *a_func_type_init(struct a_type *self,

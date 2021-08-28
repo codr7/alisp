@@ -41,11 +41,11 @@ static void test_bind() {
   a_vm_deinit(&vm);
 }
 
-static a_pc test_func_foo_body(struct a_func *self, a_pc ret) {
-  struct a_val *y = a_pop(self->vm), *x = a_peek(self->vm);
+static a_pc test_func_foo_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
+  struct a_val *y = a_pop(vm), *x = a_peek(vm);
   x->as_int += y->as_int;
   a_val_deref(y);
-  a_free(&self->vm->val_pool, y);
+  a_free(&vm->val_pool, y);
   return ret;
 }
 
@@ -56,7 +56,7 @@ static void test_func() {
 
   struct a_func f;
   
-  a_func_init(&f, &vm, a_string(&vm, "foo"),
+  a_func_init(&f, a_string(&vm, "foo"),
 	      A_ARG(&vm,
 		    {a_string(&vm, "x"), &vm.abc.int_type},
 		    {a_string(&vm, "y"), &vm.abc.int_type}),
@@ -78,7 +78,7 @@ static void test_func() {
   assert(v->as_int == 42);
   a_val_deref(v);
   a_free(&vm.val_pool, v);
-  a_func_deref(&f);
+  a_func_deref(&f, &vm);
   a_vm_deinit(&vm);
 }
 

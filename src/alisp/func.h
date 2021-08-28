@@ -25,6 +25,8 @@
     rets;								\
   })
 
+struct a_vm;
+
 struct a_arg {
   struct a_string *name;
   struct a_type *type;
@@ -41,23 +43,21 @@ struct a_rets {
 };
 
 struct a_func {
-  struct a_vm *vm;
   struct a_string *name;
   struct a_args *args;
   struct a_rets *rets;
-  a_pc (*body)(struct a_func *self, a_pc ret);
+  a_pc (*body)(struct a_func *self, struct a_vm *vm, a_pc ret);
   a_ref_count ref_count;
 };
 
 struct a_func *a_func_init(struct a_func *self,
-			   struct a_vm *vm,
 			   struct a_string *name,
 			   struct a_args *args,
 			   struct a_rets *rets);
 
 struct a_func *a_func_ref(struct a_func *self);
-bool a_func_deref(struct a_func *self);
-bool a_func_applicable(struct a_func *self);
-a_pc a_func_call(struct a_func *self, a_pc ret);
+bool a_func_deref(struct a_func *self, struct a_vm *vm);
+bool a_func_applicable(struct a_func *self, struct a_vm *vm);
+a_pc a_func_call(struct a_func *self, struct a_vm *vm, a_pc ret);
 
 #endif

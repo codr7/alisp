@@ -1,5 +1,3 @@
-* remove a_func.vm field
-** pass args instead
 * add func prim
 ** add ls form / parser
 ** add return op
@@ -12,15 +10,9 @@
 * fib
 * ---
 * ---
-* add a_pool.full_pages
-** rename pages to used_pages
-** rename free to free_slots
 * sort a_pool.free_slots in size order
 ** bail out in malloc if > size
 ** insert where >=
-* use data as ls for slots
-** add slot data struct 
-*** move ls field
 
 (func fibrec [n:Int] [Int]
   (if (< $n 2) $n (+ (fibrec (dec $n)) (fibrec (- $n 2)))))
