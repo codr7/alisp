@@ -59,13 +59,6 @@ Values are pushed on the stack.
 []
 ```
 
-The stack may be thought of as the default list, separate lists may be created by surrounding code with brackets.
-
-```
-  [1 2 3]
-[[1 2 3]]
-```
-
 ### bindings
 Values may be bound to identifiers using `let`, literals are automagically bound at compile time.
 
@@ -99,7 +92,16 @@ Bindings may be aliased at compile time using `alias`.
 `=` returns `T` if both arguments are equal.
 
 ```
-  (is [] [])
+  (= [] [])
+[T]
+```
+
+### order
+
+`<` and `>` may be used to order values.
+
+```
+  (< [1 2 3] [1 2 4])
 [T]
 ```
 
@@ -116,6 +118,14 @@ Every value has a boolean representation; most are true but zero, empty lists et
 ```
   (if [] 1 2)
 [2]
+```
+
+### lists
+List literals may be specified by enclosing code in brackets.
+
+```
+  [1 2 3]
+[[1 2 3]]
 ```
 
 ### types
