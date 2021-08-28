@@ -47,7 +47,7 @@ bool a_eval(struct a_vm *self, a_pc pc) {
     printf("COPY\n");
     struct a_ls *vls = self->stack.prev;				   
 
-    for (int i = a_baseof(pc, struct a_op, ls)->as_copy.offset; i >= 0; vls = vls->prev, i--) {
+    for (int i = a_baseof(pc, struct a_op, ls)->as_copy.offset; i > 0; vls = vls->prev, i--) {
       if (vls == &self->stack) {
 	a_fail("Not enough values on stack: %d", i+1);
 	return false;
