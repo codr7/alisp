@@ -74,3 +74,15 @@ Any binding may be aliased at compile time using `alias`.
   foo
 [Int Int]
 ```
+
+### types
+
+The following types are provided out of the box, but it's trivial to add new ones.
+
+- Bool - Boolean values
+- Func - Functions as values
+- Int - Integer values
+- Ls - List values
+- Meta - Types as values
+- Prim - Primitives as values
+- Reg - Registers as values
