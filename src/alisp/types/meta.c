@@ -6,7 +6,7 @@
 
 static void copy_val(struct a_val *dst, struct a_val *src) { dst->as_meta = src->as_meta; }
 
-static void dump_val(struct a_val *val) { puts(val->as_meta->name->data); }
+static void dump_val(struct a_val *val) { printf("%s", val->as_meta->name->data); }
 
 struct a_type *a_meta_type_init(struct a_type *self,
 				struct a_vm *vm,

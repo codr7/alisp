@@ -47,7 +47,6 @@ Values are pushed on the stack.
 
 ```
   1 2 3 (d)
-
 [1 2]
 
   (d 2)
@@ -59,4 +58,19 @@ The stack may be thought of as the default list, separate lists may be created b
 ```
   [1 2 3]
 [[1 2 3]]
+```
+
+### bindings
+
+Any binding may be aliased at compile time using `alias`.
+
+```
+  Int
+[Int]
+
+  (alias Int foo)
+[Int]
+
+  foo
+[Int Int]
 ```

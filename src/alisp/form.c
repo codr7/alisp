@@ -168,7 +168,7 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
     struct a_val *v = a_scope_find(a_scope(vm), id);
 
     if (v == NULL) {
-      a_fail("Unknown symbol: %s", id->data);
+      a_fail("Unknown id: %s", id->data);
       return false;
     }
     

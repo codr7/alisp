@@ -13,6 +13,34 @@
 #include "alisp/types/reg.h"
 #include "alisp/vm.h"
 
+static bool alias_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_ls *a = args->next;
+  struct a_form *org = a_baseof(a, struct a_form, ls);
+
+  if (org->type != A_ID_FORM) {
+    a_fail("Invalid id form: %d", org->type);
+    return false;
+  }
+
+  struct a_scope *s = a_scope(vm);
+  struct a_val *v = a_scope_find(s, org->as_id.name);
+
+  if (!v) {
+    a_fail("Unknown id: %s", org->as_id.name->data);
+    return false;
+  }
+  
+  struct a_form *new = a_baseof(a->next, struct a_form, ls);
+
+  if (new->type != A_ID_FORM) {
+    a_fail("Invalid id form: %d", new->type);
+    return false;
+  }
+
+  a_copy(a_scope_bind(s, new->as_id.name, v->type), v);
+  return true;
+}
+
 static bool d_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   int count = 1;
   
@@ -87,6 +115,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind(&self->lib, a_string(vm, "T"), &self->bool_type)->as_bool = true;
   a_lib_bind(&self->lib, a_string(vm, "F"), &self->bool_type)->as_bool = false;
 
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "alias"), 2, 2))->body = alias_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "d"), 0, 1))->body = d_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "do"), 0, -1))->body = do_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "if"), 2, 3))->body = if_body;
