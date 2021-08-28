@@ -1,6 +1,7 @@
 #include <assert.h>
 #include "alisp/fail.h"
 #include "alisp/prim.h"
+#include "alisp/string.h"
 #include "alisp/vm.h"
 
 struct a_prim *a_prim(struct a_vm *vm,
@@ -40,6 +41,6 @@ bool a_prim_call(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_
     a_fail("Wrong number of arguments: %" PRIu8, arg_count);
     return false;
   }
-  
+
   return self->body(self, vm, args, arg_count);
 }

@@ -1,7 +1,7 @@
 ## aLisp
 
 ### intro
-aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom Lisp implemented in portable C.
+aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom Lisp implemented in portable C. The current version weighs in at 3 kloc and supports all features described in this document.
 
 ### the stack
 aLisp exposes the stack to a greater extent than what in common among Lisps.

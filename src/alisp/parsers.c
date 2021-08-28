@@ -1,4 +1,5 @@
 #include <ctype.h>
+#include "alisp/fail.h"
 #include "alisp/parser.h"
 #include "alisp/parsers.h"
 #include "alisp/string.h"
@@ -24,6 +25,55 @@ struct a_form *a_skip_space(struct a_parser *self) {
   }
   
   return NULL;
+}
+
+struct a_form *a_parse_call(struct a_parser *self) {
+  struct a_pos fpos = self->pos;
+  char c = a_stream_getc(&self->in);
+  if (!c) { return NULL; }
+  
+  if (c != '(') {
+      a_stream_ungetc(&self->in);
+      return NULL;
+  }
+
+  self->pos.column++;
+
+  struct a_form *t = a_parser_pop_next(self);
+
+  if (!t) {
+    a_fail("Missing call target");
+    return NULL;
+  }
+
+  struct a_form *cf = a_malloc(&self->vm->form_pool, sizeof(struct a_form));
+  a_form_init(cf, A_CALL_FORM, fpos)->as_call.target = t;
+  
+  while (true) {
+    a_skip_space(self);
+    c = a_stream_getc(&self->in);
+
+    if (c == ')') {
+      self->pos.column++;
+      break;
+    }
+
+    if (c) { a_stream_ungetc(&self->in); }
+    struct a_form *f = a_parser_pop_next(self);
+      
+    if (!f) {
+      a_form_deref(cf);
+      a_free(&self->vm->form_pool, cf);
+      a_fail("Open call form");
+      return NULL;
+    }
+
+    a_ls_push(&cf->as_call.args, &f->ls);
+    cf->as_call.arg_count++;
+  }
+
+  a_ls_push(&self->forms, &cf->ls);
+  return cf;
 }
 
 struct a_form *a_parse_id(struct a_parser *self) {
@@ -70,11 +120,12 @@ struct a_form *a_parse_int(struct a_parser *self) {
     if (isdigit(c)) {
       neg = true;
       self->pos.column++;
+      a_stream_ungetc(&self->in);
     } else {
       a_stream_ungetc(&self->in);
+      a_stream_ungetc(&self->in);
+      return NULL;
     }
-
-    a_stream_ungetc(&self->in);
   } else {
       a_stream_ungetc(&self->in);    
   }

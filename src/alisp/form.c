@@ -15,6 +15,7 @@ struct a_form *a_form_init(struct a_form *self, enum a_form_type type, struct a_
   case A_CALL_FORM:
     self->as_call.target = NULL;
     a_ls_init(&self->as_call.args);
+    self->as_call.arg_count = 0;
     break;
   case A_ID_FORM:
     self->as_id.name = NULL;
@@ -72,15 +73,18 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
 bool a_form_emit(struct a_form *self, struct a_vm *vm) {
   switch (self->type) {
   case A_CALL_FORM: {
-    if (self->as_call.target->type != A_ID_FORM) {
-      a_fail("Invalid call target");
+    enum a_form_type tt = self->as_call.target->type;
+    
+    if (tt != A_ID_FORM) {
+      a_fail("Invalid call target: %d", tt);
       return false;
     }
-    
-    struct a_val *t = a_scope_find(a_scope(vm), self->as_call.target->as_id.name);
+
+    struct a_string *id = self->as_call.target->as_id.name;
+    struct a_val *t = a_scope_find(a_scope(vm), id);
 
     if (!t) {
-      a_fail("Unknown call target: %s", self->as_call.target->as_id.name->data);
+      a_fail("Unknown call target: %s", id->data);
       return false;
     }
 

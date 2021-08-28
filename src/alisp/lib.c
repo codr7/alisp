@@ -37,7 +37,9 @@ struct a_func *a_lib_bind_func(struct a_lib *self, struct a_func *func) {
 }
 
 struct a_prim *a_lib_bind_prim(struct a_lib *self, struct a_prim *prim) {
-  a_lib_bind(self, prim->name, &self->vm->abc.prim_type)->as_prim = prim;
+  struct a_val *v = a_lib_bind(self, prim->name, &self->vm->abc.prim_type);
+  if (!v) { return NULL; }
+  v->as_prim = prim;
   return prim;
 }
 

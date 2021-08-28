@@ -1,4 +1,3 @@
-* add call parser
 * remove a_func.vm field
 ** pass args instead
 * add func prim
@@ -25,4 +24,3 @@
 
 (func fibrec [n:Int] [Int]
   (if (< $n 2) $n (+ (fibrec (dec $n)) (fibrec (- $n 2)))))
-

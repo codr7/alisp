@@ -74,3 +74,10 @@ bool a_parser_next(struct a_parser *self) {
   
   return false;
 }
+
+struct a_form *a_parser_pop_next(struct a_parser *self) {
+  if (!a_parser_next(self)) { return NULL; }
+  struct a_ls *fls = self->forms.prev;
+  if (fls == &self->forms) { return NULL; }
+  return a_baseof(a_ls_pop(fls), struct a_form, ls);
+}

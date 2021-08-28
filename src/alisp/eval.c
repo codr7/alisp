@@ -4,7 +4,7 @@
 #include "alisp/vm.h"
 
 #define A_DISPATCH(prev)						\
-  goto *dispatch[a_baseof((pc = prev->next), struct a_op, ls)->type]
+  goto *dispatch[a_baseof((pc = (prev)->next), struct a_op, ls)->type]
 
 bool a_eval(struct a_vm *self, a_pc pc) {
   static const void* dispatch[] = {&&STOP, &&BRANCH, &&CALL, &&COPY, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&STORE};
@@ -19,7 +19,7 @@ bool a_eval(struct a_vm *self, a_pc pc) {
       return false;
     }
 
-    return a_true(c) ? pc : a_baseof(pc, struct a_op, ls)->as_branch.right_pc;
+    A_DISPATCH(a_true(c) ? pc : a_baseof(pc, struct a_op, ls)->as_branch.right_pc);
   }
   
  CALL: {

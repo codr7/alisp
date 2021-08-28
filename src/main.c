@@ -18,6 +18,7 @@ int main() {
   a_parser_init(&parser, &vm, a_string(&vm, "repl"));
   a_parser_add_prefix(&parser, a_skip_space);
   a_parser_add_prefix(&parser, a_parse_int);
+  a_parser_add_prefix(&parser, a_parse_call);
   a_parser_add_prefix(&parser, a_parse_id);
   
   while (!feof(stdin)) {
@@ -31,7 +32,11 @@ int main() {
     a_pc pc = a_next_pc(&vm);
     while (a_parser_next(&parser));
     struct a_form *f;
-    while ((f = a_parser_pop(&parser))) { a_form_emit(f, &vm); }
+    
+    while ((f = a_parser_pop(&parser))) {
+      a_form_emit(f, &vm);
+      a_form_deref(f);
+    }
     
     if (a_next_pc(&vm) != pc) {
       a_emit(&vm, A_STOP_OP);
