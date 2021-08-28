@@ -62,7 +62,14 @@ The stack may be thought of as the default list, separate lists may be created b
 
 ### bindings
 
-Any binding may be aliased at compile time using `alias`.
+Values may be bound to identifiers using `let`, literals are automagically bound at compile time.
+
+```
+  (let [x 35 y 7] (+ x y))
+[42]
+```
+
+Bindings may be aliased at compile time using `alias`.
 
 ```
   Int
@@ -77,7 +84,7 @@ Any binding may be aliased at compile time using `alias`.
 
 ### types
 
-The following types are provided out of the box, but it's trivial to add new ones.
+The following types are provided out of the box, adding more is trivial.
 
 - Bool - Boolean values
 - Func - Functions as values

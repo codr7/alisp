@@ -1,6 +1,5 @@
-* add let prim
-** bind immediately if a_form_val
-** add bindings to readme
+* add math.lt/gt
+** add type.compare_vals/a_compare
 * add func prim
 ** add pair form / parser
 ** add a_frame struct
@@ -12,29 +11,16 @@
 * add bench prim
 * fib
 * ---
+* add recoverable errors
+** add vm.errors
+** add struct a_error like form
+** add a_error(vm, type, pos, spec, args)
+** replace a_fail-calls
 * ---
 * sort a_pool.free_slots in size order
 ** bail out in malloc if > size
 ** insert where >=
 
 (func fibrec [n:Int] [Int]
-  (if (< $n 2) $n (+ (fibrec (dec $n)) (fibrec (- $n 2)))))
+  (if (< $n 2) $n (+ (fibrec (- $n 1)) (fibrec (- $n 2)))))
 
-    open func _let(pos: Pos, args: [Form]) throws {
-        let bindings = Array((args[0] as! StackForm).items.reversed())
-        let scope = env.scope!
-        var ids: [String] = []
-        var i = 0
-        
-        while i+1 < bindings.count {
-            let (v, id) = (bindings[i], "$\((bindings[i+1] as! IdForm).name)")
-            try v.emit()
-            let register = try scope.nextRegister(pos: pos, id: id)
-            env.emit(Store(env: env, pos: pos, pc: env.pc, index: register))
-            ids.append(id)
-            i += 2
-        }
-        
-        for a in args[1...] { try a.emit() }
-        for id in ids { try scope.unbind(pos: pos, id) }
-    }

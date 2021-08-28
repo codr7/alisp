@@ -150,7 +150,7 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
 
       if (t) {
 	call->target = a_malloc(&vm->val_pool, sizeof(struct a_val));
-	a_copy(call->target, t);
+	a_copy(a_val_init(call->target, t->type), t);
       }
     }
     

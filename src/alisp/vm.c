@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include "alisp/fail.h"
 #include "alisp/form.h"
+#include "alisp/func.h"
 #include "alisp/prim.h"
 #include "alisp/scope.h"
 #include "alisp/stack.h"
@@ -12,6 +13,7 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_pool_init(&self->pool, NULL, 1, A_PAGE_SIZE);
   a_pool_init(&self->binding_pool, &self->pool, A_BINDING_PAGE_SIZE, sizeof(struct a_binding));
   a_pool_init(&self->form_pool, &self->pool, A_FORM_PAGE_SIZE, sizeof(struct a_form));
+  a_pool_init(&self->func_pool, &self->pool, A_FUNC_PAGE_SIZE, sizeof(struct a_func));
   a_pool_init(&self->ls_pool, &self->pool, A_LS_PAGE_SIZE, sizeof(struct a_ls));
   a_pool_init(&self->op_pool, &self->pool, A_OP_PAGE_SIZE, sizeof(struct a_op));
   a_pool_init(&self->prim_pool, &self->pool, A_PRIM_PAGE_SIZE, sizeof(struct a_prim));
@@ -26,6 +28,8 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_ls_init(&self->stack);
   a_abc_lib_init(&self->abc, self);
   a_lib_import(&self->abc.lib);
+  a_math_lib_init(&self->math, self);
+  a_lib_import(&self->math.lib);
   return self;
 }
 
@@ -48,12 +52,16 @@ void a_vm_deinit(struct a_vm *self) {
     a_op_deinit(o);
   }
 
+  a_lib_deinit(&self->math.lib);
+  a_lib_deinit(&self->abc.lib);
+  
   a_pool_deref(&self->val_pool);
   a_pool_deref(&self->string_pool);
   a_pool_deref(&self->scope_pool);
   a_pool_deref(&self->prim_pool);
   a_pool_deref(&self->op_pool);
   a_pool_deref(&self->ls_pool);
+  a_pool_deref(&self->func_pool);
   a_pool_deref(&self->form_pool);
   a_pool_deref(&self->binding_pool);
   a_pool_deref(&self->pool);

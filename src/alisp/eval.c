@@ -1,8 +1,16 @@
 #include <stdio.h>
 #include "alisp/fail.h"
+#include "alisp/func.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
 #include "alisp/vm.h"
+
+/*
+#define A_TRACE(name)							\
+  printf(#name "\n");							\
+*/
+
+#define A_TRACE(name)
 
 #define A_DISPATCH(prev)						\
   goto *dispatch[a_baseof((pc = (prev)->next), struct a_op, ls)->type]
@@ -12,7 +20,7 @@ bool a_eval(struct a_vm *self, a_pc pc) {
   A_DISPATCH(pc);
 
  BRANCH: {
-    printf("BRANCH\n");
+    A_TRACE(BRANCH);
     struct a_val *c = a_pop(self);
 
     if (c == NULL) {
@@ -24,7 +32,7 @@ bool a_eval(struct a_vm *self, a_pc pc) {
   }
   
  CALL: {
-    printf("CALL\n");
+    A_TRACE(CALL);
     struct a_call_op *call = &a_baseof(pc, struct a_op, ls)->as_call;
     struct a_val *t = call->target;
     if (t == NULL) { t = a_pop(self); }
@@ -45,7 +53,7 @@ bool a_eval(struct a_vm *self, a_pc pc) {
   }
 
  COPY: {
-    printf("COPY\n");
+    A_TRACE(COPY);
     struct a_ls *vls = self->stack.prev;				   
 
     for (int i = a_baseof(pc, struct a_op, ls)->as_copy.offset; i > 0; vls = vls->prev, i--) {
@@ -61,7 +69,7 @@ bool a_eval(struct a_vm *self, a_pc pc) {
   }
 
  DROP: {
-    printf("DROP\n");
+    A_TRACE(DROP);
     struct a_ls *vls = self->stack.prev;				   
     int count = a_baseof(pc, struct a_op, ls)->as_drop.count;
 
@@ -97,19 +105,19 @@ bool a_eval(struct a_vm *self, a_pc pc) {
   }
   
  GOTO: {
-    printf("GOTO\n");
+    A_TRACE(GOTO);
     A_DISPATCH(a_baseof(pc, struct a_op, ls)->as_goto.pc);
   }
   
  LOAD: {
-    printf("LOAD\n");
+    A_TRACE(LOAD);
     struct a_val *v = self->regs + a_baseof(pc, struct a_op, ls)->as_load.reg;
     a_copy(a_push(self, v->type), v);
     A_DISPATCH(pc);
   }
   
  PUSH: {
-    printf("PUSH\n");
+    A_TRACE(PUSH);
 
     struct a_val
       *src = &a_baseof(pc, struct a_op, ls)->as_push.val,
@@ -120,7 +128,7 @@ bool a_eval(struct a_vm *self, a_pc pc) {
   }
 
  RESET: {
-    printf("RESET\n");
+    A_TRACE(RESET);
 
     a_ls_do(&self->stack, ls) {
       struct a_val *v = a_baseof(ls, struct a_val, ls);
@@ -133,7 +141,7 @@ bool a_eval(struct a_vm *self, a_pc pc) {
   }
 
  STORE: {
-    printf("STORE\n");
+    A_TRACE(STORE);
     struct a_val *v = a_pop(self);
     if (!v) { a_fail("Missing value to store"); }
     self->regs[a_baseof(pc, struct a_op, ls)->as_load.reg] = *v;
@@ -142,8 +150,7 @@ bool a_eval(struct a_vm *self, a_pc pc) {
   }
   
  STOP: {
-    printf("STOP\n");
-    // Done!
+    A_TRACE(STOP);
   }
 
   return true;

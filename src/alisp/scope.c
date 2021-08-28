@@ -44,6 +44,14 @@ struct a_val *a_scope_bind(struct a_scope *self, struct a_string *key, struct a_
   return a_val_init(&b->val, type);
 }
 
+bool a_scope_unbind(struct a_scope *self, struct a_string *key) {
+  struct a_val *v = a_scope_find(self, key);
+  if (!v) { return false; }
+  a_ls_pop(&v->ls);
+  a_free(&self->vm->val_pool, v);
+  return true;
+}
+
 struct a_val *a_scope_find(struct a_scope *self, const struct a_string *key) {
   struct a_ls *found = a_lset_find(&self->bindings, key);
   if (!found) { return NULL; }

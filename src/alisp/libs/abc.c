@@ -95,6 +95,60 @@ static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uin
   return true;
 }
 
+static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_scope *s = a_scope(vm);
+  struct a_form *bsf = a_baseof(args->next, struct a_form, ls);
+
+  if (bsf->type != A_LS_FORM) {
+    a_fail("Invalid bindings: %d", bsf->type);
+    return false;
+  }
+
+  struct a_ls *bs = &bsf->as_ls.items, *b = bs->prev;
+
+  while (b != bs) {
+    struct a_form *vf = a_baseof(b, struct a_form, ls);
+
+    if ((b = b->prev) == bs) {
+      a_fail("Malformed bindings");
+      return false;
+    }
+
+    struct a_form *kf = a_baseof(b, struct a_form, ls);
+    b = b->prev;    
+
+    if (kf->type != A_ID_FORM) {
+      a_fail("Invalid key form: %d", kf->type);
+      return false;
+    }
+    
+    struct a_string *k = kf->as_id.name;
+    struct a_val *v = a_form_val(vf, vm);
+    
+    if (v) {
+      a_copy(a_scope_bind(s, k, v->type), v);
+    } else {
+      a_reg reg = a_bind_reg(vm, k);
+      if (!a_form_emit(vf, vm)) { return false; }
+      a_emit(vm, A_STORE_OP)->as_store.reg = reg;
+    }
+  }
+
+  for (struct a_ls *fls = args->next->next; fls != args; fls = fls->next) {
+    if (!a_form_emit(a_baseof(fls, struct a_form, ls), vm)) { return false; }
+  }
+
+  bs = &bsf->as_ls.items;
+  b = bs->next;
+
+  for (b = bs->next; b != bs; b = b->next->next) {
+    struct a_form *kf = a_baseof(b, struct a_form, ls);
+    a_scope_unbind(s, kf->as_id.name);
+  }
+  
+  return true;
+}
+
 static bool reset_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   a_emit(vm, A_RESET_OP);
   return true;
@@ -119,6 +173,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "d"), 0, 1))->body = d_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "do"), 0, -1))->body = do_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "if"), 2, 3))->body = if_body;
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "let"), 1, -1))->body = let_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "reset"), 0, 0))->body = reset_body;
   return self;
 }

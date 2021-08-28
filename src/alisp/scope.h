@@ -24,6 +24,8 @@ bool a_scope_deref(struct a_scope *self);
 
 struct a_val *a_scope_bind(struct a_scope *self, struct a_string *key, struct a_type *type);
 
+bool a_scope_unbind(struct a_scope *self, struct a_string *key);
+
 struct a_val *a_scope_find(struct a_scope *self, const struct a_string *key);
 
 #endif

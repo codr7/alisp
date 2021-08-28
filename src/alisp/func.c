@@ -1,6 +1,14 @@
 #include <assert.h>
+#include <stdio.h>
 #include "alisp/func.h"
 #include "alisp/vm.h"
+
+struct a_func *a_func(struct a_vm *vm,
+		      struct a_string *name,
+		      struct a_args *args,
+		      struct a_rets *rets) {
+  return a_func_init(a_malloc(&vm->func_pool, sizeof(struct a_func)), name, args, rets);
+}
 
 struct a_func *a_func_init(struct a_func *self,
 			   struct a_string *name,

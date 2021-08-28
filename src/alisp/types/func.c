@@ -17,9 +17,7 @@ static void copy_val(struct a_val *dst, struct a_val *src) {
 
 static void dump_val(struct a_val *val) { printf("Func(%p)", val->as_func); }
 
-static bool deref_val(struct a_val *val) {
-  return a_func_deref(val->as_func, val->type->vm);
-}
+static bool deref_val(struct a_val *val) { return a_func_deref(val->as_func, val->type->vm); }
 
 struct a_type *a_func_type_init(struct a_type *self,
 				struct a_vm *vm,

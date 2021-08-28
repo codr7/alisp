@@ -32,7 +32,9 @@ struct a_val *a_lib_bind(struct a_lib *self, struct a_string *key, struct a_type
 }
 
 struct a_func *a_lib_bind_func(struct a_lib *self, struct a_func *func) {
-  a_lib_bind(self, func->name, &self->vm->abc.func_type)->as_func = func;
+  struct a_val *v = a_lib_bind(self, func->name, &self->vm->abc.func_type);
+  if (!v) { return NULL; }
+  v->as_func = func;
   return func;
 }
 
