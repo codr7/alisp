@@ -12,11 +12,13 @@
 ** add struct a_error like form
 ** add a_error(vm, type, pos, spec, args)
 ** replace a_fail-calls
+* add iterators
+* add strings
+* add quoting
+** add form.quote1-3
+** add '-parser
 * ---
 * sort a_pool.free_slots in size order
 ** bail out in malloc if > size
 ** insert where >=
-
-(func fibrec [n:Int] [Int]
-  (if (< $n 2) $n (+ (fibrec (- $n 1)) (fibrec (- $n 2)))))
 

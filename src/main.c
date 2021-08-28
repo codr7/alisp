@@ -19,6 +19,7 @@ int main() {
   a_parser_add_prefix(&parser, a_skip_space);
   a_parser_add_prefix(&parser, a_parse_int);
   a_parser_add_prefix(&parser, a_parse_call);
+  a_parser_add_prefix(&parser, a_parse_dot);
   a_parser_add_prefix(&parser, a_parse_ls);
   a_parser_add_prefix(&parser, a_parse_id);
   

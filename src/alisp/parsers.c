@@ -76,6 +76,48 @@ struct a_form *a_parse_call(struct a_parser *self) {
   return cf;
 }
 
+struct a_form *a_parse_dot(struct a_parser *self) {
+  struct a_pos fpos = self->pos;
+  char c = a_stream_getc(&self->in);
+  if (!c) { return NULL; }
+  
+  if (c != '.') {
+      a_stream_ungetc(&self->in);
+      return NULL;
+  }
+
+  self->pos.column++;
+
+  struct a_form *x = a_parser_pop(self);
+
+  if (!x) {
+    a_fail("Missing first argument");
+    return NULL;
+  }
+  
+  struct a_form *t = a_parser_pop_next(self);
+
+  if (!t) {
+    a_fail("Missing call target");
+    return NULL;
+  }
+
+  struct a_form *y = a_parser_pop_next(self);
+
+  if (!y) {
+    a_fail("Missing second argument");
+    return NULL;
+  }
+  
+  struct a_form *f = a_parser_push(self, A_CALL_FORM, fpos);
+  struct a_call_form *cf = &f->as_call;
+  cf->target = t;
+  cf->arg_count = 2;
+  a_ls_push(&cf->args, &x->ls);
+  a_ls_push(&cf->args, &y->ls);
+  return f;
+}
+
 struct a_form *a_parse_id(struct a_parser *self) {
   struct a_pos fpos = self->pos;
   struct a_stream out;

@@ -1,4 +1,3 @@
-#include <assert.h>
 #include <stdio.h>
 #include "alisp/fail.h"
 #include "alisp/form.h"
