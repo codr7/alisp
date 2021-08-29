@@ -67,10 +67,10 @@ Values are pushed on the stack.
 `d` may alternatively be specified as a call flag to drop all returned values.
 
 ```
-  (+ 35 7)
+  35.(+ 7)
 [42]
 
-  (+:d 35 7)
+  35.(+:d 7)
 [42]
 ```
 
