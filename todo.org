@@ -1,6 +1,6 @@
-* add func prim
 * add func field to frame
 ** use to check stack in ret op
+* add func prim
 * fib
 * add bench prim
 * add memo/m call flag

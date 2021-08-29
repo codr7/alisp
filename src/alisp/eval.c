@@ -155,7 +155,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     A_TRACE(STORE);
     struct a_val *v = a_pop(self);
     if (!v) { a_fail("Missing value to store"); }
-    self->regs[a_baseof(pc, struct a_op, ls)->as_load.reg] = v;
+    a_store(self, a_baseof(pc, struct a_op, ls)->as_load.reg, v); 
     A_DISPATCH(pc);
   }
 

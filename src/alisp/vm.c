@@ -35,25 +35,29 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_lib_import(&self->abc.lib);
   a_math_lib_init(&self->math, self);
   a_lib_import(&self->math.lib);
+
+  memset(self->regs, 0, sizeof(self->regs));
   return self;
 }
 
 void a_vm_deinit(struct a_vm *self) {  
-  a_ls_do(&self->scopes, sls) {
-    struct a_scope *s = a_baseof(sls, struct a_scope, ls);
-    a_ls_pop(sls);
-    a_scope_deref(s);
+  for (int i = 0; i < A_REG_COUNT; i++) {
+    struct a_val *v = self->regs[i];
+    if (v) { a_val_deref(v); }
   }
-
+  
   a_ls_do(&self->stack, vls) {
     struct a_val *v = a_baseof(vls, struct a_val, ls);
-    a_ls_pop(vls);
     a_val_deref(v);
+  }
+
+  a_ls_do(&self->scopes, sls) {
+    struct a_scope *s = a_baseof(sls, struct a_scope, ls);
+    a_scope_deref(s);
   }
 
   a_ls_do(&self->code, ols) {
     struct a_op *o = a_baseof(ols, struct a_op, ls);
-    a_ls_pop(ols);
     a_op_deinit(o);
   }
 
@@ -100,6 +104,18 @@ struct a_scope *a_end(struct a_vm *self) {
   assert(ls != &self->scopes);
   a_ls_pop(ls);
   return a_baseof(ls, struct a_scope, ls);
+}
+
+void a_store(struct a_vm *self, a_reg_t reg, struct a_val *val) {
+  struct a_val *prev = self->regs[reg];
+
+  if (prev) {
+    a_val_deref(prev);
+    a_free(&self->val_pool, prev);
+  }
+  
+  self->regs[reg] = val;
+
 }
 
 a_reg_t a_bind_reg(struct a_vm *self, struct a_string *key) {

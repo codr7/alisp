@@ -8,7 +8,6 @@ struct a_vm;
 
 struct a_frame {
   struct a_ls ls;
-  struct a_val *regs[A_REG_COUNT];
   a_pc_t ret;
 };
 

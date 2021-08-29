@@ -102,7 +102,7 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
 	return NULL;
       }
 
-      vm->regs[rv->as_reg] = v;
+      a_store(vm, rv->as_reg, v);
     }
 
     sp = sp->prev;

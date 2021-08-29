@@ -55,6 +55,8 @@ struct a_scope *a_scope(struct a_vm *self);
 struct a_scope *a_begin(struct a_vm *self, struct a_scope *scope);
 struct a_scope *a_end(struct a_vm *self);
 
+void a_store(struct a_vm *self, a_reg_t reg, struct a_val *val);
+
 a_reg_t a_bind_reg(struct a_vm *self, struct a_string *key);
 
 #endif
