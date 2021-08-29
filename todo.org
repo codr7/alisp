@@ -1,8 +1,8 @@
+* rename a_pc to a_pc_t
+** rename next_pc to pc
 * add func prim
-** add a_frame struct
-*** add vm.frames ls
-** add return op
-*** pop frame
+* add func field to frame
+** use to check stack in ret op
 * fib
 * add bench prim
 * add memo/m call flag
@@ -33,3 +33,4 @@
 * sort a_pool.free_slots in size order
 ** bail out in malloc if > size
 ** insert where >=
+

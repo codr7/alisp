@@ -17,6 +17,7 @@
 
 #define A_BINDING_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_FORM_PAGE_SIZE A_DEFAULT_PAGE_SIZE
+#define A_FRAME_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_FUNC_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_LS_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_OP_PAGE_SIZE A_DEFAULT_PAGE_SIZE
@@ -25,12 +26,10 @@
 #define A_STRING_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 #define A_VAL_PAGE_SIZE A_DEFAULT_PAGE_SIZE
 
-#define A_REG_COUNT 64
-
 struct a_vm {
-  struct a_pool pool;
-  struct a_pool binding_pool, ls_pool,
-    form_pool, func_pool,
+  struct a_pool pool,
+    binding_pool, ls_pool,
+    form_pool, frame_pool, func_pool,
     op_pool, prim_pool,
     scope_pool, string_pool,
     val_pool;
@@ -39,11 +38,9 @@ struct a_vm {
   struct a_abc_lib abc;
   struct a_math_lib math;
   
-  struct a_ls code;  
+  struct a_ls code, frames, scopes, stack;  
   struct a_scope main;
-  struct a_ls scopes;
-  struct a_val regs[A_REG_COUNT];
-  struct a_ls stack;
+  struct a_val *regs[A_REG_COUNT];
 };
 
 struct a_vm *a_vm_init(struct a_vm *self);
@@ -54,6 +51,9 @@ struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type);
 bool a_eval(struct a_vm *self, a_pc pc);
 
 struct a_scope *a_scope(struct a_vm *self);
+
+struct a_scope *a_begin(struct a_vm *self, struct a_scope *scope);
+struct a_scope *a_end(struct a_vm *self);
 
 a_reg a_bind_reg(struct a_vm *self, struct a_string *key);
 

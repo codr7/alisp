@@ -1,7 +1,10 @@
 #include <assert.h>
 #include <stdio.h>
+#include "alisp/fail.h"
+#include "alisp/frame.h"
 #include "alisp/func.h"
 #include "alisp/stack.h"
+#include "alisp/string.h"
 #include "alisp/vm.h"
 
 struct a_func *a_func(struct a_vm *vm,
@@ -18,6 +21,8 @@ struct a_func *a_func_init(struct a_func *self,
   self->name = name;
   self->args = args;
   self->rets = rets;
+  self->start_pc = NULL;
+  self->scope = NULL;
   self->body = NULL;
   self->ref_count = 1;
   return self;
@@ -33,7 +38,24 @@ bool a_func_deref(struct a_func *self, struct a_vm *vm) {
   if (--self->ref_count) { return false; }
   a_free(&vm->pool, self->args);
   a_free(&vm->pool, self->rets);
+  if (self->scope) { a_scope_deref(self->scope); }
   return true;
+}
+
+void a_func_begin(struct a_func *self, struct a_vm *vm) {
+  a_emit(vm, A_GOTO_OP);
+  self->start_pc = a_next_pc(vm);
+  self->scope = a_begin(vm, NULL);
+
+  for (struct a_arg *a = self->args->items; a < self->args->items+self->args->count; a++) {
+    if (a->name) { a_bind_reg(vm, a->name); }
+  }
+}
+
+void a_func_end(struct a_func *self, struct a_vm *vm) {
+  a_emit(vm, A_RET_OP);
+  a_end(vm);
+  a_baseof(self->start_pc, struct a_op, ls)->as_goto.pc = a_next_pc(vm);
 }
 
 bool a_func_applicable(struct a_func *self, struct a_vm *vm) {
@@ -49,8 +71,42 @@ bool a_func_applicable(struct a_func *self, struct a_vm *vm) {
 }
 
 a_pc a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags, a_pc ret) {
-  assert(self->body);
-  ret = self->body(self, vm, ret);
-  if (flags & A_CALL_DRETS) { a_drop(vm, self->rets->count); }
-  return ret;
+  if (self->body) {
+    ret = self->body(self, vm, ret);
+    if (flags & A_CALL_DRETS) { a_drop(vm, self->rets->count); }
+    return ret;
+  }
+
+  struct a_frame *f = a_frame_init(a_malloc(&vm->frame_pool, sizeof(struct a_frame)), vm, ret);
+  a_ls_push(&vm->frames, &f->ls);
+  
+  a_begin(vm, self->scope);
+  struct a_ls *sp = vm->stack.prev;
+  
+  for (struct a_arg *a = self->args->items+self->args->count-1; a >= self->args->items; a--) {
+    assert(sp != &vm->stack);
+
+    if (a->name) {
+      struct a_val *rv = a_scope_find(self->scope, a->name);
+
+      if (rv == NULL) {
+	a_fail("Missing argument binding: %s", a->name->data);
+	return NULL;
+      }
+      
+      assert(rv->type == &vm->abc.reg_type);
+      struct a_val *v = a_baseof(a_ls_pop(sp), struct a_val, ls);
+
+      if (v == NULL) {
+	a_fail("Missing argument: %s", a->name->data);
+	return NULL;
+      }
+
+      vm->regs[rv->as_reg] = v;
+    }
+
+    sp = sp->prev;
+  }
+  
+  return self->start_pc;
 }

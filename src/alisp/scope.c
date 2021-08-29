@@ -10,7 +10,7 @@ struct a_scope *a_scope_init(struct a_scope *self, struct a_vm *vm, struct a_sco
   self->outer = outer ? a_scope_ref(outer) : NULL;
   a_ls_init(&self->ls);
   a_lset_init(&self->bindings, a_binding_key, a_binding_compare);
-  self->next_reg = 0;
+  self->next_reg = outer ? outer->next_reg : 0;
   self->ref_count = 1;
   return self;
 }
@@ -57,3 +57,5 @@ struct a_val *a_scope_find(struct a_scope *self, const struct a_string *key) {
   if (!found) { return NULL; }
   return a_baseof(found, struct a_val, ls);
 }
+
+

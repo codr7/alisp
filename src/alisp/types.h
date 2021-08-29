@@ -3,6 +3,8 @@
 
 #include <stdint.h>
 
+#define A_REG_COUNT 64
+
 struct a_ls;
 struct a_string;
 struct a_type;

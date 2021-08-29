@@ -1,6 +1,8 @@
+#include <assert.h>
 #include <stdio.h>
 #include "alisp/fail.h"
 #include "alisp/form.h"
+#include "alisp/frame.h"
 #include "alisp/func.h"
 #include "alisp/prim.h"
 #include "alisp/scope.h"
@@ -12,6 +14,7 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_pool_init(&self->pool, NULL, 1, A_PAGE_SIZE);
   a_pool_init(&self->binding_pool, &self->pool, A_BINDING_PAGE_SIZE, sizeof(struct a_binding));
   a_pool_init(&self->form_pool, &self->pool, A_FORM_PAGE_SIZE, sizeof(struct a_form));
+  a_pool_init(&self->frame_pool, &self->pool, A_FRAME_PAGE_SIZE, sizeof(struct a_frame));
   a_pool_init(&self->func_pool, &self->pool, A_FUNC_PAGE_SIZE, sizeof(struct a_func));
   a_pool_init(&self->ls_pool, &self->pool, A_LS_PAGE_SIZE, sizeof(struct a_ls));
   a_pool_init(&self->op_pool, &self->pool, A_OP_PAGE_SIZE, sizeof(struct a_op));
@@ -21,9 +24,12 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_pool_init(&self->val_pool, &self->pool, A_VAL_PAGE_SIZE, sizeof(struct a_val));
   self->next_type_id = 0;
   a_ls_init(&self->code);
+
   a_scope_init(&self->main, self, NULL);
   a_ls_init(&self->scopes);
-  a_ls_push(&self->scopes, &self->main.ls);
+  a_begin(self, &self->main);
+
+  a_ls_init(&self->frames);
   a_ls_init(&self->stack);
   a_abc_lib_init(&self->abc, self);
   a_lib_import(&self->abc.lib);
@@ -61,6 +67,7 @@ void a_vm_deinit(struct a_vm *self) {
   a_pool_deref(&self->op_pool);
   a_pool_deref(&self->ls_pool);
   a_pool_deref(&self->func_pool);
+  a_pool_deref(&self->frame_pool);
   a_pool_deref(&self->form_pool);
   a_pool_deref(&self->binding_pool);
   a_pool_deref(&self->pool);
@@ -75,11 +82,29 @@ struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
 }
 
 struct a_scope *a_scope(struct a_vm *self) {
-  return a_baseof(self->scopes.next, struct a_scope, ls);
+  return a_baseof(self->scopes.prev, struct a_scope, ls);
+}
+
+struct a_scope *a_begin(struct a_vm *self, struct a_scope *scope) {
+  if (!scope) {
+    scope = a_malloc(&self->scope_pool, sizeof(struct a_scope));
+    a_scope_init(scope, self, a_scope(self));
+  }
+
+  a_ls_push(&self->scopes, &scope->ls);
+  return scope;
+}
+
+struct a_scope *a_end(struct a_vm *self) {
+  struct a_ls *ls = self->scopes.prev;
+  assert(ls != &self->scopes);
+  a_ls_pop(ls);
+  return a_baseof(ls, struct a_scope, ls);
 }
 
 a_reg a_bind_reg(struct a_vm *self, struct a_string *key) {
   struct a_scope *s = a_scope(self);
+  a_check(s->next_reg < A_REG_COUNT-1, "Maximum number of registers exceeded");
   a_reg r = s->next_reg++;
   a_scope_bind(s, key, &self->abc.reg_type)->as_reg = r;
   return r;

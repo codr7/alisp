@@ -18,6 +18,7 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
   case A_LOAD_OP:
   case A_PUSH_OP:
   case A_RESET_OP:
+  case A_RET_OP:
   case A_STOP_OP:
   case A_STORE_OP:
   case A_ZIP_OP:
@@ -44,6 +45,7 @@ void a_op_deinit(struct a_op *self) {
   case A_LOAD_OP:
   case A_STOP_OP:
   case A_RESET_OP:
+  case A_RET_OP:
   case A_STORE_OP:
   case A_ZIP_OP:
     break;

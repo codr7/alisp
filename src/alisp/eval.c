@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include "alisp/fail.h"
+#include "alisp/frame.h"
 #include "alisp/func.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
 #include "alisp/vm.h"
 
 /*
-#define A_TRACE(name)							\
+  #define A_TRACE(name)							\
   printf(#name "\n");							\
 */
 
@@ -17,7 +18,7 @@
 
 bool a_eval(struct a_vm *self, a_pc pc) {
   static const void* dispatch[] = {
-    &&STOP, &&BRANCH, &&CALL, &&COPY, &&DROP, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&STORE, &&ZIP
+    &&STOP, &&BRANCH, &&CALL, &&COPY, &&DROP, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&RET, &&STORE, &&ZIP
   };
   
   A_DISPATCH(pc);
@@ -45,7 +46,9 @@ bool a_eval(struct a_vm *self, a_pc pc) {
       return false;
     }
 
-    pc = a_call(t, call->flags, pc);
+    if (!(pc = a_call(t, call->flags, pc))) {
+      return false;
+    }
 
     if (!call->target) {
       a_val_deref(t);
@@ -102,7 +105,7 @@ bool a_eval(struct a_vm *self, a_pc pc) {
   
  LOAD: {
     A_TRACE(LOAD);
-    struct a_val *v = self->regs + a_baseof(pc, struct a_op, ls)->as_load.reg;
+    struct a_val *v = self->regs[a_baseof(pc, struct a_op, ls)->as_load.reg];
     a_copy(a_push(self, v->type), v);
     A_DISPATCH(pc);
   }
@@ -131,12 +134,28 @@ bool a_eval(struct a_vm *self, a_pc pc) {
     A_DISPATCH(pc);    
   }
 
+ RET: {
+    A_TRACE(RET);
+    struct a_ls *fls = self->frames.prev;
+
+    if (fls == &self->frames) {
+      a_fail("No calls in progress");
+      return false;
+    }
+    
+    a_end(self);
+    struct a_frame *f = a_baseof(a_ls_pop(fls), struct a_frame, ls);
+    pc = a_frame_restore(f, self);
+    a_frame_deinit(f);
+    a_free(&self->frame_pool, f);
+    A_DISPATCH(pc);
+  }
+  
  STORE: {
     A_TRACE(STORE);
     struct a_val *v = a_pop(self);
     if (!v) { a_fail("Missing value to store"); }
-    self->regs[a_baseof(pc, struct a_op, ls)->as_load.reg] = *v;
-    a_free(&self->val_pool, v);
+    self->regs[a_baseof(pc, struct a_op, ls)->as_load.reg] = v;
     A_DISPATCH(pc);
   }
 

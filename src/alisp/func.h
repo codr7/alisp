@@ -46,6 +46,8 @@ struct a_func {
   struct a_string *name;
   struct a_args *args;
   struct a_rets *rets;
+  a_pc start_pc;
+  struct a_scope *scope;
   a_pc (*body)(struct a_func *self, struct a_vm *vm, a_pc ret);
   a_ref_count ref_count;
 };
@@ -62,6 +64,10 @@ struct a_func *a_func_init(struct a_func *self,
 
 struct a_func *a_func_ref(struct a_func *self);
 bool a_func_deref(struct a_func *self, struct a_vm *vm);
+
+void a_func_begin(struct a_func *self, struct a_vm *vm);
+void a_func_end(struct a_func *self, struct a_vm *vm);
+
 bool a_func_applicable(struct a_func *self, struct a_vm *vm);
 a_pc a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags, a_pc ret);
 

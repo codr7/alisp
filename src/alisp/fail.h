@@ -10,7 +10,7 @@
   abort();					  
 
 #define a_check(cond, spec, ...)					\
-  if (!cond) {								\
+  if (!(cond)) {							\
     fprintf(stderr, "Check failed in %s, line %d:\n" spec,		\
 	    __FILE__, __LINE__, ##__VA_ARGS__);				\
     abort();								\
