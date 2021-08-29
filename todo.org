@@ -9,6 +9,10 @@
 ** add a_lset a_func.memo
 *** index on args
 *** add if missing
+* add pure/p func flag
+** add func flags like call flags
+** make sure all sub calls are pure
+** fail at compile time if DRETS && PURE
 * ---
 * add support for dynamic lists
 ** add LS_OP
