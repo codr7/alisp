@@ -31,6 +31,7 @@ struct a_form_parser *a_parser_add_suffix(struct a_parser *self, a_parser_body b
 struct a_form *a_parser_push(struct a_parser *self, enum a_form_type type, struct a_pos pos);
 struct a_form *a_parser_pop(struct a_parser *self);
 bool a_parser_next(struct a_parser *self);
+struct a_form *a_parser_peek_next(struct a_parser *self);
 struct a_form *a_parser_pop_next(struct a_parser *self);
 
 #endif

@@ -88,34 +88,28 @@ struct a_form *a_parse_dot(struct a_parser *self) {
 
   self->pos.column++;
 
-  struct a_form *x = a_parser_pop(self);
+  struct a_form *arg = a_parser_pop(self);
 
-  if (!x) {
+  if (!arg) {
     a_fail("Missing first argument");
     return NULL;
   }
   
-  struct a_form *t = a_parser_pop_next(self);
+  struct a_form *call = a_parser_peek_next(self);
 
-  if (!t) {
-    a_fail("Missing call target");
+  if (!call) {
+    a_fail("Missing call form");
     return NULL;
   }
 
-  struct a_form *y = a_parser_pop_next(self);
-
-  if (!y) {
-    a_fail("Missing second argument");
+  if (call->type != A_CALL_FORM) {
+    a_fail("Invalid call form: %d", call->type);
     return NULL;
   }
-  
-  struct a_form *f = a_parser_push(self, A_CALL_FORM, fpos);
-  struct a_call_form *cf = &f->as_call;
-  cf->target = t;
-  cf->arg_count = 2;
-  a_ls_push(&cf->args, &x->ls);
-  a_ls_push(&cf->args, &y->ls);
-  return f;
+
+  call->pos = fpos;
+  a_ls_push(call->as_call.args.next, &arg->ls); 
+  return call;
 }
 
 struct a_form *a_parse_id(struct a_parser *self) {

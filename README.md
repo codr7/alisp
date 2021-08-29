@@ -19,16 +19,16 @@ Return evaluates completed forms,
 (reset) clears the stack and Ctrl+D exits.
 
   (func fibrec [n:Int] [Int]
-    (if n.< 2 n (fibrec n.- 1).+ (fibrec n.- 2)))
+    (if n.(< 2) n n.(- 1).(fibrec).(+ n.(- 2).(fibrec))))
 []
 
-  (fibrec 10)
+  10.(fibrec)
 [55]
 ```
 
 ### quirks
 - Parens are used for calls, brackets for lists.
-- Operators may be called infix with `.` between first argument and target.
+- Infix calls are supported with `.` between first argument and call.
 - Lists are passed by reference.
 
 ### the stack
@@ -69,14 +69,14 @@ Values may be bound to identifiers using `let`, literals are automagically bound
 
 ```
   (let [x 35 y 7]
-    x.+ y)
+    x.(+ y))
 [42]
 ```
 
 Bindings may be aliased at compile time using `alias`.
 
 ```
-  Int.alias foo
+  Int.(alias foo)
 []
 
   foo
@@ -87,14 +87,14 @@ Bindings may be aliased at compile time using `alias`.
 `is` returns `T` if both arguments are the same value.
 
 ```
-  [].is []
+  [].is([])
 [F]
 ```
 
 `=` returns `T` if both arguments are equal.
 
 ```
-  [].= []
+  [].=([])
 [T]
 ```
 
@@ -103,7 +103,7 @@ Bindings may be aliased at compile time using `alias`.
 `<` and `>` may be used to order values.
 
 ```
-  [1 2 3].< [1 2 4]
+  [1 2 3].<([1 2 4])
 [T]
 ```
 
