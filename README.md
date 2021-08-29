@@ -3,6 +3,11 @@
 ### intro
 aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom Lisp implemented in portable C. The current version weighs in at 3 kloc and supports all features described in this document.
 
+### quirks
+- Parens are used for calls, brackets for lists.
+- Infix calls are supported with `.` between first argument and call.
+- Lists are passed by reference.
+
 ### setup
 aLisp requires CMake and a C compiler to build.
 
@@ -25,11 +30,6 @@ Return evaluates completed forms,
   10.(fibrec)
 [55]
 ```
-
-### quirks
-- Parens are used for calls, brackets for lists.
-- Infix calls are supported with `.` between first argument and call.
-- Lists are passed by reference.
 
 ### the stack
 aLisp exposes the stack to a greater extent than what in common among Lisps.
