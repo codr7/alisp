@@ -54,6 +54,12 @@ struct a_form *a_parser_pop(struct a_parser *self) {
   return a_baseof(a_ls_pop(fls), struct a_form, ls);
 }
 
+struct a_form *a_parser_pop_last(struct a_parser *self) {  
+  struct a_ls *fls = self->forms.prev;
+  if (fls == &self->forms) { return NULL; }
+  return a_baseof(a_ls_pop(fls), struct a_form, ls);
+}
+
 bool a_parser_next(struct a_parser *self) {
   a_ls_do(&self->prefix, pls) {
     struct a_form_parser *p = a_baseof(pls, struct a_form_parser, ls);
@@ -61,8 +67,8 @@ bool a_parser_next(struct a_parser *self) {
 
     if (pf) {
     read_suffix:
-      a_ls_do(&self->prefix, sls) {
-	struct a_form_parser *s = a_baseof(pls, struct a_form_parser, ls);
+      a_ls_do(&self->suffix, sls) {
+	struct a_form_parser *s = a_baseof(sls, struct a_form_parser, ls);
 	struct a_form *sf = s->body(self);
 	if (sf) { goto read_suffix; }
       }

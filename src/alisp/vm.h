@@ -10,7 +10,7 @@
 #include "alisp/types.h"
 #include "alisp/val.h"
 
-#define A_VERSION 2
+#define A_VERSION 3
 
 #define A_PAGE_SIZE 32000
 #define A_DEFAULT_PAGE_SIZE 32

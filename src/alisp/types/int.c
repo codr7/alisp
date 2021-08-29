@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include "alisp/type.h"
-#include "alisp/types/int.h"
 #include "alisp/val.h"
 
 static enum a_order compare_val(struct a_val *x, struct a_val *y) {
@@ -16,8 +15,8 @@ static bool is_val(struct a_val *x, struct a_val *y) { return x->as_int == y->as
 
 static bool true_val(struct a_val *val) { return val->as_int; }
 
-struct a_type *a_int_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super_types[]) {
-  a_type_init(self, vm, name, super_types);
+struct a_type *a_int_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]) {
+  a_type_init(self, vm, name, super);
   self->compare_val = compare_val;
   self->copy_val = copy_val;
   self->dump_val = dump_val;

@@ -18,7 +18,7 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v2
+Welcome to aLisp v3
 
 Return evaluates completed forms,
 (reset) clears the stack and Ctrl+D exits.
@@ -47,10 +47,10 @@ Values are pushed on the stack.
   42 (if _ 1 2)
 ```
 
-`$0-9` may be used to copy the value at specified offset from the top.
+`s0-9` may be used to copy the value at specified offset from the top.
 
 ```
-  1 2 3 $1
+  1 2 3 s1
 [1 2 3 2]
 ```
 
@@ -62,6 +62,16 @@ Values are pushed on the stack.
 
   (d 2)
 []
+```
+
+`d` may alternatively be specified as a call flag to drop all returned values.
+
+```
+  (+ 35 7)
+[42]
+
+  (+:d 35 7)
+[42]
 ```
 
 ### bindings
@@ -120,6 +130,15 @@ Every value has a boolean representation; most are true but zero, empty lists et
 ```
   (if [] 1 2)
 [2]
+```
+
+### pairs
+Pairs may be formed using `:`.
+
+```
+  1:2
+
+[1:2]
 ```
 
 ### lists

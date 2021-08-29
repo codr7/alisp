@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "alisp/fail.h"
 #include "alisp/ls.h"
 #include "alisp/pool.h"
 #include "alisp/stack.h"
@@ -16,10 +17,22 @@ void a_stack_dump(struct a_ls *stack) {
   putc(']', stdout);
 }
 
-struct a_val *a_push(struct a_vm *self, struct a_type *type) {
-  struct a_val *v = a_val_init(a_malloc(&self->val_pool, sizeof(struct a_val)), type);
-  a_ls_push(&self->stack, &v->ls);
-  return v;
+bool a_drop(struct a_vm *self, int count) {
+  struct a_ls *vls = self->stack.prev;				   
+  
+  for (int i = count; i > 0; vls = vls->prev, i--) {
+    if (vls == &self->stack) {
+      a_fail("Not enough values on stack: %d", i);
+      return false;
+    }
+    
+    a_ls_pop(vls);
+    struct a_val *v = a_baseof(vls, struct a_val, ls);
+    a_val_deref(v);
+    a_free(&self->val_pool, v);
+  }
+
+  return true;
 }
 
 struct a_val *a_peek(struct a_vm *self) {
@@ -28,4 +41,10 @@ struct a_val *a_peek(struct a_vm *self) {
 
 struct a_val *a_pop(struct a_vm *self) {
   return a_ls_null(&self->stack) ? NULL : a_baseof(a_ls_pop(self->stack.prev), struct a_val, ls);
+}
+
+struct a_val *a_push(struct a_vm *self, struct a_type *type) {
+  struct a_val *v = a_val_init(a_malloc(&self->val_pool, sizeof(struct a_val)), type);
+  a_ls_push(&self->stack, &v->ls);
+  return v;
 }

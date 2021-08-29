@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdio.h>
 #include "alisp/func.h"
+#include "alisp/stack.h"
 #include "alisp/vm.h"
 
 struct a_func *a_func(struct a_vm *vm,
@@ -47,7 +48,9 @@ bool a_func_applicable(struct a_func *self, struct a_vm *vm) {
   return true;
 }
 
-a_pc a_func_call(struct a_func *self, struct a_vm *vm, a_pc ret) {
+a_pc a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags, a_pc ret) {
   assert(self->body);
-  return self->body(self, vm, ret);
+  ret = self->body(self, vm, ret);
+  if (flags & A_CALL_DRETS) { a_drop(vm, self->rets->count); }
+  return ret;
 }

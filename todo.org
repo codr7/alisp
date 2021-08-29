@@ -1,12 +1,17 @@
 * add func prim
-** add pair form / parser
 ** add a_frame struct
 *** add vm.frames ls
 ** add return op
 *** pop frame
 * add bench prim
 * fib
+* add memo/m call flag
+** add a_lset a_func.memo
+*** index on args
+*** add if missing
 * ---
+* add support for dynamic lists
+** add LS_OP
 * add recoverable errors
 ** add vm.errors
 ** add struct a_error like form
@@ -17,8 +22,28 @@
 * add quoting
 ** add form.quote1-3
 ** add '-parser
+* add test prim
+** (test "..." [stack] body)
+** add test script
+* add line comments with ;
 * ---
 * sort a_pool.free_slots in size order
 ** bail out in malloc if > size
 ** insert where >=
 
+public func pairReader(_ p: Parser) throws -> Form? {
+    let c = p.getc()
+        
+    if c != ":" {
+        if c != nil { p.ungetc(c!) }
+        return nil
+    }
+        
+    p.nextColumn()
+    let left = p.popForm()
+    if left == nil { throw ReadError(p.pos, "Missing left value"); }
+    if !(try p.readForm()) { throw ReadError(p.pos, "Missing right value")}
+    let right = p.popForm()
+    
+    return PairForm(env: p.env, pos: left!.pos, (left!, right!))
+}

@@ -88,7 +88,7 @@ struct a_form *a_parse_dot(struct a_parser *self) {
 
   self->pos.column++;
 
-  struct a_form *arg = a_parser_pop(self);
+  struct a_form *arg = a_parser_pop_last(self);
 
   if (!arg) {
     a_fail("Missing first argument");
@@ -178,8 +178,8 @@ struct a_form *a_parse_int(struct a_parser *self) {
    }
 
    if (self->pos.column == fpos.column) { return NULL; }
-   struct a_form *f = a_parser_push(self, A_LITERAL_FORM, fpos);
-   a_val_init(&f->as_literal.val, &self->vm->abc.int_type)->as_int = neg ? -v : v;
+   struct a_form *f = a_parser_push(self, A_LIT_FORM, fpos);
+   a_val_init(&f->as_lit.val, &self->vm->abc.int_type)->as_int = neg ? -v : v;
    return f;
 }
 
@@ -221,4 +221,33 @@ struct a_form *a_parse_ls(struct a_parser *self) {
 
   a_ls_push(&self->forms, &lsf->ls);
   return lsf;
+}
+
+struct a_form *a_parse_pair(struct a_parser *self) {
+  char c = a_stream_getc(&self->in);
+  if (!c) { return NULL; }
+
+  if (c != ':') {
+    a_stream_ungetc(&self->in);
+    return NULL;
+  }
+
+  struct a_form *l = a_parser_pop_last(self);
+  
+  if (!l) {
+    a_fail("Missing left value");
+    return NULL;
+  }
+
+  struct a_form *r = a_parser_pop_next(self);
+
+  if (!r) {
+    a_fail("Missing right value");
+    return NULL;
+  }
+
+  struct a_form *f = a_parser_push(self, A_PAIR_FORM, l->pos);
+  f->as_pair.left = l;
+  f->as_pair.right = r;
+  return f;
 }

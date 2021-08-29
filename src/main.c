@@ -22,6 +22,7 @@ int main() {
   a_parser_add_prefix(&parser, a_parse_dot);
   a_parser_add_prefix(&parser, a_parse_ls);
   a_parser_add_prefix(&parser, a_parse_id);
+  a_parser_add_suffix(&parser, a_parse_pair);
   
   while (!feof(stdin)) {
     printf("  ");

@@ -63,6 +63,6 @@ struct a_func *a_func_init(struct a_func *self,
 struct a_func *a_func_ref(struct a_func *self);
 bool a_func_deref(struct a_func *self, struct a_vm *vm);
 bool a_func_applicable(struct a_func *self, struct a_vm *vm);
-a_pc a_func_call(struct a_func *self, struct a_vm *vm, a_pc ret);
+a_pc a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags, a_pc ret);
 
 #endif

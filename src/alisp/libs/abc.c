@@ -6,13 +6,6 @@
 #include "alisp/prim.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
-#include "alisp/types/bool.h"
-#include "alisp/types/func.h"
-#include "alisp/types/int.h"
-#include "alisp/types/ls.h"
-#include "alisp/types/meta.h"
-#include "alisp/types/prim.h"
-#include "alisp/types/reg.h"
 #include "alisp/vm.h"
 
 static bool alias_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
@@ -215,6 +208,9 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_type(&self->lib, a_func_type_init(&self->func_type, vm, a_string(vm, "Func"),
 					       A_SUPER(&self->any_type)));
   
+  a_lib_bind_type(&self->lib, a_pair_type_init(&self->pair_type, vm, a_string(vm, "Pair"),
+					       A_SUPER(&self->any_type)));
+
   a_lib_bind_type(&self->lib, a_reg_type_init(&self->reg_type, vm, a_string(vm, "Reg"),
 					      A_SUPER(&self->any_type)));
   

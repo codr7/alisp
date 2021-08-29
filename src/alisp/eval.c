@@ -16,7 +16,10 @@
   goto *dispatch[a_baseof((pc = (prev)->next), struct a_op, ls)->type]
 
 bool a_eval(struct a_vm *self, a_pc pc) {
-  static const void* dispatch[] = {&&STOP, &&BRANCH, &&CALL, &&COPY, &&DROP, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&STORE};
+  static const void* dispatch[] = {
+    &&STOP, &&BRANCH, &&CALL, &&COPY, &&DROP, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&STORE, &&ZIP
+  };
+  
   A_DISPATCH(pc);
 
  BRANCH: {
@@ -42,7 +45,7 @@ bool a_eval(struct a_vm *self, a_pc pc) {
       return false;
     }
 
-    pc = a_call(t, pc, true);
+    pc = a_call(t, call->flags, pc);
 
     if (!call->target) {
       a_val_deref(t);
@@ -70,7 +73,6 @@ bool a_eval(struct a_vm *self, a_pc pc) {
 
  DROP: {
     A_TRACE(DROP);
-    struct a_ls *vls = self->stack.prev;				   
     int count = a_baseof(pc, struct a_op, ls)->as_drop.count;
 
     if (count == -1) {
@@ -88,19 +90,8 @@ bool a_eval(struct a_vm *self, a_pc pc) {
 
       count = v->as_int;
     }
-    
-    for (int i = count; i > 0; vls = vls->prev, i--) {
-      if (vls == &self->stack) {
-	a_fail("Not enough values on stack: %d", i);
-	return false;
-      }
 
-      a_ls_pop(vls);
-      struct a_val *v = a_baseof(vls, struct a_val, ls);
-      a_val_deref(v);
-      a_free(&self->val_pool, v);
-    }
-    
+    if (!a_drop(self, count)) { return false; }    
     A_DISPATCH(pc);    
   }
   
@@ -146,6 +137,19 @@ bool a_eval(struct a_vm *self, a_pc pc) {
     if (!v) { a_fail("Missing value to store"); }
     self->regs[a_baseof(pc, struct a_op, ls)->as_load.reg] = *v;
     a_free(&self->val_pool, v);
+    A_DISPATCH(pc);
+  }
+
+ ZIP: {
+    A_TRACE(ZIP);
+    struct a_val *r = a_pop(self), *l = a_pop(self);
+
+    if (!l || !r) {
+      a_fail("Not enough values on stack");
+      return false;
+    }
+
+    a_pair_init(&a_push(self, &self->abc.pair_type)->as_pair, l, r);
     A_DISPATCH(pc);
   }
   
