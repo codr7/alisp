@@ -26,6 +26,11 @@ Return evaluates completed forms,
 [55]
 ```
 
+### quirks
+- Parens are used for calls, brackets for lists.
+- Operators may be called infix with `.` between first argument and target.
+- Lists are passed by reference.
+
 ### the stack
 aLisp exposes the stack to a greater extent than what in common among Lisps.
 
@@ -71,14 +76,11 @@ Values may be bound to identifiers using `let`, literals are automagically bound
 Bindings may be aliased at compile time using `alias`.
 
 ```
-  Int
-[Int]
-
   Int.alias foo
-[Int]
+[]
 
   foo
-[Int Int]
+[Int]
 ```
 
 ### equality
