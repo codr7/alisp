@@ -2,11 +2,15 @@
 ** parse func args
 ** drop results from stack in ret op if CALL_DRETS
 * add bench prim
-* add memo/m call flag
+* add mem call flag
 ** add a_lset a_func.memo
 *** index on args
 *** add if missing
+* add tco call flag
 * ---
+* add unbind prim
+** (let [foo 42] (unbind foo) foo)
+** add to readme/bindings
 * add recoverable errors
 ** add vm.errors
 ** add struct a_error like form

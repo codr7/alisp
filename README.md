@@ -68,7 +68,8 @@ Values are pushed on the stack.
   35.(+ 7)
   
 [42]
-
+```
+```
   35.(+:d 7)
   
 [42]
@@ -165,11 +166,11 @@ New functions may be defined using `func`.
 [42]
 ```
 
-Functions capture their defining environments.
+Functions capture their defining environment.
 
 ```
-  (let [x 42]
-    (func foo [] [Int] x))
+  (let [bar 42]
+    (func foo [] [Int] bar))
   (foo)
   
 [42]
