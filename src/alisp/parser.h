@@ -34,5 +34,6 @@ struct a_form *a_parser_pop_last(struct a_parser *self);
 bool a_parser_next(struct a_parser *self);
 struct a_form *a_parser_peek_next(struct a_parser *self);
 struct a_form *a_parser_pop_next(struct a_parser *self);
+bool a_parser_check(struct a_parser *self, char it);
 
 #endif

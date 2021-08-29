@@ -3,8 +3,8 @@
 *** add vm.frames ls
 ** add return op
 *** pop frame
-* add bench prim
 * fib
+* add bench prim
 * add memo/m call flag
 ** add a_lset a_func.memo
 *** index on args
@@ -12,7 +12,6 @@
 * add pure/p func flag
 ** add func flags like call flags
 ** make sure all sub calls are pure
-** fail at compile time if DRETS && PURE
 * ---
 * add support for dynamic lists
 ** add LS_OP
@@ -34,20 +33,3 @@
 * sort a_pool.free_slots in size order
 ** bail out in malloc if > size
 ** insert where >=
-
-public func pairReader(_ p: Parser) throws -> Form? {
-    let c = p.getc()
-        
-    if c != ":" {
-        if c != nil { p.ungetc(c!) }
-        return nil
-    }
-        
-    p.nextColumn()
-    let left = p.popForm()
-    if left == nil { throw ReadError(p.pos, "Missing left value"); }
-    if !(try p.readForm()) { throw ReadError(p.pos, "Missing right value")}
-    let right = p.popForm()
-    
-    return PairForm(env: p.env, pos: left!.pos, (left!, right!))
-}

@@ -93,3 +93,16 @@ struct a_form *a_parser_pop_next(struct a_parser *self) {
   a_ls_pop(&f->ls);
   return f;
 }
+
+bool a_parser_check(struct a_parser *self, char it) {
+  char c = a_stream_getc(&self->in);
+  if (!c) { return false; }
+  
+  if (c != it) {
+      a_stream_ungetc(&self->in);
+      return false;
+  }
+
+  self->pos.column++;
+  return true;
+}

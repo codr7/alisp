@@ -29,16 +29,7 @@ struct a_form *a_skip_space(struct a_parser *self) {
 
 struct a_form *a_parse_call(struct a_parser *self) {
   struct a_pos fpos = self->pos;
-  char c = a_stream_getc(&self->in);
-  if (!c) { return NULL; }
-  
-  if (c != '(') {
-      a_stream_ungetc(&self->in);
-      return NULL;
-  }
-
-  self->pos.column++;
-
+  if (!a_parser_check(self, '(')) { return NULL; }
   struct a_form *t = a_parser_pop_next(self);
 
   if (!t) {
@@ -51,7 +42,7 @@ struct a_form *a_parse_call(struct a_parser *self) {
   
   while (true) {
     a_skip_space(self);
-    c = a_stream_getc(&self->in);
+    char c = a_stream_getc(&self->in);
 
     if (c == ')') {
       self->pos.column++;
@@ -78,16 +69,7 @@ struct a_form *a_parse_call(struct a_parser *self) {
 
 struct a_form *a_parse_dot(struct a_parser *self) {
   struct a_pos fpos = self->pos;
-  char c = a_stream_getc(&self->in);
-  if (!c) { return NULL; }
-  
-  if (c != '.') {
-      a_stream_ungetc(&self->in);
-      return NULL;
-  }
-
-  self->pos.column++;
-
+  if (!a_parser_check(self, '.')) { return NULL; }
   struct a_form *arg = a_parser_pop_last(self);
 
   if (!arg) {
@@ -185,21 +167,13 @@ struct a_form *a_parse_int(struct a_parser *self) {
 
 struct a_form *a_parse_ls(struct a_parser *self) {
   struct a_pos fpos = self->pos;
-  char c = a_stream_getc(&self->in);
-  if (!c) { return NULL; }
-
-  if (c != '[') {
-    a_stream_ungetc(&self->in);
-    return NULL;
-  }
-
-  self->pos.column++;
+  if (!a_parser_check(self, '[')) { return NULL; }
   struct a_form *lsf = a_malloc(&self->vm->form_pool, sizeof(struct a_form));
   a_form_init(lsf, A_LS_FORM, fpos);
 
   while (true) {
     a_skip_space(self);
-    c = a_stream_getc(&self->in);
+    char c = a_stream_getc(&self->in);
 
     if (c == ']') {
       self->pos.column++;
@@ -224,14 +198,7 @@ struct a_form *a_parse_ls(struct a_parser *self) {
 }
 
 struct a_form *a_parse_pair(struct a_parser *self) {
-  char c = a_stream_getc(&self->in);
-  if (!c) { return NULL; }
-
-  if (c != ':') {
-    a_stream_ungetc(&self->in);
-    return NULL;
-  }
-
+  if (!a_parser_check(self, ':')) { return NULL; }
   struct a_form *l = a_parser_pop_last(self);
   
   if (!l) {
