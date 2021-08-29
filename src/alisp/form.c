@@ -218,12 +218,6 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
 
   case A_ID_FORM: {
     struct a_string *id = self->as_id.name;
-
-    if (id->length == 2 && id->data[0] == 's' && isdigit(id->data[1])) {
-      a_emit(vm, A_COPY_OP)->as_copy.offset = id->data[1] - '0';
-      break;
-    }
-    
     struct a_val *v = a_scope_find(a_scope(vm), id);
 
     if (v == NULL) {

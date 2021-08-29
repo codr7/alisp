@@ -50,14 +50,6 @@ Values are pushed on the stack.
 [1]
 ```
 
-`s0-9` may be used to copy the value at specified offset from the top.
-
-```
-  1 2 3 s1
-  
-[1 2 3 2]
-```
-
 `d` may be used to drop values.
 
 ```
