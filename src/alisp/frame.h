@@ -9,11 +9,11 @@ struct a_vm;
 struct a_frame {
   struct a_ls ls;
   struct a_val *regs[A_REG_COUNT];
-  a_pc ret;
+  a_pc_t ret;
 };
 
-struct a_frame *a_frame_init(struct a_frame *self, struct a_vm *vm, a_pc ret);
+struct a_frame *a_frame_init(struct a_frame *self, struct a_vm *vm, a_pc_t ret);
 void a_frame_deinit(struct a_frame *self);
-a_pc a_frame_restore(struct a_frame *self, struct a_vm *vm);
+a_pc_t a_frame_restore(struct a_frame *self, struct a_vm *vm);
 
 #endif

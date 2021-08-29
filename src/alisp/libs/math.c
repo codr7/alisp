@@ -7,7 +7,7 @@
 #include "alisp/string.h"
 #include "alisp/vm.h"
 
-static a_pc add_int_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
+static a_pc_t add_int_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm);
   x->as_int += y->as_int;
   a_val_deref(y);
@@ -15,7 +15,7 @@ static a_pc add_int_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
   return ret;
 }
 
-static a_pc sub_int_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
+static a_pc_t sub_int_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm);
   x->as_int -= y->as_int;
   a_val_deref(y);

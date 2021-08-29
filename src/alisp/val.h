@@ -22,7 +22,7 @@ struct a_val {
     struct a_type *as_meta;
     struct a_pair as_pair;
     struct a_prim *as_prim;
-    a_reg as_reg;
+    a_reg_t as_reg;
   };
 };
 
@@ -30,7 +30,7 @@ struct a_val *a_val(struct a_vm *vm, struct a_type *type);
 struct a_val *a_val_init(struct a_val *self, struct a_type *type);
 bool a_val_deref(struct a_val *self);
 
-a_pc a_call(struct a_val *self, enum a_call_flags flags, a_pc ret);
+a_pc_t a_call(struct a_val *self, enum a_call_flags flags, a_pc_t ret);
 enum a_order a_compare(struct a_val *self, struct a_val *other);
 void a_copy(struct a_val *self, struct a_val *source);
 void a_dump(struct a_val *self);

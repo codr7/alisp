@@ -46,15 +46,15 @@ struct a_vm {
 struct a_vm *a_vm_init(struct a_vm *self);
 void a_vm_deinit(struct a_vm *self);
 
-a_pc a_next_pc(struct a_vm *self);
+a_pc_t a_pc(struct a_vm *self);
 struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type);
-bool a_eval(struct a_vm *self, a_pc pc);
+bool a_eval(struct a_vm *self, a_pc_t pc);
 
 struct a_scope *a_scope(struct a_vm *self);
 
 struct a_scope *a_begin(struct a_vm *self, struct a_scope *scope);
 struct a_scope *a_end(struct a_vm *self);
 
-a_reg a_bind_reg(struct a_vm *self, struct a_string *key);
+a_reg_t a_bind_reg(struct a_vm *self, struct a_string *key);
 
 #endif

@@ -13,8 +13,8 @@ struct a_vm;
 enum a_call_flags {A_CALL_DRETS = 1, A_CALL_CHECK = 3};
 
 typedef uint16_t a_ref_count;
-typedef uint16_t a_reg;
-typedef struct a_ls *a_pc;
+typedef uint16_t a_reg_t;
+typedef struct a_ls *a_pc_t;
 
 struct a_type *a_bool_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 

@@ -32,7 +32,7 @@ int main() {
       break;
     }
 
-    a_pc pc = a_next_pc(&vm);
+    a_pc_t pc = a_pc(&vm);
     while (a_parser_next(&parser));
     struct a_form *f;
     
@@ -41,7 +41,7 @@ int main() {
       a_form_deref(f, &vm);
     }
     
-    if (a_next_pc(&vm) != pc) {
+    if (a_pc(&vm) != pc) {
       a_emit(&vm, A_STOP_OP);
       a_eval(&vm, pc);
     }

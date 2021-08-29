@@ -44,7 +44,7 @@ bool a_func_deref(struct a_func *self, struct a_vm *vm) {
 
 void a_func_begin(struct a_func *self, struct a_vm *vm) {
   a_emit(vm, A_GOTO_OP);
-  self->start_pc = a_next_pc(vm);
+  self->start_pc = a_pc(vm);
   self->scope = a_begin(vm, NULL);
 
   for (struct a_arg *a = self->args->items; a < self->args->items+self->args->count; a++) {
@@ -55,7 +55,7 @@ void a_func_begin(struct a_func *self, struct a_vm *vm) {
 void a_func_end(struct a_func *self, struct a_vm *vm) {
   a_emit(vm, A_RET_OP);
   a_end(vm);
-  a_baseof(self->start_pc, struct a_op, ls)->as_goto.pc = a_next_pc(vm);
+  a_baseof(self->start_pc, struct a_op, ls)->as_goto.pc = a_pc(vm);
 }
 
 bool a_func_applicable(struct a_func *self, struct a_vm *vm) {
@@ -70,7 +70,7 @@ bool a_func_applicable(struct a_func *self, struct a_vm *vm) {
   return true;
 }
 
-a_pc a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags, a_pc ret) {
+a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags, a_pc_t ret) {
   if (self->body) {
     ret = self->body(self, vm, ret);
     if (flags & A_CALL_DRETS) { a_drop(vm, self->rets->count); }

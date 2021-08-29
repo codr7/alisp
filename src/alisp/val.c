@@ -17,7 +17,7 @@ bool a_val_deref(struct a_val *self) {
   return self->type->deref_val ? self->type->deref_val(self) : true;
 }
 
-a_pc a_call(struct a_val *self, enum a_call_flags flags, a_pc ret) {
+a_pc_t a_call(struct a_val *self, enum a_call_flags flags, a_pc_t ret) {
   assert(self->type->call_val);
   return self->type->call_val(self, flags, ret);
 }

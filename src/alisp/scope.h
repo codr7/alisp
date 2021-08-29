@@ -14,7 +14,7 @@ struct a_scope {
   struct a_scope *outer;
   struct a_ls ls;
   struct a_lset bindings;
-  a_reg next_reg;
+  a_reg_t next_reg;
   a_ref_count ref_count;
 };
 

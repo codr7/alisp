@@ -73,7 +73,7 @@ void a_vm_deinit(struct a_vm *self) {
   a_pool_deref(&self->pool);
 }
 
-a_pc a_next_pc(struct a_vm *self) { return self->code.prev; }
+a_pc_t a_pc(struct a_vm *self) { return self->code.prev; }
 
 struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
   struct a_op *op = a_op_init(a_malloc(&self->op_pool, sizeof(struct a_op)), op_type);
@@ -102,10 +102,10 @@ struct a_scope *a_end(struct a_vm *self) {
   return a_baseof(ls, struct a_scope, ls);
 }
 
-a_reg a_bind_reg(struct a_vm *self, struct a_string *key) {
+a_reg_t a_bind_reg(struct a_vm *self, struct a_string *key) {
   struct a_scope *s = a_scope(self);
   a_check(s->next_reg < A_REG_COUNT-1, "Maximum number of registers exceeded");
-  a_reg r = s->next_reg++;
+  a_reg_t r = s->next_reg++;
   a_scope_bind(s, key, &self->abc.reg_type)->as_reg = r;
   return r;
 }

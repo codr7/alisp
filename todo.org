@@ -1,5 +1,3 @@
-* rename a_pc to a_pc_t
-** rename next_pc to pc
 * add func prim
 * add func field to frame
 ** use to check stack in ret op

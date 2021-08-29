@@ -4,7 +4,7 @@
 #include "alisp/string.h"
 #include "alisp/val.h"
 
-static a_pc call_val(struct a_val *val, enum a_call_flags flags, a_pc ret) {
+static a_pc_t call_val(struct a_val *val, enum a_call_flags flags, a_pc_t ret) {
   struct a_func *f = val->as_func;
   if ((flags & A_CALL_CHECK) && !a_func_applicable(f, val->type->vm)) { a_fail("Func not applicable: %s", f->name->data); }
   return a_func_call(f, val->type->vm, flags, ret);

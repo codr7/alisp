@@ -13,7 +13,7 @@ enum a_op_type {
   A_STORE_OP, A_ZIP_OP};
 
 struct a_branch_op {
-  a_pc right_pc;
+  a_pc_t right_pc;
 };
   
 struct a_call_op {
@@ -30,11 +30,11 @@ struct a_drop_op {
 };
 
 struct a_goto_op {
-  a_pc pc;
+  a_pc_t pc;
 };
 
 struct a_load_op {
-  a_reg reg;
+  a_reg_t reg;
 };
 
 struct a_push_op {
@@ -42,7 +42,7 @@ struct a_push_op {
 };
 
 struct a_store_op {
-  a_reg reg;
+  a_reg_t reg;
 };
 
 struct a_op {

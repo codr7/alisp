@@ -68,7 +68,7 @@ static bool do_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uin
   return true;
 }
 
-static a_pc equals_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
+static a_pc_t equals_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_pop(vm);
   a_push(vm, &vm->abc.bool_type)->as_bool = a_equals(x, y);
   a_val_deref(x);
@@ -78,7 +78,7 @@ static a_pc equals_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
   return ret;
 }
 
-static a_pc lt_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
+static a_pc_t lt_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_pop(vm);
   a_push(vm, &vm->abc.bool_type)->as_bool = a_compare(x, y) == A_LT;
   a_val_deref(x);
@@ -88,7 +88,7 @@ static a_pc lt_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
   return ret;
 }
 
-static a_pc gt_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
+static a_pc_t gt_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_pop(vm);
   a_push(vm, &vm->abc.bool_type)->as_bool = a_compare(x, y) == A_GT;
   a_val_deref(x);
@@ -109,18 +109,18 @@ static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uin
 
   if ((a = a->next) != args) {
     struct a_goto_op *skip_right = &a_emit(vm, A_GOTO_OP)->as_goto;
-    branch->right_pc = a_next_pc(vm);
+    branch->right_pc = a_pc(vm);
     right = a_baseof(a, struct a_form, ls);
     if (!a_form_emit(right, vm)) { return false; }
-    skip_right->pc = a_next_pc(vm);
+    skip_right->pc = a_pc(vm);
   } else {
-    branch->right_pc = a_next_pc(vm);
+    branch->right_pc = a_pc(vm);
   }
 
   return true;
 }
 
-static a_pc is_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
+static a_pc_t is_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_pop(vm);
   a_push(vm, &vm->abc.bool_type)->as_bool = a_is(x, y);
   a_val_deref(x);
@@ -163,7 +163,7 @@ static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
     if (v) {
       a_copy(a_scope_bind(s, k, v->type), v);
     } else {
-      a_reg reg = a_bind_reg(vm, k);
+      a_reg_t reg = a_bind_reg(vm, k);
       if (!a_form_emit(vf, vm)) { return false; }
       a_emit(vm, A_STORE_OP)->as_store.reg = reg;
     }

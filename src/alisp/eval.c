@@ -16,7 +16,7 @@
 #define A_DISPATCH(prev)						\
   goto *dispatch[a_baseof((pc = (prev)->next), struct a_op, ls)->type]
 
-bool a_eval(struct a_vm *self, a_pc pc) {
+bool a_eval(struct a_vm *self, a_pc_t pc) {
   static const void* dispatch[] = {
     &&STOP, &&BRANCH, &&CALL, &&COPY, &&DROP, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&RET, &&STORE, &&ZIP
   };

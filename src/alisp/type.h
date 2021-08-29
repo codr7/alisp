@@ -21,7 +21,7 @@ struct a_type {
   a_type_id id;
   struct a_string *name;
   struct a_type *super[A_MAX_TYPE_ID]; 
-  a_pc (*call_val)(struct a_val *val, enum a_call_flags flags, a_pc ret);
+  a_pc_t (*call_val)(struct a_val *val, enum a_call_flags flags, a_pc_t ret);
   enum a_order (*compare_val)(struct a_val *x, struct a_val *y);
   void (*copy_val)(struct a_val *dst, struct a_val *src);
   bool (*deref_val)(struct a_val *val);

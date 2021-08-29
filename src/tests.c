@@ -10,7 +10,7 @@
 static void test_push() {
   struct a_vm vm;
   a_vm_init(&vm);
-  a_pc pc = a_next_pc(&vm);
+  a_pc_t pc = a_pc(&vm);
   a_val_init(&a_emit(&vm, A_PUSH_OP)->as_push.val, &vm.abc.int_type)->as_int = 42;
   a_emit(&vm, A_STOP_OP);
   a_eval(&vm, pc);
@@ -25,8 +25,8 @@ static void test_push() {
 static void test_bind() {
   struct a_vm vm;
   a_vm_init(&vm);
-  a_pc pc = a_next_pc(&vm);
-  a_reg reg = a_bind_reg(&vm, a_string(&vm, "foo"));
+  a_pc_t pc = a_pc(&vm);
+  a_reg_t reg = a_bind_reg(&vm, a_string(&vm, "foo"));
   a_val_init(&a_emit(&vm, A_PUSH_OP)->as_push.val, &vm.abc.int_type)->as_int = 42;
   a_emit(&vm, A_STORE_OP)->as_store.reg = reg;
   a_emit(&vm, A_LOAD_OP)->as_load.reg = reg;
@@ -40,7 +40,7 @@ static void test_bind() {
   a_vm_deinit(&vm);
 }
 
-static a_pc test_func_foo_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
+static a_pc_t test_func_foo_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm);
   x->as_int += y->as_int;
   a_val_deref(y);
@@ -51,7 +51,7 @@ static a_pc test_func_foo_body(struct a_func *self, struct a_vm *vm, a_pc ret) {
 static void test_func() {
   struct a_vm vm;
   a_vm_init(&vm);
-  a_pc pc = a_next_pc(&vm);
+  a_pc_t pc = a_pc(&vm);
 
   struct a_func f;
   
@@ -84,7 +84,7 @@ static void test_func() {
 static void test_func_emit() {
   struct a_vm vm;
   a_vm_init(&vm);
-  a_pc pc = a_next_pc(&vm);
+  a_pc_t pc = a_pc(&vm);
 
   struct a_func f;
   
