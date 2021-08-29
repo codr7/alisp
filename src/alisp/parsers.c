@@ -27,7 +27,7 @@ struct a_form *a_skip_space(struct a_parser *self) {
   return NULL;
 }
 
-struct a_form *a_parse_call(struct a_parser *self) {
+struct a_form *a_parse_call(struct a_parser *self) {  
   struct a_pos fpos = self->pos;
   if (!a_parser_check(self, '(')) { return NULL; }
   struct a_form *t = a_parser_pop_next(self);
@@ -51,7 +51,7 @@ struct a_form *a_parse_call(struct a_parser *self) {
 
     if (c) { a_stream_ungetc(&self->in); }
     struct a_form *f = a_parser_pop_next(self);
-      
+    
     if (!f) {
       a_form_deref(cf, self->vm);
       a_free(&self->vm->form_pool, cf);
@@ -102,7 +102,7 @@ struct a_form *a_parse_id(struct a_parser *self) {
 
   while ((c = a_stream_getc(&self->in))) {
     if (isspace(c) ||
-	c == '(' || c == ')' || c == '[' || c == ']' || c == ':' || c == '.' || c == '\'' || c == ',') {
+	c == '(' || c == ')' || c == '[' || c == ']' || c == ':' || c == '.' || c == '\'') {
       a_stream_ungetc(&self->in);
       break;
     }

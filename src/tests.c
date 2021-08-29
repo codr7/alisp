@@ -26,7 +26,7 @@ static void test_bind() {
   struct a_vm vm;
   a_vm_init(&vm);
   a_pc_t pc = a_pc(&vm);
-  a_reg_t reg = a_bind_reg(&vm, a_string(&vm, "foo"));
+  a_reg_t reg = a_scope_bind_reg(a_scope(&vm), a_string(&vm, "foo"));
   a_val_init(&a_emit(&vm, A_PUSH_OP)->as_push.val, &vm.abc.int_type)->as_int = 42;
   a_emit(&vm, A_STORE_OP)->as_store.reg = reg;
   a_emit(&vm, A_LOAD_OP)->as_load.reg = reg;

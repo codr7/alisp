@@ -45,10 +45,10 @@ bool a_func_deref(struct a_func *self, struct a_vm *vm) {
 void a_func_begin(struct a_func *self, struct a_vm *vm) {
   a_emit(vm, A_GOTO_OP);
   self->start_pc = a_pc(vm);
-  self->scope = a_begin(vm, NULL);
+  self->scope = a_begin(vm);
 
   for (struct a_arg *a = self->args->items; a < self->args->items+self->args->count; a++) {
-    if (a->name) { a_bind_reg(vm, a->name); }
+    if (a->name) { a_scope_bind_reg(self->scope, a->name); }
   }
 }
 
@@ -79,8 +79,6 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
 
   struct a_frame *f = a_frame_init(a_malloc(&vm->frame_pool, sizeof(struct a_frame)), vm, self, ret);
   a_ls_push(&vm->frames, &f->ls);
-  
-  a_begin(vm, self->scope);
   struct a_ls *sp = vm->stack.prev;
   
   for (struct a_arg *a = self->args->items+self->args->count-1; a >= self->args->items; a--) {
@@ -109,4 +107,16 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
   }
   
   return self->start_pc;
+}
+
+struct a_args *a_args(struct a_vm *vm, uint8_t count) {
+  struct a_args *args =	a_malloc(&vm->pool, sizeof(struct a_args) + count*sizeof(struct a_arg));	
+  args->count = count;
+  return args;
+}
+
+struct a_rets *a_rets(struct a_vm *vm, uint8_t count) {
+  struct a_rets *rets =	a_malloc(&vm->pool, sizeof(struct a_rets) + count*sizeof(struct a_type *));	
+  rets->count = count;
+  return rets;
 }

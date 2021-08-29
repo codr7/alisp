@@ -8,7 +8,7 @@
 
 int main() {
   printf("Welcome to aLisp v%d\n\n", A_VERSION);
-  printf("Return evaluates completed forms,\n");
+  printf("Return on empty line evaluates,\n");
   printf("(reset) clears the stack and Ctrl+D exits.\n\n");
 	 
   struct a_vm vm;
@@ -19,19 +19,16 @@ int main() {
   a_parser_add_prefix(&parser, a_skip_space);
   a_parser_add_prefix(&parser, a_parse_int);
   a_parser_add_prefix(&parser, a_parse_call);
-  a_parser_add_prefix(&parser, a_parse_dot);
   a_parser_add_prefix(&parser, a_parse_ls);
   a_parser_add_prefix(&parser, a_parse_id);
+  a_parser_add_suffix(&parser, a_parse_dot);
   a_parser_add_suffix(&parser, a_parse_pair);
   
   while (!feof(stdin)) {
     printf("  ");
-    a_stream_getline(&parser.in, stdin);
-    
-    if (feof(stdin)) {
-      break;
-    }
-
+    char *line = a_stream_getline(&parser.in, stdin);
+    if (feof(stdin)) { break; }
+    if (line[0] != '\n') { continue; }
     a_pc_t pc = a_pc(&vm);
     while (a_parser_next(&parser));
     struct a_form *f;

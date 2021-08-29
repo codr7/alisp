@@ -10,7 +10,7 @@
 #include "alisp/types.h"
 #include "alisp/val.h"
 
-#define A_VERSION 3
+#define A_VERSION 4
 
 #define A_PAGE_SIZE 32000
 #define A_DEFAULT_PAGE_SIZE 32
@@ -52,11 +52,10 @@ bool a_eval(struct a_vm *self, a_pc_t pc);
 
 struct a_scope *a_scope(struct a_vm *self);
 
-struct a_scope *a_begin(struct a_vm *self, struct a_scope *scope);
+struct a_scope *a_push_scope(struct a_vm *self, struct a_scope *scope);
+struct a_scope *a_begin(struct a_vm *self);
 struct a_scope *a_end(struct a_vm *self);
 
 void a_store(struct a_vm *self, a_reg_t reg, struct a_val *val);
-
-a_reg_t a_bind_reg(struct a_vm *self, struct a_string *key);
 
 #endif

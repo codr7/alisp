@@ -60,14 +60,6 @@ static bool d_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint
   return true;
 }
 
-static bool do_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
-  a_ls_do(args, a) {
-    if (!a_form_emit(a_baseof(a, struct a_form, ls), vm)) { return false; }
-  }
-
-  return true;
-}
-
 static a_pc_t equals_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_pop(vm);
   a_push(vm, &vm->abc.bool_type)->as_bool = a_equals(x, y);
@@ -96,6 +88,89 @@ static a_pc_t gt_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   a_val_deref(y);
   a_free(&vm->val_pool, y);
   return ret;
+}
+
+static bool do_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  a_ls_do(args, a) {
+    if (!a_form_emit(a_baseof(a, struct a_form, ls), vm)) { return false; }
+  }
+
+  return true;
+}
+
+static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_ls *a = args->next;
+  struct a_form *name_form = a_baseof(a, struct a_form, ls);
+
+  if (name_form->type != A_ID_FORM) {
+    a_fail("Invalid function name: %d", name_form->type);
+    return false;
+  }
+  
+  struct a_form *args_form = a_baseof((a = a->next), struct a_form, ls);
+
+  if (args_form->type != A_LS_FORM) {
+    a_fail("Invalid function arguments: %d", args_form->type);
+    return false;
+  }
+
+  struct a_form *rets_form = a_baseof((a = a->next), struct a_form, ls);
+
+  if (rets_form->type != A_LS_FORM) {
+    a_fail("Invalid function returns: %d", rets_form->type);
+    return false;
+  }
+
+  uint8_t
+    farg_count = a_ls_count(&args_form->as_ls.items),
+    fret_count = a_ls_count(&rets_form->as_ls.items);
+  
+  struct a_args *fargs = a_args(vm, farg_count);
+  
+  struct a_rets *frets = a_rets(vm, fret_count);
+  struct a_type **frp = frets->items;
+  
+  a_ls_do(&rets_form->as_ls.items, rls) {
+    struct a_form *rf = a_baseof(rls, struct a_form, ls);
+    
+    if (rf->type != A_ID_FORM) {
+      a_fail("Invalid return form: %d", rf->type);
+      return false;
+    }
+
+    struct a_val *v = a_scope_find(a_scope(vm), rf->as_id.name);
+
+    if (!v) {
+      a_fail("Unknown return type: %s", rf->as_id.name->data);
+      return false;
+    }
+
+    if (v->type != &vm->abc.meta_type) {
+      a_fail("Invalid return type: %s", v->type->name->data);
+      return false;
+    }
+    
+    *frp++ = v->as_meta;
+  }
+  
+  struct a_func *f = a_func(vm, name_form->as_id.name, fargs, frets);
+  struct a_val *v = a_scope_bind(&vm->main, f->name, &vm->abc.func_type);
+
+  if (!v) {
+    a_fail("Duplicate binding: %s", f->name->data);
+    return false;
+  }
+  
+  v->as_func = f;
+  a_func_begin(f, vm);
+
+  while (a != args) {
+    struct a_form *f = a_baseof((a = a->next), struct a_form, ls);
+    if (!a_form_emit(f, vm)) { return false; }
+  }
+  
+  a_func_end(f, vm);
+  return true;
 }
 
 static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
@@ -131,7 +206,6 @@ static a_pc_t is_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 }
 
 static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
-  struct a_scope *s = a_scope(vm);
   struct a_form *bsf = a_baseof(args->next, struct a_form, ls);
 
   if (bsf->type != A_LS_FORM) {
@@ -140,12 +214,14 @@ static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
   }
 
   struct a_ls *bs = &bsf->as_ls.items, *b = bs->prev;
+  struct a_scope *s = a_begin(vm);
 
   while (b != bs) {
     struct a_form *vf = a_baseof(b, struct a_form, ls);
 
     if ((b = b->prev) == bs) {
       a_fail("Malformed bindings");
+      a_end(vm);
       return false;
     }
 
@@ -154,6 +230,7 @@ static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
 
     if (kf->type != A_ID_FORM) {
       a_fail("Invalid key form: %d", kf->type);
+      a_end(vm);
       return false;
     }
     
@@ -163,8 +240,13 @@ static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
     if (v) {
       a_copy(a_scope_bind(s, k, v->type), v);
     } else {
-      a_reg_t reg = a_bind_reg(vm, k);
-      if (!a_form_emit(vf, vm)) { return false; }
+      a_reg_t reg = a_scope_bind_reg(s, k);
+
+      if (!a_form_emit(vf, vm)) {
+	a_end(vm);
+	return false;
+      }
+      
       a_emit(vm, A_STORE_OP)->as_store.reg = reg;
     }
   }
@@ -173,14 +255,7 @@ static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
     if (!a_form_emit(a_baseof(fls, struct a_form, ls), vm)) { return false; }
   }
 
-  bs = &bsf->as_ls.items;
-  b = bs->next;
-
-  for (b = bs->next; b != bs; b = b->next->next) {
-    struct a_form *kf = a_baseof(b, struct a_form, ls);
-    a_scope_unbind(s, kf->as_id.name);
-  }
-  
+  a_end(vm);
   return true;
 }
 
@@ -245,6 +320,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "alias"), 2, 2))->body = alias_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "d"), 0, 1))->body = d_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "do"), 0, -1))->body = do_body;
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "func"), 3, -1))->body = func_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "if"), 2, 3))->body = if_body;
 
   a_lib_bind_func(&self->lib,

@@ -54,7 +54,7 @@ struct a_form *a_parser_pop(struct a_parser *self) {
   return a_baseof(a_ls_pop(fls), struct a_form, ls);
 }
 
-struct a_form *a_parser_pop_last(struct a_parser *self) {  
+struct a_form *a_parser_pop_last(struct a_parser *self) {
   struct a_ls *fls = self->forms.prev;
   if (fls == &self->forms) { return NULL; }
   return a_baseof(a_ls_pop(fls), struct a_form, ls);
@@ -90,6 +90,7 @@ struct a_form *a_parser_peek_next(struct a_parser *self) {
 
 struct a_form *a_parser_pop_next(struct a_parser *self) {
   struct a_form *f = a_parser_peek_next(self);
+  if (!f) { return NULL; }
   a_ls_pop(&f->ls);
   return f;
 }

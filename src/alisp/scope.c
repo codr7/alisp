@@ -1,4 +1,5 @@
 #include <assert.h>
+#include "alisp/fail.h"
 #include "alisp/pool.h"
 #include "alisp/scope.h"
 #include "alisp/string.h"
@@ -44,6 +45,14 @@ struct a_val *a_scope_bind(struct a_scope *self, struct a_string *key, struct a_
   return a_val_init(&b->val, type);
 }
 
+a_reg_t a_scope_bind_reg(struct a_scope *self, struct a_string *key) {
+  a_check(self->next_reg < A_REG_COUNT-1, "Maximum number of registers exceeded");
+  a_reg_t r = self->next_reg++;
+  a_scope_bind(self, key, &self->vm->abc.reg_type)->as_reg = r;
+  return r;
+}
+
+
 bool a_scope_unbind(struct a_scope *self, struct a_string *key) {
   struct a_val *v = a_scope_find(self, key);
   if (!v) { return false; }
@@ -54,8 +63,6 @@ bool a_scope_unbind(struct a_scope *self, struct a_string *key) {
 
 struct a_val *a_scope_find(struct a_scope *self, const struct a_string *key) {
   struct a_ls *found = a_lset_find(&self->bindings, key);
-  if (!found) { return NULL; }
+  if (!found) { return self->outer ? a_scope_find(self->outer, key) : NULL; }
   return a_baseof(found, struct a_val, ls);
 }
-
-

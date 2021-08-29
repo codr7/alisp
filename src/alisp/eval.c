@@ -143,7 +143,6 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
       return false;
     }
     
-    a_end(self);
     struct a_frame *f = a_baseof(a_ls_pop(fls), struct a_frame, ls);
     pc = a_frame_restore(f, self);
     struct a_ls *sp = self->stack.prev;

@@ -27,7 +27,7 @@ struct a_vm *a_vm_init(struct a_vm *self) {
 
   a_scope_init(&self->main, self, NULL);
   a_ls_init(&self->scopes);
-  a_begin(self, &self->main);
+  a_push_scope(self, &self->main);
 
   a_ls_init(&self->frames);
   a_ls_init(&self->stack);
@@ -89,14 +89,15 @@ struct a_scope *a_scope(struct a_vm *self) {
   return a_baseof(self->scopes.prev, struct a_scope, ls);
 }
 
-struct a_scope *a_begin(struct a_vm *self, struct a_scope *scope) {
-  if (!scope) {
-    scope = a_malloc(&self->scope_pool, sizeof(struct a_scope));
-    a_scope_init(scope, self, a_scope(self));
-  }
-
+struct a_scope *a_push_scope(struct a_vm *self, struct a_scope *scope) {
   a_ls_push(&self->scopes, &scope->ls);
   return scope;
+}
+
+struct a_scope *a_begin(struct a_vm *self) {
+  struct a_scope *s = a_malloc(&self->scope_pool, sizeof(struct a_scope));
+  a_scope_init(s, self, a_scope(self));
+  return a_push_scope(self, s);
 }
 
 struct a_scope *a_end(struct a_vm *self) {
@@ -116,12 +117,4 @@ void a_store(struct a_vm *self, a_reg_t reg, struct a_val *val) {
   
   self->regs[reg] = val;
 
-}
-
-a_reg_t a_bind_reg(struct a_vm *self, struct a_string *key) {
-  struct a_scope *s = a_scope(self);
-  a_check(s->next_reg < A_REG_COUNT-1, "Maximum number of registers exceeded");
-  a_reg_t r = s->next_reg++;
-  a_scope_bind(s, key, &self->abc.reg_type)->as_reg = r;
-  return r;
 }

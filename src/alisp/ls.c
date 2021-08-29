@@ -17,3 +17,10 @@ struct a_ls *a_ls_pop(struct a_ls *self) {
   self->next->prev = self->prev;
   return self;
 }
+
+uint32_t a_ls_count(struct a_ls *self) {
+  uint32_t n = 0;
+  for (struct a_ls *i = self->next; i != self; i = i->next, n++);
+  return n;
+}
+

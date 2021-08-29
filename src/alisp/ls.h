@@ -2,6 +2,7 @@
 #define ALISP_LS_H
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "alisp/macros.h"
 
 #define _a_ls_do(ls, i, _next)				\
@@ -21,5 +22,7 @@ bool a_ls_null(const struct a_ls *self);
 
 void a_ls_push(struct a_ls *self, struct a_ls *it);
 struct a_ls *a_ls_pop(struct a_ls *self);
+
+uint32_t a_ls_count(struct a_ls *self);
 
 #endif

@@ -1,16 +1,12 @@
-* add func prim
 * fib
+** parse func args
+** drop results from stack in ret op if CALL_DRETS
 * add bench prim
 * add memo/m call flag
 ** add a_lset a_func.memo
 *** index on args
 *** add if missing
-* add pure/p func flag
-** add func flags like call flags
-** make sure all sub calls are pure
 * ---
-* add support for dynamic lists
-** add LS_OP
 * add recoverable errors
 ** add vm.errors
 ** add struct a_error like form
@@ -21,12 +17,35 @@
 * add quoting
 ** add form.quote1-3
 ** add '-parser
+* add multi support
+** create automatically in func prim
+** create automatically in lib import
 * add test prim
 ** (test "..." [stack] body)
 ** add test script
 * add line comments with ;
+* add support for dynamic lists
+** add LS_OP
+* capture registers in func, apply/restore in frame
+** only those loaded but not stored in body
 * ---
 * sort a_pool.free_slots in size order
 ** bail out in malloc if > size
 ** insert where >=
 
+    public static func getArg(env: Env, pos: Pos, _ f: Form) throws -> Arg {
+        var l: String?
+        var r: String
+        
+        switch f {
+        case let f as IdForm:
+            r = f.name
+        case let f as PairForm:
+            l = (f.left as! IdForm).name
+            r = (f.right as! IdForm).name
+        default:
+            throw EmitError(pos, "Invalid func argument: #\(f)")
+        }
+        
+        return (l, try env.getType(pos: pos, r))
+    }

@@ -9,8 +9,7 @@
   ({									\
     struct a_arg items[] = {__VA_ARGS__};				\
     struct a_args *args =						\
-      a_malloc(&(vm)->pool, sizeof(struct a_args) + sizeof(items));	\
-    args->count = sizeof(items) / sizeof(struct a_arg);			\
+      a_args(vm, sizeof(items) / sizeof(struct a_arg));			\
     memcpy(args->items, items, sizeof(items));				\
     args;								\
   })
@@ -19,8 +18,7 @@
   ({									\
     struct a_type *items[] = {__VA_ARGS__};				\
     struct a_rets *rets =						\
-      a_malloc(&(vm)->pool, sizeof(struct a_rets) + sizeof(items));	\
-    rets->count = sizeof(items) / sizeof(struct a_type *);		\
+      a_rets(vm, sizeof(items) / sizeof(struct a_type *));		\
     memcpy(rets->items, items, sizeof(items));				\
     rets;								\
   })
@@ -70,5 +68,8 @@ void a_func_end(struct a_func *self, struct a_vm *vm);
 
 bool a_func_applicable(struct a_func *self, struct a_vm *vm);
 a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags, a_pc_t ret);
+
+struct a_args *a_args(struct a_vm *vm, uint8_t count);
+struct a_rets *a_rets(struct a_vm *vm, uint8_t count);
 
 #endif

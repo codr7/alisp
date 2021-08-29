@@ -18,9 +18,9 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v3
+Welcome to aLisp v4
 
-Return evaluates completed forms,
+Return on empty line evaluates,
 (reset) clears the stack and Ctrl+D exits.
 
   (func fibrec [n:Int] [Int]
@@ -38,6 +38,7 @@ Values are pushed on the stack.
 
 ```
   1 2 3
+  
 [1 2 3]
 ```
 
@@ -45,12 +46,15 @@ Values are pushed on the stack.
 
 ```
   42 (if _ 1 2)
+  
+[1]
 ```
 
 `s0-9` may be used to copy the value at specified offset from the top.
 
 ```
   1 2 3 s1
+  
 [1 2 3 2]
 ```
 
@@ -58,9 +62,11 @@ Values are pushed on the stack.
 
 ```
   1 2 3 (d)
+  
 [1 2]
 
   (d 2)
+  
 []
 ```
 
@@ -68,9 +74,11 @@ Values are pushed on the stack.
 
 ```
   35.(+ 7)
+  
 [42]
 
   35.(+:d 7)
+  
 [42]
 ```
 
@@ -80,6 +88,7 @@ Values may be bound to identifiers using `let`, literals are automagically bound
 ```
   (let [x 35 y 7]
     x.(+ y))
+    
 [42]
 ```
 
@@ -87,9 +96,8 @@ Bindings may be aliased at compile time using `alias`.
 
 ```
   Int.(alias foo)
-[]
-
   foo
+  
 [Int]
 ```
 
@@ -98,6 +106,7 @@ Bindings may be aliased at compile time using `alias`.
 
 ```
   [].is([])
+  
 [F]
 ```
 
@@ -105,6 +114,7 @@ Bindings may be aliased at compile time using `alias`.
 
 ```
   [].=([])
+  
 [T]
 ```
 
@@ -114,6 +124,7 @@ Bindings may be aliased at compile time using `alias`.
 
 ```
   [1 2 3].<([1 2 4])
+  
 [T]
 ```
 
@@ -122,6 +133,7 @@ The boolean type has two values, `T` and `F`.
 
 ```
   (if F 1 2)
+  
 [2]
 ```
 
@@ -129,6 +141,7 @@ Every value has a boolean representation; most are true but zero, empty lists et
 
 ```
   (if [] 1 2)
+  
 [2]
 ```
 
@@ -146,7 +159,28 @@ List literals may be specified by enclosing code in brackets.
 
 ```
   [1 2 3]
+  
 [[1 2 3]]
+```
+
+### functions
+New functions may be defined using `func`.
+
+```
+  (func foo [] [Int] 42)
+  (foo)
+  
+[42]
+```
+
+Functions capture their defining environments.
+
+```
+  (let [x 42]
+    (func foo [] [Int] x))
+  (foo)
+  
+[42]
 ```
 
 ### types
