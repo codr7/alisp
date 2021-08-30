@@ -93,7 +93,9 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
       }
       
       assert(rv->type == &vm->abc.reg_type);
-      struct a_val *v = a_baseof(a_ls_pop(sp), struct a_val, ls);
+      struct a_ls *vls = sp;
+      sp = sp->prev;
+      struct a_val *v = a_baseof(a_ls_pop(vls), struct a_val, ls);
 
       if (v == NULL) {
 	a_fail("Missing argument: %s", a->name->data);
@@ -101,9 +103,9 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
       }
 
       a_store(vm, rv->as_reg, v);
+    } else {
+      sp = sp->prev;
     }
-
-    sp = sp->prev;
   }
   
   return self->start_pc;

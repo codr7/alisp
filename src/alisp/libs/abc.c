@@ -98,6 +98,15 @@ static bool do_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uin
   return true;
 }
 
+static a_pc_t dump_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *v = a_pop(vm);
+  a_dump(v);
+  putc('\n', stdout);
+  a_val_deref(v);
+  a_free(&vm->val_pool, v);
+  return ret;
+}
+
 static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   struct a_ls *a = args->next;
   struct a_form *name_form = a_baseof(a, struct a_form, ls);
@@ -125,7 +134,44 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
     farg_count = a_ls_count(&args_form->as_ls.items),
     fret_count = a_ls_count(&rets_form->as_ls.items);
   
-  struct a_args *fargs = a_args(vm, farg_count);
+  struct a_args *fargs = a_args(vm, farg_count); 
+  struct a_arg *fap = fargs->items;
+
+  a_ls_do(&args_form->as_ls.items, als) {
+    struct a_form *af = a_baseof(als, struct a_form, ls);
+    fap->name = NULL;
+    
+    if (af->type == A_PAIR_FORM) {
+      struct a_form *nf = af->as_pair.left;
+
+      if (nf->type != A_ID_FORM) {
+	a_fail("Invalid argument name: %d", nf->type);
+	return false;
+      }
+      
+      fap->name = nf->as_id.name;
+      af = af->as_pair.right;
+    }
+
+    if (af->type == A_ID_FORM) {
+         struct a_val *v = a_scope_find(a_scope(vm), af->as_id.name);
+
+	 if (!v) {
+	   a_fail("Unknown argument type: %s", af->as_id.name->data);
+	   return false;
+	 }
+	 
+	 if (v->type != &vm->abc.meta_type) {
+	   a_fail("Invalid argument type: %s", v->type->name->data);
+	   return false;
+	 }
+
+	 fap->type = v->as_meta;
+    } else {
+      a_fail("Invalid argument: %d", af->type);
+      return false;
+    }
+  }
   
   struct a_rets *frets = a_rets(vm, fret_count);
   struct a_type **frp = frets->items;
@@ -134,7 +180,7 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
     struct a_form *rf = a_baseof(rls, struct a_form, ls);
     
     if (rf->type != A_ID_FORM) {
-      a_fail("Invalid return form: %d", rf->type);
+      a_fail("Invalid return: %d", rf->type);
       return false;
     }
 
@@ -164,8 +210,8 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
   v->as_func = f;
   a_func_begin(f, vm);
 
-  while (a != args) {
-    struct a_form *f = a_baseof((a = a->next), struct a_form, ls);
+  while ((a = a->next) != args) {
+    struct a_form *f = a_baseof(a, struct a_form, ls);
     if (!a_form_emit(f, vm)) { return false; }
   }
   
@@ -320,6 +366,12 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "alias"), 2, 2))->body = alias_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "d"), 0, 1))->body = d_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "do"), 0, -1))->body = do_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func(vm, a_string(vm, "dump"),
+			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
+			 A_RET(vm)))->body = dump_body;
+
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "func"), 3, -1))->body = func_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "if"), 2, 3))->body = if_body;
 

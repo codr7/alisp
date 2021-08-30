@@ -176,6 +176,24 @@ Functions capture their defining environment.
 [42]
 ```
 
+Anonymous arguments are left on the stack.
+
+```
+  (func foo [Int] [Int] _.(+ 7))
+  (foo 35)
+
+[42]
+```
+
+Specifying a name binds the value.
+
+```
+  (func foo [n:Int] [Int] n.(+ 7))
+  (foo 35)
+
+[42]
+```
+
 ### types
 The following types are provided out of the box, adding more is trivial.
 

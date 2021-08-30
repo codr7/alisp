@@ -1,5 +1,6 @@
 * fib
-** parse func args
+** backup/restore arg registers in frame
+*** add a_frame.regs
 ** drop results from stack in ret op if CALL_DRETS
 * add bench prim
 * add mem call flag
@@ -7,6 +8,7 @@
 *** index on args
 *** add if missing
 * add tco call flag
+** trigger tco
 * ---
 * add unbind prim
 ** (let [foo 42] (unbind foo) foo)
@@ -36,20 +38,3 @@
 * sort a_pool.free_slots in size order
 ** bail out in malloc if > size
 ** insert where >=
-
-    public static func getArg(env: Env, pos: Pos, _ f: Form) throws -> Arg {
-        var l: String?
-        var r: String
-        
-        switch f {
-        case let f as IdForm:
-            r = f.name
-        case let f as PairForm:
-            l = (f.left as! IdForm).name
-            r = (f.right as! IdForm).name
-        default:
-            throw EmitError(pos, "Invalid func argument: #\(f)")
-        }
-        
-        return (l, try env.getType(pos: pos, r))
-    }
