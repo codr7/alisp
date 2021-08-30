@@ -1,4 +1,8 @@
+#include <string.h>
 #include "alisp/frame.h"
+#include "alisp/func.h"
+#include "alisp/scope.h"
+#include "alisp/vm.h"
 
 struct a_frame *a_frame_init(struct a_frame *self,
 			     struct a_vm *vm,
@@ -8,13 +12,29 @@ struct a_frame *a_frame_init(struct a_frame *self,
   self->func = func;
   self->flags = flags;
   self->ret = ret;
+  memset(self->regs, 0, sizeof(self->regs));
+
+  a_ls_do(&func->scope->bindings.items, ls) {
+    struct a_val *v = a_baseof(ls, struct a_val, ls);
+    if (v->type == &vm->abc.reg_type) {
+      struct a_val *src = vm->regs[v->as_reg];
+
+      if (src) {
+	struct a_val *dst = a_malloc(&vm->val_pool, sizeof(struct a_val));
+	self->regs[v->as_reg] = dst;
+	a_copy(a_val_init(dst, src->type), src);
+      }
+    }
+  }
+  
   return self;
 }
 
-void a_frame_deinit(struct a_frame *self) {
-
-}
-
 a_pc_t a_frame_restore(struct a_frame *self, struct a_vm *vm) {
+  for (a_reg_t i = 0; i < A_REG_COUNT; i++) {
+    struct a_val *v = self->regs[i];
+    if (v) { a_store(vm, i, v); }
+  }
+  
   return self->ret;
 }

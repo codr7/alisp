@@ -1,7 +1,3 @@
-* fib
-** backup/restore arg registers in frame
-*** add a_frame.regs
-*** use a_store to restore
 * add bench prim
 * add mem call flag
 ** add a_lset a_func.memo
@@ -14,7 +10,11 @@
 ** move args on call
 ** move rets on returnb
 ** add a_ls_splice(self, fst, lst)
-* ---
+* capture stored registers in func
+** bindings
+** scan code for STORE
+** a_reg_t regs[A_REG_COUNT]
+** reg_count
 * add unbind prim
 ** (let [foo 42] (unbind foo) foo)
 ** add to readme/bindings
@@ -37,8 +37,6 @@
 * add line comments with ;
 * add support for dynamic lists
 ** add LS_OP
-* capture registers in func, apply/restore in frame
-** only those loaded but not stored in body
 * ---
 * sort a_pool.free_slots in size order
 ** bail out in malloc if > size

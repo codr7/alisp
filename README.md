@@ -25,8 +25,6 @@ Return on empty line evaluates,
 
   (func fibrec [n:Int] [Int]
     (if n.(< 2) n n.(- 1).(fibrec).(+ n.(- 2).(fibrec))))
-[]
-
   10.(fibrec)
 [55]
 ```
