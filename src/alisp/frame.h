@@ -9,10 +9,16 @@ struct a_vm;
 struct a_frame {
   struct a_ls ls;
   struct a_func *func;
+  enum a_call_flags flags;
   a_pc_t ret;
 };
 
-struct a_frame *a_frame_init(struct a_frame *self, struct a_vm *vm, struct a_func *func, a_pc_t ret);
+struct a_frame *a_frame_init(struct a_frame *self,
+			     struct a_vm *vm,
+			     struct a_func *func,
+			     enum a_call_flags flags,
+			     a_pc_t ret);
+
 void a_frame_deinit(struct a_frame *self);
 a_pc_t a_frame_restore(struct a_frame *self, struct a_vm *vm);
 

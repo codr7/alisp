@@ -77,7 +77,7 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
     return ret;
   }
 
-  struct a_frame *f = a_frame_init(a_malloc(&vm->frame_pool, sizeof(struct a_frame)), vm, self, ret);
+  struct a_frame *f = a_frame_init(a_malloc(&vm->frame_pool, sizeof(struct a_frame)), vm, self, flags, ret);
   a_ls_push(&vm->frames, &f->ls);
   struct a_ls *sp = vm->stack.prev;
   

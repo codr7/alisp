@@ -2,7 +2,6 @@
 ** backup/restore arg registers in frame
 *** add a_frame.regs
 *** use a_store to restore
-** drop results from stack in ret op if CALL_DRETS
 * add bench prim
 * add mem call flag
 ** add a_lset a_func.memo
@@ -13,7 +12,7 @@
 * add separate func stacks
 ** store in frame
 ** move args on call
-** move rets on return
+** move rets on returnb
 ** add a_ls_splice(self, fst, lst)
 * ---
 * add unbind prim

@@ -164,7 +164,8 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
 	return false;
       }
     }
-    
+
+    if (f->flags & A_CALL_DRETS) { a_drop(self, f->func->rets->count); }
     a_frame_deinit(f);
     a_free(&self->frame_pool, f);
     A_DISPATCH(pc);
