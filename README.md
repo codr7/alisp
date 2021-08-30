@@ -195,11 +195,13 @@ Specifying a name binds the value.
 ### types
 The following types are provided out of the box, adding more is trivial.
 
+- Any - Any value
 - Bool - Boolean values
 - Func - Functions as values
 - Int - Integer values
 - Ls - List values
 - Meta - Types as values
+- Pair - Pair values
 - Prim - Primitives as values
 - Reg - Registers as values
 
@@ -223,7 +225,7 @@ To get an idea, we will compare the opening example with Python3.
 [50]
 ```
 
-And it looks like the core vm is currently around twice as slow as Python, but we're just getting started.
+It looks like the core VM is currently around twice as slow as Python, but we're just getting started.
 
 ```
 $ cd alisp
