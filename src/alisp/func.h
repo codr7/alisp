@@ -46,6 +46,8 @@ struct a_func {
   struct a_rets *rets;
   a_pc_t start_pc;
   struct a_scope *scope;
+  a_reg_t regs[A_REG_COUNT];
+  uint16_t reg_count;
   a_pc_t (*body)(struct a_func *self, struct a_vm *vm, a_pc_t ret);
   a_ref_count ref_count;
 };

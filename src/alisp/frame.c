@@ -12,18 +12,14 @@ struct a_frame *a_frame_init(struct a_frame *self,
   self->func = func;
   self->flags = flags;
   self->ret = ret;
-  memset(self->regs, 0, sizeof(self->regs));
 
-  a_ls_do(&func->scope->bindings.items, ls) {
-    struct a_val *v = a_baseof(ls, struct a_val, ls);
-    if (v->type == &vm->abc.reg_type) {
-      struct a_val *src = vm->regs[v->as_reg];
-
-      if (src) {
-	struct a_val *dst = a_malloc(&vm->val_pool, sizeof(struct a_val));
-	self->regs[v->as_reg] = dst;
-	a_copy(a_val_init(dst, src->type), src);
-      }
+  for (a_reg_t *reg = func->regs; reg < func->regs + func->reg_count; reg++) {
+    struct a_val *src = vm->regs[*reg];
+    
+    if (src) {
+      struct a_val *dst = a_malloc(&vm->val_pool, sizeof(struct a_val));
+      self->regs[*reg] = dst;
+      a_copy(a_val_init(dst, src->type), src);
     }
   }
   
@@ -31,9 +27,9 @@ struct a_frame *a_frame_init(struct a_frame *self,
 }
 
 a_pc_t a_frame_restore(struct a_frame *self, struct a_vm *vm) {
-  for (a_reg_t i = 0; i < A_REG_COUNT; i++) {
-    struct a_val *v = self->regs[i];
-    if (v) { a_store(vm, i, v); }
+  for (a_reg_t *reg = self->func->regs; reg < self->func->regs + self->func->reg_count; reg++) {
+    struct a_val *v = self->regs[*reg];
+    if (v) { a_store(vm, *reg, v); }
   }
   
   return self->ret;

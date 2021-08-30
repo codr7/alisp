@@ -202,3 +202,32 @@ The following types are provided out of the box, adding more is trivial.
 - Meta - Types as values
 - Prim - Primitives as values
 - Reg - Registers as values
+
+### debugging
+`dump` may be used to dump any value to `stdout`.
+
+```
+  (dump [1 T Int])
+
+[1 T Int]
+[]
+```
+
+### performance
+
+To get an idea, we will compare the opening example with Python3.
+
+```
+  (bench 100 (fibrec:d 10))
+
+[50]
+```
+
+And it looks like the core vm is currently around twice as slow as Python, but we're just getting started.
+
+```
+$ cd alisp
+$ cd bench
+$ python3 fibrec.py
+22
+```

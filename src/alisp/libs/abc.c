@@ -28,11 +28,38 @@ static bool alias_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, 
   struct a_form *new = a_baseof(a->next, struct a_form, ls);
 
   if (new->type != A_ID_FORM) {
-    a_fail("Invalid id form: %d", new->type);
+    a_fail("Invalid id: %d", new->type);
     return false;
   }
 
   a_copy(a_scope_bind(s, new->as_id.name, v->type), v);
+  return true;
+}
+
+static bool bench_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_ls *a = args;
+  struct a_form *reps_form = a_baseof((a = a->next), struct a_form, ls);
+  struct a_val *reps = a_form_val(reps_form, vm);
+
+  if (!reps) {
+    a_fail("Invalid reps: %d", reps_form->type);
+    return false;
+  }
+
+  if (reps->type != &vm->abc.int_type) {
+    a_fail("Invalid reps: %s", reps->type->name->data);
+    return false;
+  }
+
+  struct a_bench_op *op = &a_emit(vm, A_BENCH_OP)->as_bench;
+  op->reps = reps->as_int;
+
+  while ((a = a->next) != args) {
+    if (!a_form_emit(a_baseof(a, struct a_form, ls), vm)) { return false; }
+  }
+
+  a_emit(vm, A_STOP_OP);
+  op->end_pc = a_pc(vm);
   return true;
 }
 
@@ -364,6 +391,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 			 A_RET(vm, &vm->abc.bool_type)))->body = gt_body;
 
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "alias"), 2, 2))->body = alias_body;
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "bench"), 1, -1))->body = bench_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "d"), 0, 1))->body = d_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "do"), 0, -1))->body = do_body;
 

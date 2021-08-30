@@ -6,11 +6,16 @@
 
 enum a_op_type {
   A_STOP_OP=0,
-  A_BRANCH_OP,
+  A_BENCH_OP, A_BRANCH_OP,
   A_CALL_OP, A_COPY_OP,
   A_DROP_OP, A_GOTO_OP, A_LOAD_OP, A_PUSH_OP,
   A_RESET_OP, A_RET_OP,
   A_STORE_OP, A_ZIP_OP};
+
+struct a_bench_op {
+  int reps;
+  a_pc_t end_pc;
+};
 
 struct a_branch_op {
   a_pc_t right_pc;
@@ -50,6 +55,7 @@ struct a_op {
   enum a_op_type type;
   
   union {
+    struct a_bench_op as_bench;
     struct a_branch_op as_branch;
     struct a_call_op as_call;
     struct a_copy_op as_copy;

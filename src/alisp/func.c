@@ -23,6 +23,7 @@ struct a_func *a_func_init(struct a_func *self,
   self->rets = rets;
   self->start_pc = NULL;
   self->scope = NULL;
+  self->reg_count = 0;
   self->body = NULL;
   self->ref_count = 1;
   return self;
@@ -42,13 +43,17 @@ bool a_func_deref(struct a_func *self, struct a_vm *vm) {
   return true;
 }
 
+static void push_reg(struct a_func *self, a_reg_t reg) {
+  self->regs[self->reg_count++] = reg;
+}
+
 void a_func_begin(struct a_func *self, struct a_vm *vm) {
   a_emit(vm, A_GOTO_OP);
   self->start_pc = a_pc(vm);
   self->scope = a_begin(vm);
 
   for (struct a_arg *a = self->args->items; a < self->args->items+self->args->count; a++) {
-    if (a->name) { a_scope_bind_reg(self->scope, a->name); }
+    if (a->name) { push_reg(self, a_scope_bind_reg(self->scope, a->name)); }
   }
 }
 

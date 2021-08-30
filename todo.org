@@ -1,4 +1,3 @@
-* add bench prim
 * add mem call flag
 ** add a_lset a_func.memo
 *** index on args
@@ -11,10 +10,13 @@
 ** move rets on returnb
 ** add a_ls_splice(self, fst, lst)
 * capture stored registers in func
-** bindings
-** scan code for STORE
-** a_reg_t regs[A_REG_COUNT]
-** reg_count
+** scan code for STORE & push reg
+* add test prim
+** (test "..." [stack] body)
+** add test script
+* add strings
+* add iterators
+* add or/and prims
 * add unbind prim
 ** (let [foo 42] (unbind foo) foo)
 ** add to readme/bindings
@@ -23,17 +25,12 @@
 ** add struct a_error like form
 ** add a_error(vm, type, pos, spec, args)
 ** replace a_fail-calls
-* add iterators
-* add strings
 * add quoting
 ** add form.quote1-3
 ** add '-parser
 * add multi support
 ** create automatically in func prim
 ** create automatically in lib import
-* add test prim
-** (test "..." [stack] body)
-** add test script
 * add line comments with ;
 * add support for dynamic lists
 ** add LS_OP

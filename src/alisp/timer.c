@@ -25,3 +25,7 @@ uint64_t a_timer_nsecs(const struct a_timer *self) {
 uint64_t a_timer_usecs(const struct a_timer *self) {
   return a_timer_nsecs(self) / 1000;
 }
+
+uint64_t a_timer_msecs(const struct a_timer *self) {
+  return a_timer_usecs(self) / 1000;
+}

@@ -4,6 +4,7 @@
 #include "alisp/func.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
+#include "alisp/timer.h"
 #include "alisp/vm.h"
 
 /*
@@ -18,11 +19,36 @@
 
 bool a_eval(struct a_vm *self, a_pc_t pc) {
   static const void* dispatch[] = {
-    &&STOP, &&BRANCH, &&CALL, &&COPY, &&DROP, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&RET, &&STORE, &&ZIP
+    &&STOP, &&BENCH, &&BRANCH, &&CALL, &&COPY, &&DROP, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&RET, &&STORE, &&ZIP
   };
   
   A_DISPATCH(pc);
 
+ BENCH: {
+    A_TRACE(BENCH);
+    struct a_bench_op *op = &a_baseof(pc, struct a_op, ls)->as_bench;
+    struct a_ls stack = self->stack;
+    a_ls_init(&self->stack);
+    struct a_timer t;
+    a_timer_reset(&t);
+    
+    for (int i = 0; i < op->reps; i++) {
+      if (!a_eval(self, pc)) { return false; }
+    }
+    
+    int msecs = a_timer_msecs(&t);
+
+    a_ls_do(&self->stack, ls) {
+      struct a_val *v = a_baseof(ls, struct a_val, ls);
+      a_val_deref(v);
+      a_free(&self->val_pool, v);
+    }
+    
+    self->stack = stack;
+    a_push(self, &self->abc.int_type)->as_int = msecs;
+    A_DISPATCH(op->end_pc);
+  }
+  
  BRANCH: {
     A_TRACE(BRANCH);
     struct a_val *c = a_pop(self);
