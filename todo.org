@@ -1,19 +1,23 @@
+* add separate func stacks
+** store in frame
+** move args on call
+** move rets on returnb
+** add a_ls_splice(self, fst, lst)
 * add mem call flag
 ** add a_lset a_func.memo
 *** index on args
 *** add if missing
 * add tco call flag
 ** trigger tco
-* add separate func stacks
-** store in frame
-** move args on call
-** move rets on returnb
-** add a_ls_splice(self, fst, lst)
 * capture stored registers in func
 ** scan code for STORE & push reg
 * add test prim
 ** (test "..." [stack] body)
 ** add test script
+* add compile stage with stack analysis
+** fib
+** add undef_type
+** disable call type checks if applicable
 * add strings
 * add iterators
 * add or/and prims

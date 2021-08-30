@@ -70,7 +70,7 @@ Values are pushed on the stack.
 ```
   35.(+:d 7)
   
-[42]
+[]
 ```
 
 ### bindings
@@ -209,9 +209,9 @@ The following types are provided out of the box, adding more is trivial.
 `dump` may be used to dump any value to `stdout`.
 
 ```
-  (dump [1 T Int])
+  (dump [42 T Int])
 
-[1 T Int]
+[42 T Int]
 []
 ```
 
@@ -225,7 +225,7 @@ To get an idea, we will compare the opening example with Python3.
 [50]
 ```
 
-It looks like the core VM is currently around twice as slow as Python, but we're just getting started.
+It looks like the core VM is currently around twice as slow, but we're just getting started.
 
 ```
 $ cd alisp
