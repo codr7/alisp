@@ -65,7 +65,6 @@ void a_func_end(struct a_func *self, struct a_vm *vm) {
 }
 
 bool a_func_applicable(struct a_func *self, struct a_vm *vm) {
-  if (!self->args) { return true; }
   struct a_ls *s = vm->stack.prev;
   
   for (struct a_arg *a = self->args->items + self->args->count-1; a >= self->args->items; a--, s = s->prev) {

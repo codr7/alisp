@@ -88,7 +88,7 @@ struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
 void a_analyze(struct a_vm *self, a_pc_t pc) {
   struct a_ls stack = self->stack;
 
-  while (pc != &self->code) {
+  while (pc && pc != &self->code) {
     struct a_op *op = a_baseof(pc, struct a_op, pc);
     pc = a_op_analyze(op, self);
   }

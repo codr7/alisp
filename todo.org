@@ -17,7 +17,6 @@
 * add func op
 ** replaces skip goto in body
 ** reset & push unnamed args in analyze
-* signal error if no undef values on stack and not applicable in analyze
 * add registers to analyze
 ** backup/restore
 ** set/get in store/load

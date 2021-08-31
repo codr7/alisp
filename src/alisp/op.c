@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "alisp/fail.h"
 #include "alisp/func.h"
 #include "alisp/op.h"
 #include "alisp/stack.h"
@@ -74,11 +75,31 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
     if (op->target && op->target->type == &vm->abc.func_type) {
       struct a_func *f = op->target->as_func;
 
-      if ((op->flags & A_CALL_CHECK) && a_func_applicable(f, vm)) {
-	op->flags ^= A_CALL_CHECK;
-	printf("Disabled arg check: %s %d ", f->name->data, op->flags);
-	a_stack_type_dump(&vm->stack);
-	putc('\n', stdout);
+      if (op->flags & A_CALL_CHECK) {
+	struct a_ls *s = vm->stack.prev;
+	bool applicable = true;
+	
+	for (struct a_arg *a = f->args->items + f->args->count-1; a >= f->args->items; a--, s = s->prev) {
+	  if (s == &vm->stack) { break; }
+	  struct a_val *sv = a_baseof(s, struct a_val, ls);
+
+	  if (!a_isa(sv->type, a->type)) {
+	    if (sv->type != &vm->abc.undef_type) {
+	      a_fail("Func not applicable: %s", f->name->data);
+	      return NULL;
+	    }
+	    
+	    applicable = false;
+	    break;
+	  }
+	}
+
+	if (applicable) {
+	  op->flags ^= A_CALL_CHECK;
+	  printf("Disabled arg check: %s %d ", f->name->data, op->flags);
+	  a_stack_type_dump(&vm->stack);
+	  putc('\n', stdout);
+	}
       }
 
       a_drop(vm, f->args->count);
