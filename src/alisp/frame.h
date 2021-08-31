@@ -1,6 +1,7 @@
 #ifndef ALISP_FRAME_H
 #define ALISP_FRAME_H
 
+#include "alisp/limits.h"
 #include "alisp/ls.h"
 #include "alisp/types.h"
 
@@ -20,6 +21,6 @@ struct a_frame *a_frame_init(struct a_frame *self,
 			     enum a_call_flags flags,
 			     a_pc_t ret);
 
-a_pc_t a_frame_restore(struct a_frame *self, struct a_vm *vm);
+void a_frame_restore(struct a_frame *self, struct a_vm *vm);
 
 #endif

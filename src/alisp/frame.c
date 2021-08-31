@@ -26,11 +26,9 @@ struct a_frame *a_frame_init(struct a_frame *self,
   return self;
 }
 
-a_pc_t a_frame_restore(struct a_frame *self, struct a_vm *vm) {
+void a_frame_restore(struct a_frame *self, struct a_vm *vm) {
   for (a_reg_t *reg = self->func->regs; reg < self->func->regs + self->func->reg_count; reg++) {
     struct a_val *v = self->regs[*reg];
     if (v) { a_store(vm, *reg, v); }
   }
-  
-  return self->ret;
 }

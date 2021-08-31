@@ -18,7 +18,7 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_ls_init(&self->scopes);
   a_push_scope(self, &self->main);
 
-  a_ls_init(&self->frames);
+  self->frame_count = 0;
   a_ls_init(&self->stack);
   a_abc_lib_init(&self->abc, self);
   a_lib_import(&self->abc.lib);
@@ -48,7 +48,7 @@ void a_vm_deinit(struct a_vm *self) {
   a_ls_do(&self->scopes, sls) {
     struct a_scope *s = a_baseof(sls, struct a_scope, ls);
     a_scope_deref(s);
-    a_free(self, s);
+    if (s != &self->main) { a_free(self, s); }
   }
 
   a_ls_do(&self->code, ols) {
@@ -103,6 +103,19 @@ struct a_scope *a_end(struct a_vm *self) {
   assert(ls != &self->scopes);
   a_ls_pop(ls);
   return a_baseof(ls, struct a_scope, ls);
+}
+
+struct a_frame *a_push_frame(struct a_vm *self, struct a_func *func, enum a_call_flags flags, a_pc_t ret) {
+  assert(self->frame_count < A_FRAME_COUNT);
+  struct a_frame *f = self->frames + self->frame_count++;
+  return a_frame_init(f, self, func, flags, ret);
+}
+
+struct a_frame *a_pop_frame(struct a_vm *self) {
+  assert(self->frame_count);
+  struct a_frame *f = self->frames + --self->frame_count;
+  a_frame_restore(f, self);
+  return f;
 }
 
 void a_store(struct a_vm *self, a_reg_t reg, struct a_val *val) {

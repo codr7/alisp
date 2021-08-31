@@ -1,3 +1,7 @@
+* add memoize/m call flag
+** add a_lset a_func.mem
+*** index on args
+*** add if missing
 * add separate func stacks
 ** store in frame
 ** move args on call
@@ -16,10 +20,6 @@
 ** backup/restore
 ** set/get in store/load
 ** clear on fence/func/goto/ret/stop
-* add memoize/m call flag
-** add a_lset a_func.mem
-*** index on args
-*** add if missing
 * capture stored registers in func
 ** scan code for STORE & push reg
 * add strings

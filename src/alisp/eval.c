@@ -154,36 +154,31 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
 
  RET: {
     A_TRACE(RET);
-    struct a_ls *fls = self->frames.prev;
+    struct a_frame *f = a_pop_frame(self);
 
-    if (fls == &self->frames) {
+    if (!f) {
       a_fail("No calls in progress");
       return false;
     }
-    
-    struct a_frame *f = a_baseof(a_ls_pop(fls), struct a_frame, ls);
-    pc = a_frame_restore(f, self);
+
     struct a_ls *sp = self->stack.prev;
     
     for (struct a_type **r = f->func->rets->items+f->func->rets->count-1; r >= f->func->rets->items; r--, sp = sp->prev) {
       if (sp == &self->stack) {
-	a_free(self, f);
 	a_fail("Not enough return values on stack");
 	return false;
       }
-
+      
       struct a_type *rt = a_baseof(sp, struct a_val, ls)->type;
       
       if (!a_isa(rt, *r)) {
-	a_free(self, f);
 	a_fail("Invalid return value: %s", rt->name->data);
 	return false;
       }
     }
-
+    
     if (f->flags & A_CALL_DRETS) { a_drop(self, f->func->rets->count); }
-    a_free(self, f);
-    A_DISPATCH(pc);
+    A_DISPATCH(f->ret);
   }
   
  STORE: {

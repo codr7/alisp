@@ -18,7 +18,7 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v5
+Welcome to aLisp v6
 
 Return on empty line evaluates,
 (reset) clears the stack and Ctrl+D exits.
@@ -224,14 +224,14 @@ $ python3 fibrec.py
 235
 ```
 
-It looks like the core VM is around 7 times as slow, but we're just getting started.
+It looks like the core VM is around 5 times as slow, but we're just getting started.
 
 ```
   (func fibrec [n:Int] [Int]
     (if n.(< 2) n n.(- 1).(fibrec).(+ n.(- 2).(fibrec))))
   (bench 100 (fibrec:d 20))
 
-[1541]
+[1236]
 ```
 
 Switching to a tail recursive implementation and increasing the number of repetitions to get more data.
@@ -242,23 +242,13 @@ $ python3 fibtail.py
 104
 ```
 
-Which says we're around 10 times as slow.
-
-```
-  (func fibtail1 [n:Int a:Int b:Int] [Int]
-    (if n.(= 0) a (if n.(= 1) b (fibtail1 n.(- 1) b a.(+ b)))))
-  (bench 10000 (fibtail1:d 70 0 1))
-
-[1055]
-```
-
-Since the recursive call is now in tail position; `:t` may be used to trigger TCO, which brings us back down to 7 times as slow.
+Since the only recursive call is in tail position; `:t` may be used to trigger TCO and avoid blowing the call stack, the resulting code runs 7 times as slow.
 
 ```
   (func fibtail2 [n:Int a:Int b:Int] [Int]
     (if n.(= 0) a (if n.(= 1) b (fibtail2:t n.(- 1) b a.(+ b)))))
   (bench 10000 (fibtail2:d 70 0 1))
 
-[748]
+[729]
 ```
 

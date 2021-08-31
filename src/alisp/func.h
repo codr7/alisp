@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include <string.h>
+#include "alisp/limits.h"
 #include "alisp/types.h"
 
 #define A_ARG(vm, ...)							\
