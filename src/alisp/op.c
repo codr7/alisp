@@ -146,9 +146,6 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
   }
 
   case A_RET_OP: {
-    a_stack_type_dump(&vm->stack);
-    putc('\n', stdout);
-
     struct a_ret_op *op = &self->as_ret;
     struct a_func *f = op->func;
     

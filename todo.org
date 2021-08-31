@@ -1,3 +1,6 @@
+* add tco/t call flag
+** trigger tco
+** bench
 * add optional type to load op
 ** check on eval if set
 ** use in op_analyze
@@ -25,8 +28,6 @@
 ** add a_lset a_func.mem
 *** index on args
 *** add if missing
-* add tco/t call flag
-** trigger tco
 * capture stored registers in func
 ** scan code for STORE & push reg
 * add strings
