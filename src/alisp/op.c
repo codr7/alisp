@@ -81,8 +81,8 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
       struct a_func *f = op->target->as_func;
 
       if ((op->flags & A_CALL_CHECK) && a_func_applicable(f, vm)) {
-	printf("Disabled arg check: %s\n", f->name->data);
 	op->flags ^= A_CALL_CHECK;
+	printf("Disabled arg check: %s %d\n", f->name->data, op->flags);
       }
 
       a_drop(vm, f->args->count);
