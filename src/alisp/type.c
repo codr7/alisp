@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <stddef.h>
+#include <stdio.h>
 #include <string.h>
+#include "alisp/string.h"
 #include "alisp/type.h"
 #include "alisp/vm.h"
 
@@ -21,8 +23,6 @@ struct a_type *a_type_init(struct a_type *self, struct a_vm *vm, struct a_string
       struct a_type *t = (*st)->super[id];
       if (t) { self->super[id] = t; }
     }
-    
-    self->super[(*st)->id] = *st;
   }
   
   self->call_val = NULL;

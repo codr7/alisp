@@ -3,6 +3,7 @@
 #include "alisp/ls.h"
 #include "alisp/pool.h"
 #include "alisp/stack.h"
+#include "alisp/string.h"
 #include "alisp/val.h"
 #include "alisp/vm.h"
 
@@ -12,6 +13,17 @@ void a_stack_dump(struct a_ls *stack) {
   a_ls_do(stack, ls) {
     if (ls != stack->next) { putc(' ', stdout); }
     a_dump(a_baseof(ls, struct a_val, ls));
+  }
+  
+  putc(']', stdout);
+}
+
+void a_stack_type_dump(struct a_ls *stack) {
+  putc('[', stdout);
+
+  a_ls_do(stack, ls) {
+    if (ls != stack->next) { putc(' ', stdout); }
+    printf("%s", a_baseof(ls, struct a_val, ls)->type->name->data);
   }
   
   putc(']', stdout);

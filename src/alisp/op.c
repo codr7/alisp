@@ -63,17 +63,11 @@ void a_op_deinit(struct a_op *self) {
 
 a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {  
   switch (self->type) {
-  case A_PUSH_OP: {
-    struct a_val *v = &self->as_push.val;
-    a_copy(a_push(vm, v->type), v);
+  case A_BRANCH_OP: {
+    a_drop(vm, 1);
     break;
   }
-    
-  case A_LOAD_OP: {
-    a_push(vm, &vm->abc.undef_type);
-    break;
-  }
-    
+        
   case A_CALL_OP: {
     struct a_call_op *op = &self->as_call;
 
@@ -82,7 +76,9 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 
       if ((op->flags & A_CALL_CHECK) && a_func_applicable(f, vm)) {
 	op->flags ^= A_CALL_CHECK;
-	printf("Disabled arg check: %s %d\n", f->name->data, op->flags);
+	printf("Disabled arg check: %s %d ", f->name->data, op->flags);
+	a_stack_type_dump(&vm->stack);
+	putc('\n', stdout);
       }
 
       a_drop(vm, f->args->count);
@@ -109,6 +105,17 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
     a_drop(vm, self->as_drop.count);
     break;
   }
+    
+  case A_PUSH_OP: {
+    struct a_val *v = &self->as_push.val;
+    a_copy(a_push(vm, v->type), v);
+    break;
+  }
+
+  case A_LOAD_OP: {
+    a_push(vm, &vm->abc.undef_type);
+    break;
+  }
 
   case A_STORE_OP: {
     a_drop(vm, 1);
@@ -121,6 +128,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
     break;
   }
 
+    
   case A_FENCE_OP:
   case A_GOTO_OP:
   case A_RESET_OP:
@@ -131,7 +139,6 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
   }
     
   case A_BENCH_OP:
-  case A_BRANCH_OP:
     break;
   }
 

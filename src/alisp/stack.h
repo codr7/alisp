@@ -9,6 +9,7 @@ struct a_vm;
 struct a_val;
 
 void a_stack_dump(struct a_ls *stack);
+void a_stack_type_dump(struct a_ls *stack);
 
 bool a_drop(struct a_vm *self, int count);
 struct a_val *a_peek(struct a_vm *self, int offset);
