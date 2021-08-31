@@ -7,8 +7,11 @@
 
 #define A_MAX_TYPE_ID 32
 
-#define A_SUPER(...)				\
+#define _A_SUPER(...)				\
   (struct a_type *[]){__VA_ARGS__}
+
+#define A_SUPER(...)				\
+  _A_SUPER(__VA_ARGS__, NULL)
 
 struct a_string;
 struct a_val;

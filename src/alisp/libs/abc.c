@@ -260,8 +260,10 @@ static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uin
     branch->right_pc = a_pc(vm);
     right = a_baseof(a, struct a_form, ls);
     if (!a_form_emit(right, vm)) { return false; }
+    a_emit(vm, A_FENCE_OP);
     skip_right->pc = a_pc(vm);
   } else {
+    a_emit(vm, A_FENCE_OP);
     branch->right_pc = a_pc(vm);
   }
 
@@ -339,7 +341,7 @@ static bool reset_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, 
 
 struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_init(&self->lib, vm, a_string(vm, "abc"));
-  a_lib_bind_type(&self->lib, a_type_init(&self->any_type, vm, a_string(vm, "Any"), (struct a_type *[]){NULL}));
+  a_lib_bind_type(&self->lib, a_type_init(&self->any_type, vm, a_string(vm, "Any"), A_SUPER(NULL)));
   
   a_lib_bind_type(&self->lib, a_bool_type_init(&self->bool_type, vm, a_string(vm, "Bool"),
 					       A_SUPER(&self->any_type)));
@@ -364,7 +366,9 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   
   a_lib_bind_type(&self->lib, a_prim_type_init(&self->prim_type, vm, a_string(vm, "Prim"),
 					       A_SUPER(&self->any_type)));
-  
+
+  a_lib_bind_type(&self->lib, a_type_init(&self->undef_type, vm, a_string(vm, "Undef"), A_SUPER(NULL)));
+
   a_lib_bind(&self->lib, a_string(vm, "ALISP-VERSION"), &self->int_type)->as_int = A_VERSION;
   a_lib_bind(&self->lib, a_string(vm, "T"), &self->bool_type)->as_bool = true;
   a_lib_bind(&self->lib, a_string(vm, "F"), &self->bool_type)->as_bool = false;

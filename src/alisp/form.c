@@ -210,7 +210,7 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
 	a_copy(a_val_init(call->target, t->type), t);
       }
 
-      call->flags = flags;
+      call->flags = A_CALL_CHECK | flags;
     }
     
     break;

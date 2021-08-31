@@ -35,8 +35,10 @@ bool a_drop(struct a_vm *self, int count) {
   return true;
 }
 
-struct a_val *a_peek(struct a_vm *self) {
-  return a_ls_null(&self->stack) ? NULL : a_baseof(self->stack.prev, struct a_val, ls);
+struct a_val *a_peek(struct a_vm *self, int offset) {
+  struct a_ls *ls = self->stack.prev;
+  while (ls != &self->stack && offset--) { ls = ls->prev; }
+  return (ls == &self->stack) ? NULL : a_baseof(ls, struct a_val, ls);
 }
 
 struct a_val *a_pop(struct a_vm *self) {
@@ -47,4 +49,14 @@ struct a_val *a_push(struct a_vm *self, struct a_type *type) {
   struct a_val *v = a_val_init(a_malloc(&self->val_pool, sizeof(struct a_val)), type);
   a_ls_push(&self->stack, &v->ls);
   return v;
+}
+
+void a_reset(struct a_vm *self) {
+  a_ls_do(&self->stack, ls) {
+    struct a_val *v = a_baseof(ls, struct a_val, ls);
+    a_val_deref(v);
+    a_free(&self->val_pool, v);
+  }
+
+  a_ls_init(&self->stack);
 }

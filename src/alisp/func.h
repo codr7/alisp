@@ -28,6 +28,7 @@ struct a_vm;
 struct a_arg {
   struct a_string *name;
   struct a_type *type;
+  a_reg_t reg;
 };
 
 struct a_args {

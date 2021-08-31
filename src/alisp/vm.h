@@ -10,7 +10,7 @@
 #include "alisp/types.h"
 #include "alisp/val.h"
 
-#define A_VERSION 4
+#define A_VERSION 5
 
 #define A_PAGE_SIZE 32000
 #define A_DEFAULT_PAGE_SIZE 32
@@ -48,6 +48,7 @@ void a_vm_deinit(struct a_vm *self);
 
 a_pc_t a_pc(struct a_vm *self);
 struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type);
+void a_analyze(struct a_vm *self, a_pc_t pc);
 bool a_eval(struct a_vm *self, a_pc_t pc);
 
 struct a_scope *a_scope(struct a_vm *self);

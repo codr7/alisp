@@ -8,7 +8,7 @@
 #include "alisp/vm.h"
 
 static a_pc_t add_int_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_peek(vm);
+  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_int += y->as_int;
   a_val_deref(y);
   a_free(&vm->val_pool, y);
@@ -16,7 +16,7 @@ static a_pc_t add_int_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 }
 
 static a_pc_t sub_int_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_peek(vm);
+  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_int -= y->as_int;
   a_val_deref(y);
   a_free(&vm->val_pool, y);

@@ -57,7 +57,7 @@ void a_vm_deinit(struct a_vm *self) {
   }
 
   a_ls_do(&self->code, ols) {
-    struct a_op *o = a_baseof(ols, struct a_op, ls);
+    struct a_op *o = a_baseof(ols, struct a_op, pc);
     a_op_deinit(o);
   }
 
@@ -81,9 +81,22 @@ a_pc_t a_pc(struct a_vm *self) { return self->code.prev; }
 
 struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
   struct a_op *op = a_op_init(a_malloc(&self->op_pool, sizeof(struct a_op)), op_type);
-  a_ls_push(&self->code, &op->ls);
+  a_ls_push(&self->code, &op->pc);
   return op;
 }
+
+void a_analyze(struct a_vm *self, a_pc_t pc) {
+  struct a_ls stack = self->stack;
+
+  while (pc != &self->code) {
+    struct a_op *op = a_baseof(pc, struct a_op, pc);
+    pc = a_op_analyze(op, self);
+  }
+  
+  a_reset(self);
+  self->stack = stack;
+}
+
 
 struct a_scope *a_scope(struct a_vm *self) {
   return a_baseof(self->scopes.prev, struct a_scope, ls);

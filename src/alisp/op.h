@@ -8,7 +8,7 @@ enum a_op_type {
   A_STOP_OP=0,
   A_BENCH_OP, A_BRANCH_OP,
   A_CALL_OP, A_COPY_OP,
-  A_DROP_OP, A_GOTO_OP, A_LOAD_OP, A_PUSH_OP,
+  A_DROP_OP, A_FENCE_OP, A_GOTO_OP, A_LOAD_OP, A_PUSH_OP,
   A_RESET_OP, A_RET_OP,
   A_STORE_OP, A_ZIP_OP};
 
@@ -51,7 +51,7 @@ struct a_store_op {
 };
 
 struct a_op {
-  struct a_ls ls;
+  struct a_ls pc;
   enum a_op_type type;
   
   union {
@@ -69,5 +69,6 @@ struct a_op {
 
 struct a_op *a_op_init(struct a_op *self, enum a_op_type type);
 void a_op_deinit(struct a_op *self);
+a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm);
 
 #endif

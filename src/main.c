@@ -13,7 +13,8 @@ int main() {
 	 
   struct a_vm vm;
   a_vm_init(&vm);
-
+  a_emit(&vm, A_STOP_OP);
+  
   struct a_parser parser;
   a_parser_init(&parser, &vm, a_string(&vm, "repl"));
   a_parser_add_prefix(&parser, a_skip_space);
@@ -40,6 +41,7 @@ int main() {
     
     if (a_pc(&vm) != pc) {
       a_emit(&vm, A_STOP_OP);
+      a_analyze(&vm, pc);
       a_eval(&vm, pc);
     }
     

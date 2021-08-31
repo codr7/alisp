@@ -18,7 +18,7 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v4
+Welcome to aLisp v5
 
 Return on empty line evaluates,
 (reset) clears the stack and Ctrl+D exits.
@@ -30,7 +30,7 @@ Return on empty line evaluates,
 ```
 
 ### the stack
-aLisp exposes the stack to a greater extent than what in common among Lisps.
+aLisp exposes the stack to a greater extent than what is common among Lisps.
 
 Values are pushed on the stack.
 

@@ -15,18 +15,18 @@
 #define A_TRACE(name)
 
 #define A_DISPATCH(prev)						\
-  goto *dispatch[a_baseof((pc = (prev)->next), struct a_op, ls)->type]
+  goto *dispatch[a_baseof((pc = (prev)->next), struct a_op, pc)->type]
 
 bool a_eval(struct a_vm *self, a_pc_t pc) {
   static const void* dispatch[] = {
-    &&STOP, &&BENCH, &&BRANCH, &&CALL, &&COPY, &&DROP, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&RET, &&STORE, &&ZIP
+    &&STOP, &&BENCH, &&BRANCH, &&CALL, &&COPY, &&DROP, &&FENCE, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&RET, &&STORE, &&ZIP
   };
   
   A_DISPATCH(pc);
 
  BENCH: {
     A_TRACE(BENCH);
-    struct a_bench_op *op = &a_baseof(pc, struct a_op, ls)->as_bench;
+    struct a_bench_op *op = &a_baseof(pc, struct a_op, pc)->as_bench;
     struct a_ls stack = self->stack;
     a_ls_init(&self->stack);
     struct a_timer t;
@@ -37,13 +37,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     }
     
     int msecs = a_timer_msecs(&t);
-
-    a_ls_do(&self->stack, ls) {
-      struct a_val *v = a_baseof(ls, struct a_val, ls);
-      a_val_deref(v);
-      a_free(&self->val_pool, v);
-    }
-    
+    a_reset(self);
     self->stack = stack;
     a_push(self, &self->abc.int_type)->as_int = msecs;
     A_DISPATCH(op->end_pc);
@@ -58,12 +52,12 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
       return false;
     }
 
-    A_DISPATCH(a_true(c) ? pc : a_baseof(pc, struct a_op, ls)->as_branch.right_pc);
+    A_DISPATCH(a_true(c) ? pc : a_baseof(pc, struct a_op, pc)->as_branch.right_pc);
   }
   
  CALL: {
     A_TRACE(CALL);
-    struct a_call_op *call = &a_baseof(pc, struct a_op, ls)->as_call;
+    struct a_call_op *call = &a_baseof(pc, struct a_op, pc)->as_call;
     struct a_val *t = call->target;
     if (t == NULL) { t = a_pop(self); }
 
@@ -88,7 +82,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     A_TRACE(COPY);
     struct a_ls *vls = self->stack.prev;				   
 
-    for (int i = a_baseof(pc, struct a_op, ls)->as_copy.offset; i > 0; vls = vls->prev, i--) {
+    for (int i = a_baseof(pc, struct a_op, pc)->as_copy.offset; i > 0; vls = vls->prev, i--) {
       if (vls == &self->stack) {
 	a_fail("Not enough values on stack: %d", i+1);
 	return false;
@@ -102,7 +96,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
 
  DROP: {
     A_TRACE(DROP);
-    int count = a_baseof(pc, struct a_op, ls)->as_drop.count;
+    int count = a_baseof(pc, struct a_op, pc)->as_drop.count;
 
     if (count == -1) {
       struct a_val *v = a_pop(self);
@@ -123,15 +117,20 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     if (!a_drop(self, count)) { return false; }    
     A_DISPATCH(pc);    
   }
+
+ FENCE: {
+    A_TRACE(FENCE);
+    A_DISPATCH(pc);
+  }
   
  GOTO: {
     A_TRACE(GOTO);
-    A_DISPATCH(a_baseof(pc, struct a_op, ls)->as_goto.pc);
+    A_DISPATCH(a_baseof(pc, struct a_op, pc)->as_goto.pc);
   }
   
  LOAD: {
     A_TRACE(LOAD);
-    struct a_val *v = self->regs[a_baseof(pc, struct a_op, ls)->as_load.reg];
+    struct a_val *v = self->regs[a_baseof(pc, struct a_op, pc)->as_load.reg];
     a_copy(a_push(self, v->type), v);
     A_DISPATCH(pc);
   }
@@ -140,7 +139,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     A_TRACE(PUSH);
 
     struct a_val
-      *src = &a_baseof(pc, struct a_op, ls)->as_push.val,
+      *src = &a_baseof(pc, struct a_op, pc)->as_push.val,
       *dst = a_push(self, src->type);
 
     a_copy(dst, src);
@@ -149,14 +148,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
 
  RESET: {
     A_TRACE(RESET);
-
-    a_ls_do(&self->stack, ls) {
-      struct a_val *v = a_baseof(ls, struct a_val, ls);
-      a_val_deref(v);
-      a_free(&self->val_pool, v);
-    }
-
-    a_ls_init(&self->stack);
+    a_reset(self);
     A_DISPATCH(pc);    
   }
 
@@ -197,8 +189,13 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
  STORE: {
     A_TRACE(STORE);
     struct a_val *v = a_pop(self);
-    if (!v) { a_fail("Missing value to store"); }
-    a_store(self, a_baseof(pc, struct a_op, ls)->as_load.reg, v); 
+
+    if (!v) {
+      a_fail("Missing value to store");
+      return false;
+    }
+    
+    a_store(self, a_baseof(pc, struct a_op, pc)->as_load.reg, v); 
     A_DISPATCH(pc);
   }
 

@@ -43,8 +43,9 @@ bool a_func_deref(struct a_func *self, struct a_vm *vm) {
   return true;
 }
 
-static void push_reg(struct a_func *self, a_reg_t reg) {
+static a_reg_t push_reg(struct a_func *self, a_reg_t reg) {
   self->regs[self->reg_count++] = reg;
+  return reg;
 }
 
 void a_func_begin(struct a_func *self, struct a_vm *vm) {
@@ -53,14 +54,14 @@ void a_func_begin(struct a_func *self, struct a_vm *vm) {
   self->scope = a_begin(vm);
 
   for (struct a_arg *a = self->args->items; a < self->args->items+self->args->count; a++) {
-    if (a->name) { push_reg(self, a_scope_bind_reg(self->scope, a->name)); }
+    if (a->name) { a->reg = push_reg(self, a_scope_bind_reg(self->scope, a->name)); }
   }
 }
 
 void a_func_end(struct a_func *self, struct a_vm *vm) {
   a_emit(vm, A_RET_OP);
   a_end(vm);
-  a_baseof(self->start_pc, struct a_op, ls)->as_goto.pc = a_pc(vm);
+  a_baseof(self->start_pc, struct a_op, pc)->as_goto.pc = a_pc(vm);
 }
 
 bool a_func_applicable(struct a_func *self, struct a_vm *vm) {
