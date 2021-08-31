@@ -30,7 +30,7 @@ Return on empty line evaluates,
 ```
 
 ### the stack
-aLisp exposes the stack to a greater extent than what is common among Lisps.
+aLisp exposes the stack to a greater extent than usual among Lisps.
 
 Values are pushed on the stack.
 
@@ -183,7 +183,7 @@ Anonymous arguments are left on the stack.
 [42]
 ```
 
-Specifying a name binds the value.
+Specifying names binds the values.
 
 ```
   (func foo [n:Int] [Int] n.(+ 7))
@@ -219,18 +219,36 @@ The following types are provided out of the box, adding more is trivial.
 To get an idea, we will compare the opening fibonacci example with Python3.
 
 ```
-$ cd alisp
 $ cd bench
 $ python3 fibrec.py
-245
+235
 ```
 
-It looks like the core VM is slightly faster, and we're just getting started.
+It looks like the core VM is around 7 times as slow, but we're just getting started.
 
 ```
-  (bench 10 (fibrec:d 20))
+  (func fibrec [n:Int] [Int]
+    (if n.(< 2) n n.(- 1).(fibrec).(+ n.(- 2).(fibrec))))
+  (bench 100 (fibrec:d 20))
 
-[172]
+[1541]
 ```
 
+Switching to a tail recursive implementation and increasing the number of repetitions to get more data.
+
+``` 
+$ cd bench
+$ python3 fibtail.py
+104
+```
+
+10 times as slow.
+
+```
+  (func fibtail1 [n:Int a:Int b:Int] [Int]
+    (if n.(= 0) a (if n.(= 1) b (fibtail1 n.(- 1) b a.(+ b)))))
+  (bench 10000 (fibtail1:d 70 0 1))
+
+[1055]
+```
 

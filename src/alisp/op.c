@@ -21,12 +21,15 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
   case A_DROP_OP:
     self->as_drop.count = 1;
     break;
+  case A_RET_OP:
+    self->as_ret.func = NULL;
+    self->as_ret.check = true;
+    break;
   case A_FENCE_OP:
   case A_GOTO_OP:
   case A_LOAD_OP:
   case A_PUSH_OP:
   case A_RESET_OP:
-  case A_RET_OP:
   case A_STOP_OP:
   case A_STORE_OP:
   case A_ZIP_OP:
@@ -142,6 +145,48 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
     break;
   }
 
+  case A_RET_OP: {
+    a_stack_type_dump(&vm->stack);
+    putc('\n', stdout);
+
+    struct a_ret_op *op = &self->as_ret;
+    struct a_func *f = op->func;
+    
+    if (op->check) {
+      struct a_ls *s = vm->stack.prev;
+      bool ok = true;
+	
+      for (struct a_type **r = f->rets->items + f->rets->count-1; r >= f->rets->items; r--, s = s->prev) {
+	if (s == &vm->stack) {
+	  ok = false;
+	  break;
+	}
+	
+	struct a_val *sv = a_baseof(s, struct a_val, ls);
+	
+	if (!a_isa(sv->type, *r)) {
+	  if (sv->type != &vm->abc.undef_type) {
+	    a_fail("Invalid func result: %s %s", f->name->data, sv->type->name->data);
+	    return NULL;
+	  }
+	  
+	  ok = false;
+	  break;
+	}
+      }
+
+      if (ok) {
+	op->check = false;
+	printf("Disabled ret check: %s", f->name->data);
+	a_stack_type_dump(&vm->stack);
+	putc('\n', stdout);
+      }
+    }
+
+    a_reset(vm);
+    break;
+  }
+
   case A_STORE_OP: {
     a_drop(vm, 1);
     break;
@@ -157,7 +202,6 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
   case A_FENCE_OP:
   case A_GOTO_OP:
   case A_RESET_OP:
-  case A_RET_OP:
   case A_STOP_OP: {
     a_reset(vm);
     break;

@@ -1,8 +1,3 @@
-* analyze rets
-** add bool ret_op.check
-*** default true
-** disable check if ok
-** throw error if not undef and no match
 * add optional type to load op
 ** check on eval if set
 ** use in op_analyze
@@ -13,6 +8,9 @@
 ** move args on call
 ** move rets on returnb
 ** add a_ls_splice(self, fst, lst)
+* add test prim
+** (test "..." [stack] body)
+** add test script
 * add def prim
 ** compile time binding
 ** eval value if !a_form_val
@@ -31,9 +29,6 @@
 ** trigger tco
 * capture stored registers in func
 ** scan code for STORE & push reg
-* add test prim
-** (test "..." [stack] body)
-** add test script
 * add strings
 * add iterators
 * add or/and prims

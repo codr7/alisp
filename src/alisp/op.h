@@ -46,6 +46,11 @@ struct a_push_op {
   struct a_val val;
 };
 
+struct a_ret_op {
+  struct a_func *func;
+  bool check;
+};
+
 struct a_store_op {
   a_reg_t reg;
 };
@@ -63,6 +68,7 @@ struct a_op {
     struct a_goto_op as_goto;
     struct a_load_op as_load;
     struct a_push_op as_push;
+    struct a_ret_op as_ret;
     struct a_store_op as_store;
   };
 };

@@ -54,12 +54,17 @@ void a_func_begin(struct a_func *self, struct a_vm *vm) {
   self->scope = a_begin(vm);
 
   for (struct a_arg *a = self->args->items; a < self->args->items+self->args->count; a++) {
-    if (a->name) { a->reg = push_reg(self, a_scope_bind_reg(self->scope, a->name)); }
+    printf("binding %p\n", a->name);
+
+    if (a->name) {
+      a->reg = push_reg(self, a_scope_bind_reg(self->scope, a->name));
+      printf("binding %s\n", a->name->data);
+    }
   }
 }
 
 void a_func_end(struct a_func *self, struct a_vm *vm) {
-  a_emit(vm, A_RET_OP);
+  a_emit(vm, A_RET_OP)->as_ret.func = self;
   a_end(vm);
   a_baseof(self->start_pc, struct a_op, pc)->as_goto.pc = a_pc(vm);
 }

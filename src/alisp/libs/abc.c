@@ -198,6 +198,8 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
       a_fail("Invalid argument: %d", af->type);
       return false;
     }
+
+    fap++;
   }
   
   struct a_rets *frets = a_rets(vm, fret_count);
