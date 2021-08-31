@@ -1,6 +1,3 @@
-* add fence op
-** reset stack in analyze
-** emit after branch in if prim
 * analyze rets
 ** add bool ret_op.check
 *** default true

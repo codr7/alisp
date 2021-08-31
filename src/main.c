@@ -41,7 +41,7 @@ int main() {
     
     if (a_pc(&vm) != pc) {
       a_emit(&vm, A_STOP_OP);
-      a_analyze(&vm, pc);
+      //a_analyze(&vm, pc);
       a_eval(&vm, pc);
     }
     
