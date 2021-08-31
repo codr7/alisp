@@ -80,7 +80,11 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 	bool applicable = true;
 	
 	for (struct a_arg *a = f->args->items + f->args->count-1; a >= f->args->items; a--, s = s->prev) {
-	  if (s == &vm->stack) { break; }
+	  if (s == &vm->stack) {
+	    applicable = false;
+	    break;
+	  }
+	  
 	  struct a_val *sv = a_baseof(s, struct a_val, ls);
 
 	  if (!a_isa(sv->type, a->type)) {

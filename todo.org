@@ -1,8 +1,8 @@
 * analyze rets
 ** add bool ret_op.check
 *** default true
-*** extract logic
-**** disable check if ok
+** disable check if ok
+** throw error if not undef and no match
 * add optional type to load op
 ** check on eval if set
 ** use in op_analyze
@@ -20,7 +20,7 @@
 * add registers to analyze
 ** backup/restore
 ** set/get in store/load
-** clear on barrier/func/goto/ret/stop
+** clear on fence/func/goto/ret/stop
 * add memoize/m call flag
 ** add a_lset a_func.mem
 *** index on args
