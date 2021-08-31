@@ -13,7 +13,8 @@ struct a_vm;
 struct a_val {
   struct a_ls ls;
   struct a_type *type;
-
+  bool undef;
+  
   union  {
     bool as_bool;
     struct a_func *as_func;

@@ -72,7 +72,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
 
     if (!call->target) {
       a_val_deref(t);
-      a_free(&self->val_pool, t);
+      a_free(self, t);
     }
     
     A_DISPATCH(pc);
@@ -167,7 +167,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     
     for (struct a_type **r = f->func->rets->items+f->func->rets->count-1; r >= f->func->rets->items; r--, sp = sp->prev) {
       if (sp == &self->stack) {
-	a_free(&self->frame_pool, f);
+	a_free(self, f);
 	a_fail("Not enough return values on stack");
 	return false;
       }
@@ -175,14 +175,14 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
       struct a_type *rt = a_baseof(sp, struct a_val, ls)->type;
       
       if (!a_isa(rt, *r)) {
-	a_free(&self->frame_pool, f);
+	a_free(self, f);
 	a_fail("Invalid return value: %s", rt->name->data);
 	return false;
       }
     }
 
     if (f->flags & A_CALL_DRETS) { a_drop(self, f->func->rets->count); }
-    a_free(&self->frame_pool, f);
+    a_free(self, f);
     A_DISPATCH(pc);
   }
   

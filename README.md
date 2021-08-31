@@ -216,16 +216,7 @@ The following types are provided out of the box, adding more is trivial.
 ```
 
 ### performance
-
-To get an idea, we will compare the opening example with Python3.
-
-```
-  (bench 100 (fibrec:d 10))
-
-[50]
-```
-
-It looks like the core VM is currently around twice as slow, but we're just getting started.
+To get an idea, we will compare the opening fibonacci example with Python3.
 
 ```
 $ cd alisp
@@ -233,3 +224,13 @@ $ cd bench
 $ python3 fibrec.py
 22
 ```
+
+It looks like the core VM is currently slightly faster, and we're just getting started.
+
+```
+  (bench 100 (fibrec:d 10))
+
+[17]
+```
+
+

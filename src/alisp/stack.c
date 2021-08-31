@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include "alisp/fail.h"
 #include "alisp/ls.h"
-#include "alisp/pool.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
 #include "alisp/val.h"
@@ -41,7 +40,7 @@ bool a_drop(struct a_vm *self, int count) {
     a_ls_pop(vls);
     struct a_val *v = a_baseof(vls, struct a_val, ls);
     a_val_deref(v);
-    a_free(&self->val_pool, v);
+    a_free(self, v);
   }
 
   return true;
@@ -58,7 +57,7 @@ struct a_val *a_pop(struct a_vm *self) {
 }
 
 struct a_val *a_push(struct a_vm *self, struct a_type *type) {
-  struct a_val *v = a_val_init(a_malloc(&self->val_pool, sizeof(struct a_val)), type);
+  struct a_val *v = a_val_init(a_malloc(self, sizeof(struct a_val)), type);
   a_ls_push(&self->stack, &v->ls);
   return v;
 }
@@ -67,7 +66,7 @@ void a_reset(struct a_vm *self) {
   a_ls_do(&self->stack, ls) {
     struct a_val *v = a_baseof(ls, struct a_val, ls);
     a_val_deref(v);
-    a_free(&self->val_pool, v);
+    a_free(self, v);
   }
 
   a_ls_init(&self->stack);

@@ -1,12 +1,11 @@
 #include <assert.h>
 #include <string.h>
-#include "alisp/pool.h"
 #include "alisp/string.h"
 #include "alisp/vm.h"
 
 struct a_string *a_string(struct a_vm *vm, const char *data) {
   a_string_length length = strlen(data);
-  struct a_string *s = a_malloc(&vm->string_pool, sizeof(struct a_string)+length+1);
+  struct a_string *s = a_malloc(vm, sizeof(struct a_string)+length+1);
   s->vm = vm;
 
   s->length = length;

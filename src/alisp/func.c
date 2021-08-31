@@ -11,7 +11,7 @@ struct a_func *a_func(struct a_vm *vm,
 		      struct a_string *name,
 		      struct a_args *args,
 		      struct a_rets *rets) {
-  return a_func_init(a_malloc(&vm->func_pool, sizeof(struct a_func)), name, args, rets);
+  return a_func_init(a_malloc(vm, sizeof(struct a_func)), name, args, rets);
 }
 
 struct a_func *a_func_init(struct a_func *self,
@@ -37,8 +37,8 @@ struct a_func *a_func_ref(struct a_func *self) {
 bool a_func_deref(struct a_func *self, struct a_vm *vm) {
   assert(self->ref_count);
   if (--self->ref_count) { return false; }
-  a_free(&vm->pool, self->args);
-  a_free(&vm->pool, self->rets);
+  a_free(vm, self->args);
+  a_free(vm, self->rets);
   if (self->scope) { a_scope_deref(self->scope); }
   return true;
 }
@@ -82,7 +82,7 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
     return ret;
   }
 
-  struct a_frame *f = a_frame_init(a_malloc(&vm->frame_pool, sizeof(struct a_frame)), vm, self, flags, ret);
+  struct a_frame *f = a_frame_init(a_malloc(vm, sizeof(struct a_frame)), vm, self, flags, ret);
   a_ls_push(&vm->frames, &f->ls);
   struct a_ls *sp = vm->stack.prev;
   
@@ -117,13 +117,13 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
 }
 
 struct a_args *a_args(struct a_vm *vm, uint8_t count) {
-  struct a_args *args =	a_malloc(&vm->pool, sizeof(struct a_args) + count*sizeof(struct a_arg));	
+  struct a_args *args =	a_malloc(vm, sizeof(struct a_args) + count*sizeof(struct a_arg));	
   args->count = count;
   return args;
 }
 
 struct a_rets *a_rets(struct a_vm *vm, uint8_t count) {
-  struct a_rets *rets =	a_malloc(&vm->pool, sizeof(struct a_rets) + count*sizeof(struct a_type *));	
+  struct a_rets *rets =	a_malloc(vm, sizeof(struct a_rets) + count*sizeof(struct a_type *));	
   rets->count = count;
   return rets;
 }

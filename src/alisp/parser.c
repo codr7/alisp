@@ -1,5 +1,4 @@
 #include "alisp/parser.h"
-#include "alisp/pool.h"
 #include "alisp/vm.h"
 
 struct a_parser *a_parser_init(struct a_parser *self, struct a_vm *vm, struct a_string *source) {
@@ -14,35 +13,35 @@ struct a_parser *a_parser_init(struct a_parser *self, struct a_vm *vm, struct a_
 
 void a_parser_deinit(struct a_parser *self) {
   a_ls_do(&self->prefix, ls) {
-    a_free(&self->vm->pool, a_baseof(ls, struct a_form_parser, ls));
+    a_free(self->vm, a_baseof(ls, struct a_form_parser, ls));
   }
 
   a_ls_do(&self->suffix, ls) {
-    a_free(&self->vm->pool, a_baseof(ls, struct a_form_parser, ls));
+    a_free(self->vm, a_baseof(ls, struct a_form_parser, ls));
   }
 
   a_ls_do(&self->forms, ls) {
     struct a_form *f = a_baseof(ls, struct a_form, ls);
-    if (a_form_deref(f, self->vm)) { a_free(&self->vm->form_pool, f); }
+    if (a_form_deref(f, self->vm)) { a_free(self->vm, f); }
   }
 }
 
 struct a_form_parser *a_parser_add_prefix(struct a_parser *self, a_parser_body body) {
-  struct a_form_parser *fp = a_malloc(&self->vm->pool, sizeof(struct a_form_parser));
+  struct a_form_parser *fp = a_malloc(self->vm, sizeof(struct a_form_parser));
   a_ls_push(&self->prefix, &fp->ls);
   fp->body = body;
   return fp;
 }
 
 struct a_form_parser *a_parser_add_suffix(struct a_parser *self, a_parser_body body) {
-  struct a_form_parser *fp = a_malloc(&self->vm->pool, sizeof(struct a_form_parser));
+  struct a_form_parser *fp = a_malloc(self->vm, sizeof(struct a_form_parser));
   a_ls_push(&self->suffix, &fp->ls);
   fp->body = body;
   return fp;
 }
 
 struct a_form *a_parser_push(struct a_parser *self, enum a_form_type type, struct a_pos pos) {
-  struct a_form *f = a_malloc(&self->vm->form_pool, sizeof(struct a_form));
+  struct a_form *f = a_malloc(self->vm, sizeof(struct a_form));
   a_form_init(f, type, pos);
   a_ls_push(&self->forms, &f->ls);
   return f;

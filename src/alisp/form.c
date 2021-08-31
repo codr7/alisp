@@ -59,7 +59,7 @@ bool a_form_deref(struct a_form *self, struct a_vm *vm) {
 
     if (self->as_ls.val) {
       a_val_deref(self->as_ls.val);
-      a_free(&vm->ls_pool, self->as_ls.val);
+      a_free(vm, self->as_ls.val);
     }
 
     break;
@@ -72,7 +72,7 @@ bool a_form_deref(struct a_form *self, struct a_vm *vm) {
 
     if (v) {
       a_val_deref(v);
-      a_free(&vm->val_pool, v);
+      a_free(vm, v);
     }
     
     break;
@@ -109,7 +109,7 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
     }
 
     if (lit) {
-      struct a_ls *out = a_malloc(&vm->ls_pool, sizeof(struct a_ls));
+      struct a_ls *out = a_malloc(vm, sizeof(struct a_ls));
       a_ls_init(out);
 
       a_ls_do(&self->as_ls.items, ls) {
@@ -206,7 +206,7 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
       struct a_call_op *call = &a_emit(vm, A_CALL_OP)->as_call;
 
       if (t) {
-	call->target = a_malloc(&vm->val_pool, sizeof(struct a_val));
+	call->target = a_malloc(vm, sizeof(struct a_val));
 	a_copy(a_val_init(call->target, t->type), t);
       }
 

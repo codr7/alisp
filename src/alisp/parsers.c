@@ -37,7 +37,7 @@ struct a_form *a_parse_call(struct a_parser *self) {
     return NULL;
   }
 
-  struct a_form *cf = a_malloc(&self->vm->form_pool, sizeof(struct a_form));
+  struct a_form *cf = a_malloc(self->vm, sizeof(struct a_form));
   a_form_init(cf, A_CALL_FORM, fpos)->as_call.target = t;
   
   while (true) {
@@ -54,7 +54,7 @@ struct a_form *a_parse_call(struct a_parser *self) {
     
     if (!f) {
       a_form_deref(cf, self->vm);
-      a_free(&self->vm->form_pool, cf);
+      a_free(self->vm, cf);
       a_fail("Open call form");
       return NULL;
     }
@@ -168,7 +168,7 @@ struct a_form *a_parse_int(struct a_parser *self) {
 struct a_form *a_parse_ls(struct a_parser *self) {
   struct a_pos fpos = self->pos;
   if (!a_parser_check(self, '[')) { return NULL; }
-  struct a_form *lsf = a_malloc(&self->vm->form_pool, sizeof(struct a_form));
+  struct a_form *lsf = a_malloc(self->vm, sizeof(struct a_form));
   a_form_init(lsf, A_LS_FORM, fpos);
 
   while (true) {
@@ -185,7 +185,7 @@ struct a_form *a_parse_ls(struct a_parser *self) {
       
     if (!f) {
       a_form_deref(lsf, self->vm);
-      a_free(&self->vm->form_pool, lsf);
+      a_free(self->vm, lsf);
       a_fail("Open ls form");
       return NULL;
     }

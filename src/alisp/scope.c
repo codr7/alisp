@@ -1,6 +1,5 @@
 #include <assert.h>
 #include "alisp/fail.h"
-#include "alisp/pool.h"
 #include "alisp/scope.h"
 #include "alisp/string.h"
 #include "alisp/val.h"
@@ -34,11 +33,11 @@ bool a_scope_deref(struct a_scope *self) {
 }
 
 struct a_val *a_scope_bind(struct a_scope *self, struct a_string *key, struct a_type *type) {
-  struct a_binding *b = a_malloc(&self->vm->binding_pool, sizeof(struct a_binding));
+  struct a_binding *b = a_malloc(self->vm, sizeof(struct a_binding));
   b->key = key;
 
   if (!a_lset_insert(&self->bindings, &b->val.ls, false)) {
-    a_free(&self->vm->binding_pool, b);
+    a_free(self->vm, b);
     return NULL;
   }
   
@@ -57,7 +56,7 @@ bool a_scope_unbind(struct a_scope *self, struct a_string *key) {
   struct a_val *v = a_scope_find(self, key);
   if (!v) { return false; }
   a_ls_pop(&v->ls);
-  a_free(&self->vm->val_pool, v);
+  a_free(self->vm, v);
   return true;
 }
 

@@ -110,7 +110,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 
       if (!(op->flags & A_CALL_DRETS)) {
 	for (struct a_type **rt = f->rets->items; rt < f->rets->items + f->rets->count; rt++) {
-	  a_push(vm, *rt);
+	  a_push(vm, *rt)->undef = true;
 	}
       }
     } else {
@@ -132,8 +132,8 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
   }
     
   case A_PUSH_OP: {
-    struct a_val *v = &self->as_push.val;
-    a_copy(a_push(vm, v->type), v);
+    struct a_val *src = &self->as_push.val, *dst = a_push(vm, src->type);
+    a_copy(dst, src);
     break;
   }
 
@@ -149,7 +149,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 
   case A_ZIP_OP: {
     a_drop(vm, 2);
-    a_push(vm, &vm->abc.pair_type);
+    a_push(vm, &vm->abc.pair_type)->undef = true;
     break;
   }
 

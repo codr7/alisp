@@ -7,7 +7,7 @@
 struct a_prim *a_prim(struct a_vm *vm,
 		      struct a_string *name,
 		      int8_t min_args, int8_t max_args) {
-  return a_prim_init(a_malloc(&vm->prim_pool, sizeof(struct a_prim)), name, min_args, max_args);
+  return a_prim_init(a_malloc(vm, sizeof(struct a_prim)), name, min_args, max_args);
 }
 
 
