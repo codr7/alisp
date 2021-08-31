@@ -1,7 +1,7 @@
 ## aLisp
 
 ### intro
-aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom Lisp implemented in portable C. The current version weighs in at 3 kloc and supports all features described in this document.
+aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom Lisp implemented in portable C. The current version weighs in at 4 kloc and supports all features described in this document.
 
 ### quirks
 - Parens are used for calls, brackets for lists.
@@ -222,15 +222,15 @@ To get an idea, we will compare the opening fibonacci example with Python3.
 $ cd alisp
 $ cd bench
 $ python3 fibrec.py
-22
+245
 ```
 
-It looks like the core VM is currently slightly faster, and we're just getting started.
+It looks like the core VM is slightly faster, and we're just getting started.
 
 ```
-  (bench 100 (fibrec:d 10))
+  (bench 10 (fibrec:d 20))
 
-[17]
+[172]
 ```
 
 
