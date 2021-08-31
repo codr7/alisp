@@ -8,7 +8,6 @@
 ** use in op_analyze
 ** go through code and look for load ops in a_func_end
 *** set type if matches args reg
-* --
 * add separate func stacks
 ** store in frame
 ** move args on call
@@ -55,10 +54,6 @@
 * add line comments with ;
 * add support for dynamic lists
 ** add LS_OP
-* ---
-* sort a_pool.free_slots in size order
-** bail out in malloc if > size
-** insert where >=
 * add unsafe/u call flag
 ** skip arg/ret checks
 
@@ -69,20 +64,3 @@
                          (swap) _.(- 1) 
                          _.(fibrecs)
                          _.(+ _)))))
-
-
-Been there, done that; har lyckats både läsa och titta sönder Sagan om ringen, och läsa först på Svenska och sedan Engelska :)
-Det slutade med at jag satt och försökte avkoda Silmarillion på Engelska men det blev till och med för konstigt för mig.
-
-Deal!
-Mitt inre orakel säger Torsdag lunch, känns det okej?
-Det ryktas dessutom bli strålande sol då :)
-
-
-Haha, så du har till och med försökt avkoda Silmarillion på Engelska :joy: Vad har du inte gjort är ju frågan? hahah
-Torsdag tror jag att det är någon brown bag (eller hur man nu uttrycker det) under lunchen. Kanske redan imorgon under lunchen eller på fredag (tror att det även då ryktas om att det ska vara sol:star-struck:)? Annars kan vi ju gå en sväng på torsdag där vid 10:00?
-
-Det är verkligen frågan :)
-
-Torsdag 10 fungerar här!
-Sedan har jag en låång promenad inbokad tidigt på Fredag; två till och med, fram och tillbaka till frukosten.
