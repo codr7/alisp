@@ -40,6 +40,7 @@ struct a_goto_op {
 
 struct a_load_op {
   a_reg_t reg;
+  struct a_type *type;
 };
 
 struct a_push_op {

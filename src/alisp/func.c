@@ -54,19 +54,32 @@ void a_func_begin(struct a_func *self, struct a_vm *vm) {
   self->scope = a_begin(vm);
 
   for (struct a_arg *a = self->args->items; a < self->args->items+self->args->count; a++) {
-    printf("binding %p\n", a->name);
-
-    if (a->name) {
-      a->reg = push_reg(self, a_scope_bind_reg(self->scope, a->name));
-      printf("binding %s\n", a->name->data);
-    }
+    if (a->name) { a->reg = push_reg(self, a_scope_bind_reg(self->scope, a->name)); }
   }
+}
+
+static struct a_arg *find_arg(struct a_func *self, a_reg_t reg) {
+  for (struct a_arg *a = self->args->items; a < self->args->items + self->args->count; a++) {
+    if (a->reg == reg) { return a; }
+  }
+
+  return NULL;
 }
 
 void a_func_end(struct a_func *self, struct a_vm *vm) {
   a_emit(vm, A_RET_OP)->as_ret.func = self;
   a_end(vm);
   a_baseof(self->start_pc, struct a_op, pc)->as_goto.pc = a_pc(vm);
+
+  for (a_pc_t pc = self->start_pc->next; ; pc = pc->next) {
+    struct a_op *op = a_baseof(pc, struct a_op, pc);
+    if (op->type == A_RET_OP && op->as_ret.func == self) { break; }
+    
+    if (op->type == A_LOAD_OP) {
+      struct a_arg *a = find_arg(self, op->as_load.reg);
+      if (a) { op->as_load.type = a->type; }
+    }
+  }
 }
 
 bool a_func_applicable(struct a_func *self, struct a_vm *vm) {

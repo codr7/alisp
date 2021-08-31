@@ -242,7 +242,7 @@ $ python3 fibtail.py
 104
 ```
 
-10 times as slow.
+Which says we're around 10 times as slow.
 
 ```
   (func fibtail1 [n:Int a:Int b:Int] [Int]
@@ -252,7 +252,7 @@ $ python3 fibtail.py
 [1055]
 ```
 
-Since the recursive call is now in tail position, call flag `t` may be used to trigger TCO, which brings us back down to 7 times as slow.
+Since the recursive call is now in tail position; `:t` may be used to trigger TCO, which brings us back down to 7 times as slow.
 
 ```
   (func fibtail2 [n:Int a:Int b:Int] [Int]

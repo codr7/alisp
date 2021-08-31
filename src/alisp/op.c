@@ -21,13 +21,15 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
   case A_DROP_OP:
     self->as_drop.count = 1;
     break;
+  case A_LOAD_OP:
+    self->as_load.type = NULL;
+    break;
   case A_RET_OP:
     self->as_ret.func = NULL;
     self->as_ret.check = true;
     break;
   case A_FENCE_OP:
   case A_GOTO_OP:
-  case A_LOAD_OP:
   case A_PUSH_OP:
   case A_RESET_OP:
   case A_STOP_OP:
@@ -141,7 +143,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
   }
 
   case A_LOAD_OP: {
-    a_push(vm, &vm->abc.undef_type);
+    a_push(vm, self->as_load.type ? self->as_load.type : &vm->abc.undef_type);
     break;
   }
 

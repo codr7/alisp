@@ -1,9 +1,3 @@
-* add optional type to load op
-** check on eval if set
-** use in op_analyze
-** go through code and look for load ops in a_func_end
-*** set type if matches args reg
-* --
 * add separate func stacks
 ** store in frame
 ** move args on call
