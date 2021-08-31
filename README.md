@@ -224,7 +224,7 @@ $ python3 fibrec.py
 235
 ```
 
-It looks like the core VM is around 5 times as slow, but we're just getting started.
+It looks like the core VM is around 5 times as slow at the moment.
 
 ```
   (func fibrec [n:Int] [Int]
