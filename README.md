@@ -252,3 +252,13 @@ $ python3 fibtail.py
 [1055]
 ```
 
+Since the recursive call is now in tail position, call flag `t` may be used to trigger TCO, which brings us back down to 7 times as slow.
+
+```
+  (func fibtail2 [n:Int a:Int b:Int] [Int]
+    (if n.(= 0) a (if n.(= 1) b (fibtail2:t n.(- 1) b a.(+ b)))))
+  (bench 10000 (fibtail2:d 70 0 1))
+
+[748]
+```
+

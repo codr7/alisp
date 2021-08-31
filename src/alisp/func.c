@@ -87,8 +87,11 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
     return ret;
   }
 
-  struct a_frame *f = a_frame_init(a_malloc(vm, sizeof(struct a_frame)), vm, self, flags, ret);
-  a_ls_push(&vm->frames, &f->ls);
+  if (!(flags & A_CALL_TCO)) {
+    struct a_frame *f = a_frame_init(a_malloc(vm, sizeof(struct a_frame)), vm, self, flags, ret);
+    a_ls_push(&vm->frames, &f->ls);
+  }
+
   struct a_ls *sp = vm->stack.prev;
   
   for (struct a_arg *a = self->args->items+self->args->count-1; a >= self->args->items; a--) {

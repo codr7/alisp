@@ -160,11 +160,13 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
     enum a_form_type tt = tf->type;
     enum a_call_flags flags = 0;
     
-    if (tt == A_PAIR_FORM) {
+    while (tt == A_PAIR_FORM) {
       struct a_form *r = tf->as_pair.right;
 
       if (r->type == A_ID_FORM && strcmp(r->as_id.name->data, "d") == 0) {
 	flags |= A_CALL_DRETS;
+      } else if (r->type == A_ID_FORM && strcmp(r->as_id.name->data, "t") == 0) {
+	flags |= A_CALL_TCO;
       } else {
 	a_fail("Invalid call flag: %d", r->type);
       }
