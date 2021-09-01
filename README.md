@@ -246,9 +246,13 @@ The following types are provided out of the box, adding more is trivial.
 `ceval` may be used to evaluate forms at compile time and emit code to push their results.
 
 ```
-  (ceval 1 2 3)
+  (func foo [] [Int] (ceval 35.(+ 7) (dup).(dump)))
 
-[1 2 3]
+42
+[]
+
+  (foo)
+[42]
 ```
 
 ### debugging

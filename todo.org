@@ -1,3 +1,7 @@
+* bring back pool allocation of vals and ops
+** remove free list from pool
+** remove slot struct
+** bench one at a time
 * add type-of/isa prims
 ** readme/types
 * add real undef type
