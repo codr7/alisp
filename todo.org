@@ -44,7 +44,3 @@
 ** add LS_OP
 * add unsafe/u call flag
 ** skip arg/ret checks
-
-
-Hur går det med jobberiet förresten?
-Jag kommer ihåg när jag började, det var mycket e-post och inloggningar där ett par veckor :)
