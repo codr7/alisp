@@ -254,10 +254,7 @@ Dropping the binding and dealing directly with the stack is slightly faster.
 
 ```
   (func fibrecs [Int] [Int]
-    (dup)
-    (if _.(< 2) _ (do 
-                    _.(- 1) (dup) 
-                    _.(fibrecs).(+ (swap).(- 1).(fibrecs)))))
+    (if (dup).(< 2) _ (do _.(- 1) (dup).(fibrecs).(+ (swap).(- 1).(fibrecs)))))
   (bench 100 (fibrecs:d 20))
 
 [420]
