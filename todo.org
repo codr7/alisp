@@ -1,5 +1,7 @@
 * add type-of/isa prims
 ** readme/types
+* add real undef type
+** replace checks in a_val
 * add quoting
 ** add a_form_dump
 ** add a_val *a_form_quote(form, vm)
