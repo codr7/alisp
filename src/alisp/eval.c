@@ -18,8 +18,8 @@
   goto *dispatch[a_baseof((pc = (prev)->next), struct a_op, pc)->type]
 
 bool a_eval(struct a_vm *self, a_pc_t pc) {
-  static const void* dispatch[] = {
-    &&STOP, &&BENCH, &&BRANCH, &&CALL, &&COPY, &&DROP, &&FENCE, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&RET, &&STORE, &&ZIP
+  static const void* dispatch[] = {&&STOP,
+    &&BENCH, &&BRANCH, &&CALL, &&DROP, &&DUP, &&FENCE, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&RET, &&STORE, &&SWAP, &&ZIP
   };
   
   A_DISPATCH(pc);
@@ -78,22 +78,6 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     A_DISPATCH(pc);
   }
 
- COPY: {
-    A_TRACE(COPY);
-    struct a_ls *vls = self->stack.prev;				   
-
-    for (int i = a_baseof(pc, struct a_op, pc)->as_copy.offset; i > 0; vls = vls->prev, i--) {
-      if (vls == &self->stack) {
-	a_fail("Not enough values on stack: %d", i+1);
-	return false;
-      }
-    }
-
-    struct a_val *v = a_baseof(vls, struct a_val, ls);
-    a_copy(a_push(self, v->type), v);
-    A_DISPATCH(pc);    
-  }
-
  DROP: {
     A_TRACE(DROP);
     int count = a_baseof(pc, struct a_op, pc)->as_drop.count;
@@ -115,6 +99,19 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     }
 
     if (!a_drop(self, count)) { return false; }    
+    A_DISPATCH(pc);    
+  }
+
+ DUP: {
+    A_TRACE(SWAP);
+    struct a_val *v = a_peek(self, a_baseof(pc, struct a_op, pc)->as_dup.offset);
+
+    if (!v) {
+      a_fail("Not enough values on stack");
+      return false;
+    }
+
+    a_copy(a_push(self, v->type), v);
     A_DISPATCH(pc);    
   }
 
@@ -192,6 +189,21 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     
     a_store(self, a_baseof(pc, struct a_op, pc)->as_load.reg, v); 
     A_DISPATCH(pc);
+  }
+
+ SWAP: {
+    A_TRACE(SWAP);
+    struct a_val *x = a_peek(self, a_baseof(pc, struct a_op, pc)->as_swap.offset + 1);
+    
+    if (!x) {
+      a_fail("Not enough values on stack");
+      return false;
+    }
+
+    struct a_val *y = a_peek(self, 0);
+    a_ls_push(&x->ls, a_ls_pop(&y->ls));
+    a_ls_push(&self->stack, a_ls_pop(&x->ls));
+    A_DISPATCH(pc);    
   }
 
  ZIP: {

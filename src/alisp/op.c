@@ -15,11 +15,11 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
     break;
   case A_BENCH_OP:
   case A_BRANCH_OP:
-  case A_COPY_OP:
-    self->as_copy.offset = 0;
-    break;
   case A_DROP_OP:
     self->as_drop.count = 1;
+    break;
+  case A_DUP_OP:
+    self->as_dup.offset = 0;
     break;
   case A_LOAD_OP:
     self->as_load.type = NULL;
@@ -34,6 +34,9 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
   case A_RESET_OP:
   case A_STOP_OP:
   case A_STORE_OP:
+  case A_SWAP_OP:
+    self->as_swap.offset = 0;
+    break;
   case A_ZIP_OP:
     break;
   }
@@ -53,8 +56,8 @@ void a_op_deinit(struct a_op *self) {
     break;
   case A_BENCH_OP:
   case A_BRANCH_OP:
-  case A_COPY_OP:
   case A_DROP_OP:
+  case A_DUP_OP:
   case A_FENCE_OP:
   case A_GOTO_OP:
   case A_LOAD_OP:
@@ -62,6 +65,7 @@ void a_op_deinit(struct a_op *self) {
   case A_RESET_OP:
   case A_RET_OP:
   case A_STORE_OP:
+  case A_SWAP_OP:
   case A_ZIP_OP:
     break;
   }
@@ -124,9 +128,14 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
     
     break;
   }
+    
+  case A_DROP_OP: {
+    a_drop(vm, self->as_drop.count);
+    break;
+  }
 
-  case A_COPY_OP: {
-    struct a_val *v = a_peek(vm, self->as_copy.offset);
+  case A_DUP_OP: {
+    struct a_val *v = a_peek(vm, self->as_dup.offset);
 
     if (v) {
       a_copy(a_push(vm, v->type), v);
@@ -136,12 +145,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
     
     break;
   }
-    
-  case A_DROP_OP: {
-    a_drop(vm, self->as_drop.count);
-    break;
-  }
-    
+
   case A_PUSH_OP: {
     struct a_val *src = &self->as_push.val, *dst = a_push(vm, src->type);
     a_copy(dst, src);
@@ -194,6 +198,20 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 
   case A_STORE_OP: {
     a_drop(vm, 1);
+    break;
+  }
+
+  case A_SWAP_OP: {
+    struct a_val *x = a_peek(vm, self->as_swap.offset+1);
+
+    if (x) {
+      struct a_val *y = a_peek(vm, 0);
+      a_ls_push(&x->ls, a_ls_pop(&y->ls));
+      a_ls_push(&vm->stack, a_ls_pop(&x->ls));
+    } else {
+      a_reset(vm);
+    }
+    
     break;
   }
 

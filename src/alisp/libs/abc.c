@@ -134,6 +134,11 @@ static a_pc_t dump_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
+static bool dup_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  a_emit(vm, A_DUP_OP);
+  return true;
+}
+
 static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   struct a_ls *a = args->next;
   struct a_form *name_form = a_baseof(a, struct a_form, ls);
@@ -341,6 +346,11 @@ static bool reset_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, 
   return true;
 }
 
+static bool swap_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  a_emit(vm, A_SWAP_OP);
+  return true;
+}
+
 struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_init(&self->lib, vm, a_string(vm, "abc"));
   a_lib_bind_type(&self->lib, a_type_init(&self->any_type, vm, a_string(vm, "Any"), A_SUPER(NULL)));
@@ -406,6 +416,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
 			 A_RET(vm)))->body = dump_body;
 
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "dup"), 0, 0))->body = dup_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "func"), 3, -1))->body = func_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "if"), 2, 3))->body = if_body;
 
@@ -418,5 +429,6 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "let"), 1, -1))->body = let_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "reset"), 0, 0))->body = reset_body;
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "swap"), 0, 0))->body = swap_body;
   return self;
 }

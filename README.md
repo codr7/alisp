@@ -73,6 +73,22 @@ Values are pushed on the stack.
 []
 ```
 
+`dup` may be used to repeat the top value.
+
+```
+  1 2 3 (dup)
+
+[1 2 3 3]
+```
+
+`swap` may be used to swap the top two values.
+
+```
+  1 2 3 (swap)
+
+[1 3 2]
+```
+
 ### bindings
 Values may be bound to identifiers using `let`, literals are automagically bound at compile time.
 
@@ -224,7 +240,7 @@ $ python3 fibrec.py
 235
 ```
 
-It looks like the core VM is around twice as slow at the moment.
+Around twice as slow at the moment.
 
 ```
   (func fibrec [n:Int] [Int]
@@ -232,6 +248,19 @@ It looks like the core VM is around twice as slow at the moment.
   (bench 100 (fibrec:d 20))
 
 [475]
+```
+
+Dropping the binding and dealing directly with the stack is slightly faster.
+
+```
+  (func fibrecs [Int] [Int]
+    (dup)
+    (if _.(< 2) _ (do 
+                    _.(- 1) (dup) 
+                    _.(fibrecs).(+ (swap).(- 1).(fibrecs)))))
+  (bench 100 (fibrecs:d 20))
+
+[420]
 ```
 
 Switching to a tail recursive implementation and increasing the number of repetitions to get more data.
