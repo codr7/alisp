@@ -252,6 +252,7 @@ The following types are provided out of the box, adding more is trivial.
 []
 
   (foo)
+  
 [42]
 ```
 
