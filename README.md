@@ -174,9 +174,21 @@ Pairs may be formed using `:`.
 List literals may be specified by enclosing code in brackets.
 
 ```
+  []
+
+[NIL]
+
+  [1]
+
+[NIL 1:NIL]
+
+  [1 2]
+
+[NIL 1:NIL 1:2]
+
   [1 2 3]
-  
-[[1 2 3]]
+
+[NIL 1:NIL 1:2 1:2:3]
 ```
 
 ### functions
@@ -224,8 +236,8 @@ The following types are provided out of the box, adding more is trivial.
 - Bool - Boolean values
 - Func - Functions as values
 - Int - Integer values
-- Ls - List values
 - Meta - Types as values
+- Nil - Missing values
 - Pair - Pair values
 - Prim - Primitives as values
 - Reg - Registers as values

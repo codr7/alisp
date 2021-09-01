@@ -34,14 +34,18 @@ a_pc_t a_call(struct a_val *self, enum a_call_flags flags, a_pc_t ret) {
 }
 
 enum a_order a_compare(struct a_val *self, struct a_val *other) {
+  assert(self->type == other->type);
   assert(!self->undef);
   assert(self->type->compare_val);
   return self->type->compare_val(self, other);
 }
 
 struct a_val *a_copy(struct a_val *self, struct a_val *source) {
-  assert(source->type->copy_val);
-  if (!(self->undef = source->undef)) { source->type->copy_val(self, source); }
+  if (!(self->undef = source->undef)) {
+    assert(source->type->copy_val);
+    source->type->copy_val(self, source);
+  }
+  
   return self;
 }
 
@@ -52,6 +56,7 @@ void a_dump(struct a_val *self) {
 }
 
 bool a_equals(struct a_val *self, struct a_val *other) {
+  if (self->type != other->type) { return false; }
   assert(!self->undef);
   assert(self->type->equals_val);
   return self->type->equals_val(self, other);

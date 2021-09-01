@@ -109,20 +109,37 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
     }
 
     if (lit) {
-      struct a_ls *out = a_malloc(vm, sizeof(struct a_ls));
-      a_ls_init(out);
-
+      struct a_val *out = a_val(&vm->abc.pair_type), *v = out;
+      v->as_pair.left = NULL;
+      v->as_pair.right = NULL;
+      
       a_ls_do(&self->as_ls.items, ls) {
 	struct a_val *src = a_form_val(a_baseof(ls, struct a_form, ls), vm);
 	struct a_val *dst = a_val(src->type);
 	a_copy(dst, src);
-	a_ls_push(out, &dst->ls);
+
+	if (ls->next == &self->as_ls.items) {
+	  if (v->as_pair.left) {
+	    v->as_pair.right = dst;
+	  } else {
+	    v->as_pair.left = dst;
+	  }
+	} else if (v->as_pair.left) {
+	  v = v->as_pair.right = a_val(&vm->abc.pair_type);
+	  v->as_pair.left = dst;
+	  v->as_pair.right = NULL;
+	} else {
+	  v->as_pair.left = dst;
+	}
       }
-	
-      struct a_val *v = a_val(&vm->abc.ls_type);
-      v->as_ls = out;
-      self->as_ls.val = v;
-      return v;
+
+      if (!v->as_pair.left && !v->as_pair.right) {
+	out->type = &vm->abc.nil_type;
+      } else if (!v->as_pair.right) {
+	v->as_pair.right = a_val(&vm->abc.nil_type);
+      }
+      
+      return out;
     }
 
     break;

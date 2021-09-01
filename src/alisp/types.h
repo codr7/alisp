@@ -27,6 +27,8 @@ struct a_type *a_ls_type_init(struct a_type *self, struct a_vm *vm, struct a_str
 
 struct a_type *a_meta_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 
+struct a_type *a_nil_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
+
 struct a_type *a_pair_type_init(struct a_type *self,
 				struct a_vm *vm,
 				struct a_string *name,
