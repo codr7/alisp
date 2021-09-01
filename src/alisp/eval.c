@@ -173,7 +173,8 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
 	return false;
       }
     }
-    
+
+    if (f->flags & A_CALL_MEM) { a_func_mem(f->func, self, f->mem); }
     if (f->flags & A_CALL_DRETS) { a_drop(self, f->func->rets->count); }
     A_DISPATCH(f->ret);
   }

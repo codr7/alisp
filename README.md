@@ -230,6 +230,15 @@ The following types are provided out of the box, adding more is trivial.
 - Prim - Primitives as values
 - Reg - Registers as values
 
+### compile time evaluation
+`ceval` may be used to evaluate forms at compile time and emit code to push their results.
+
+```
+  (ceval 1 2 3)
+
+[1 2 3]
+```
+
 ### debugging
 `dump` may be used to dump any value to `stdout`.
 
@@ -269,7 +278,19 @@ Dropping the binding and dealing directly with the stack is slightly faster.
 [420]
 ```
 
-Let's switch to a tail recursive implementation and increase the number of repetitions to get more data.
+Memoization is a nice solution for these kinds of problems, `:m` may be used to memoize calls.
+Note that I had to increase the number of repetitions by four orders of magnitude to get a similar measurable time.
+
+```
+  (func fibrec [n:Int] [Int]
+    (if n.(< 2) n n.(- 1).(fibrec:m).(+ n.(- 2).(fibrec:m))))
+  (bench 1000000 (fibrec:d 20))
+
+Disabled arg check: fibrec 2 [Int]
+[355]
+```
+
+Let's switch to a tail recursive implementation to get more data.
 
 ``` 
 $ cd bench
@@ -285,5 +306,15 @@ $ python3 fibtail.py
   (bench 10000 (fibtail:d 70 0 1))
 
 [280]
+```
+
+When combining TCO with memoization, only memoized frames are skipped.
+
+```
+  (func fibtail [n:Int a:Int b:Int] [Int]
+    (if n.(= 0) a (if n.(= 1) b (fibtail:m:t n.(- 1) b a.(+ b)))))
+  (bench 10000 (fibtail:d 70 0 1))
+
+[9]
 ```
 

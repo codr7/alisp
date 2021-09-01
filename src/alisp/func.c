@@ -7,14 +7,8 @@
 #include "alisp/string.h"
 #include "alisp/vm.h"
 
-struct a_mem {
-  struct a_ls ls;
-  struct a_ls args;
-  struct a_ls rets;
-};
-
 static const void *mem_key(const struct a_ls *self) {
-  return &a_baseof(self, struct a_mem, ls)->args;
+  return &a_baseof(self, struct a_func_mem, ls)->args;
 }
 
 static enum a_order mem_compare(const void *x, const void *y) {
@@ -23,9 +17,7 @@ static enum a_order mem_compare(const void *x, const void *y) {
   for (;;) {
     xls = xls->next;
     yls = yls->next;
-    
-    if (xls == x && yls != y) { return A_LT; }
-    if (xls != x && yls == y) { return A_GT; }
+    if (xls == x || yls == y) { break; }
 
     switch (a_compare(a_baseof(xls, struct a_val, ls), a_baseof(yls, struct a_val, ls))) {
     case A_LT:
@@ -74,6 +66,23 @@ bool a_func_deref(struct a_func *self, struct a_vm *vm) {
   a_free(vm, self->args);
   a_free(vm, self->rets);
   if (self->scope) { a_scope_deref(self->scope); }
+
+  a_ls_do(&self->mem.items, ls) {
+    struct a_func_mem *m = a_baseof(ls, struct a_func_mem, ls);
+
+    a_ls_do(&m->args, ls) {
+      struct a_val *v = a_baseof(ls, struct a_val, ls);
+      a_val_deref(v);
+      a_val_free(v, vm);
+    }
+
+    a_ls_do(&m->rets, ls) {
+      struct a_val *v = a_baseof(ls, struct a_val, ls);
+      a_val_deref(v);
+      a_val_free(v, vm);
+    }
+  }
+  
   return true;
 }
 
@@ -128,13 +137,44 @@ bool a_func_applicable(struct a_func *self, struct a_vm *vm) {
 }
 
 a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags, a_pc_t ret) {
+  struct a_func_mem *mem = NULL;
+  
+  if (flags & A_CALL_MEM) {
+    assert(self->args->count);
+    struct a_ls *sp = &vm->stack;
+    for (int i = 0; i < self->args->count; i++, sp = sp->prev);
+    struct a_ls *found = a_lset_find(&self->mem, sp->prev);
+    
+    if (found) {
+      a_drop(vm, self->args->count);
+      
+      a_ls_do(&a_baseof(found, struct a_func_mem, ls)->rets, ls) {
+	struct a_val *v = a_baseof(ls, struct a_val, ls);
+	a_copy(a_push(vm, v->type), v);
+      }
+      
+      return ret;
+    } else {
+      mem = a_malloc(vm, sizeof(struct a_func_mem));
+      struct a_ls *sp = vm->stack.prev;
+      a_ls_init(&mem->args);
+      
+      for (int i = 0; i < self->args->count && sp != &vm->stack; i++, sp = sp->prev) {
+	struct a_val *src = a_baseof(sp, struct a_val, ls), *dst = a_val(src->type);
+	a_copy(dst, src);
+	a_ls_push(mem->args.next, &dst->ls);
+      }
+    }
+  }
+  
   if (self->body) {
     ret = self->body(self, vm, ret);
+    if (mem) { a_func_mem(self, vm, mem); }
     if (flags & A_CALL_DRETS) { a_drop(vm, self->rets->count); }
     return ret;
   }
 
-  if (!(flags & A_CALL_TCO)) { a_push_frame(vm, self, flags, ret); }
+  if (mem || !(flags & A_CALL_TCO)) { a_push_frame(vm, self, flags, mem, ret); }
   struct a_ls *sp = vm->stack.prev;
   
   for (struct a_arg *a = self->args->items+self->args->count-1; a >= self->args->items; a--) {
@@ -165,6 +205,19 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
   }
   
   return self->start_pc;
+}
+
+void a_func_mem(struct a_func *self, struct a_vm *vm, struct a_func_mem *mem) {  
+  struct a_ls *sp = vm->stack.prev;
+  a_ls_init(&mem->rets);
+
+  for (int i = 0; i < self->rets->count; i++, sp = sp->prev) {
+    struct a_val *src = a_baseof(sp, struct a_val, ls), *dst = a_val(src->type);
+    a_copy(dst, src);
+    a_ls_push(mem->rets.next, &dst->ls);
+  }
+
+  a_lset_insert(&self->mem, &mem->ls, false);
 }
 
 struct a_args *a_args(struct a_vm *vm, uint8_t count) {

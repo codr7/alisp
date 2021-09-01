@@ -114,10 +114,14 @@ struct a_scope *a_end(struct a_vm *self) {
   return a_baseof(ls, struct a_scope, ls);
 }
 
-struct a_frame *a_push_frame(struct a_vm *self, struct a_func *func, enum a_call_flags flags, a_pc_t ret) {
+struct a_frame *a_push_frame(struct a_vm *self,
+			     struct a_func *func,
+			     enum a_call_flags flags,
+			     struct a_func_mem *mem,
+			     a_pc_t ret) {
   assert(self->frame_count < A_FRAME_COUNT);
   struct a_frame *f = self->frames + self->frame_count++;
-  return a_frame_init(f, self, func, flags, ret);
+  return a_frame_init(f, self, func, flags, mem, ret);
 }
 
 struct a_frame *a_pop_frame(struct a_vm *self) {

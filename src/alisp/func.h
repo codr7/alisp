@@ -56,6 +56,12 @@ struct a_func {
   a_ref_count ref_count;
 };
 
+struct a_func_mem {
+  struct a_ls ls;
+  struct a_ls args;
+  struct a_ls rets;
+};
+
 struct a_func *a_func(struct a_vm *vm,
 		      struct a_string *name,
 		      struct a_args *args,
@@ -74,6 +80,7 @@ void a_func_end(struct a_func *self, struct a_vm *vm);
 
 bool a_func_applicable(struct a_func *self, struct a_vm *vm);
 a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags, a_pc_t ret);
+void a_func_mem(struct a_func *self, struct a_vm *vm, struct a_func_mem *mem);
 
 struct a_args *a_args(struct a_vm *vm, uint8_t count);
 struct a_rets *a_rets(struct a_vm *vm, uint8_t count);

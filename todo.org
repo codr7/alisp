@@ -1,12 +1,5 @@
-* add memoize call flag
-** search for mem on call if call flag
-** bench
-** add if missing
-* add once prim
-** add A_ONCE_OP
-*** emit like bench
-** keep internal val in op
-** set on first eval
+* add type-of/isa prims
+** readme/types
 * add quoting
 ** add a_form_dump
 ** add a_val *a_form_quote(form, vm)
@@ -62,6 +55,11 @@
 * add line comments with ;
 * add support for dynamic lists
 ** add LS_OP
+* add once prim
+** add A_ONCE_OP
+*** emit like bench
+** keep internal val in op
+** set on first eval
 * add unsafe/u call flag
 ** skip arg/ret checks
 * add macros

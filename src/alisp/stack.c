@@ -32,11 +32,7 @@ bool a_drop(struct a_vm *self, int count) {
   struct a_ls *vls = self->stack.prev;				   
   
   for (int i = count; i > 0; vls = vls->prev, i--) {
-    if (vls == &self->stack) {
-      a_fail("Not enough values on stack: %d", i);
-      return false;
-    }
-    
+    if (vls == &self->stack) { return false; }
     a_ls_pop(vls);
     struct a_val *v = a_baseof(vls, struct a_val, ls);
     a_val_deref(v);

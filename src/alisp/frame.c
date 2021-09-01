@@ -8,9 +8,11 @@ struct a_frame *a_frame_init(struct a_frame *self,
 			     struct a_vm *vm,
 			     struct a_func *func,
 			     enum a_call_flags flags,
+			     struct a_func_mem *mem,
 			     a_pc_t ret) {
   self->func = func;
   self->flags = flags;
+  self->mem = mem;
   self->ret = ret;
 
   for (a_reg_t *reg = func->regs; reg < func->regs + func->reg_count; reg++) {

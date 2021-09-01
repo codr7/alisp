@@ -40,7 +40,12 @@ struct a_scope *a_push_scope(struct a_vm *self, struct a_scope *scope);
 struct a_scope *a_begin(struct a_vm *self);
 struct a_scope *a_end(struct a_vm *self);
 
-struct a_frame *a_push_frame(struct a_vm *self, struct a_func *func, enum a_call_flags flags, a_pc_t ret);
+struct a_frame *a_push_frame(struct a_vm *self,
+			     struct a_func *func,
+			     enum a_call_flags flags,
+			     struct a_func_mem *mem,
+			     a_pc_t ret);
+
 struct a_frame *a_pop_frame(struct a_vm *self);
 
 void a_store(struct a_vm *self, a_reg_t reg, struct a_val *val);

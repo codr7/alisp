@@ -157,28 +157,36 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
   switch (self->type) {
   case A_CALL_FORM: {
     struct a_form *tf = self->as_call.target;
-    enum a_form_type tt = tf->type;
     enum a_call_flags flags = 0;
-    
-    while (tt == A_PAIR_FORM) {
-      struct a_form *r = tf->as_pair.right;
 
-      if (r->type == A_ID_FORM && strcmp(r->as_id.name->data, "d") == 0) {
-	flags |= A_CALL_DRETS;
-      } else if (r->type == A_ID_FORM && strcmp(r->as_id.name->data, "m") == 0) {
-	flags |= A_CALL_MEM;
-      } else if (r->type == A_ID_FORM && strcmp(r->as_id.name->data, "t") == 0) {
-	flags |= A_CALL_TCO;
-      } else {
-	a_fail("Invalid call flag: %d", r->type);
-      }
-
+    if (tf->type == A_PAIR_FORM) {
+      struct a_form *ff = tf->as_pair.right;
       tf = tf->as_pair.left;
-      tt = tf->type;
+
+      while (ff) {
+	struct a_form *r = ff;
+	
+	if (r->type == A_PAIR_FORM) {
+	  r = ff->as_pair.left;
+	  ff = ff->as_pair.right;
+	} else {
+	  ff = NULL;
+	}
+		
+	if (r->type == A_ID_FORM && strcmp(r->as_id.name->data, "d") == 0) {
+	  flags |= A_CALL_DRETS;
+	} else if (r->type == A_ID_FORM && strcmp(r->as_id.name->data, "m") == 0) {
+	  flags |= A_CALL_MEM;
+	} else if (r->type == A_ID_FORM && strcmp(r->as_id.name->data, "t") == 0) {
+	  flags |= A_CALL_TCO;
+	} else {
+	  a_fail("Invalid call flag: %d", r->type);
+	}	
+      }
     }
     
-    if (tt != A_ID_FORM) {
-      a_fail("Invalid call target: %d", tt);
+    if (tf->type != A_ID_FORM) {
+      a_fail("Invalid call target: %d", tf->type);
       return false;
     }
 
