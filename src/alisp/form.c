@@ -59,7 +59,7 @@ bool a_form_deref(struct a_form *self, struct a_vm *vm) {
 
     if (self->as_ls.val) {
       a_val_deref(self->as_ls.val);
-      a_free(vm, self->as_ls.val);
+      a_val_free(self->as_ls.val, vm);
     }
 
     break;
@@ -72,7 +72,7 @@ bool a_form_deref(struct a_form *self, struct a_vm *vm) {
 
     if (v) {
       a_val_deref(v);
-      a_free(vm, v);
+      a_val_free(v, vm);
     }
     
     break;
@@ -114,12 +114,12 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
 
       a_ls_do(&self->as_ls.items, ls) {
 	struct a_val *src = a_form_val(a_baseof(ls, struct a_form, ls), vm);
-	struct a_val *dst = a_val(vm, src->type);
+	struct a_val *dst = a_val(src->type);
 	a_copy(dst, src);
 	a_ls_push(out, &dst->ls);
       }
 	
-      struct a_val *v = a_val(vm, &vm->abc.ls_type);
+      struct a_val *v = a_val(&vm->abc.ls_type);
       v->as_ls = out;
       self->as_ls.val = v;
       return v;
@@ -136,7 +136,7 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
       *rv = a_form_val(self->as_pair.right, vm);
 
     if (lv && rv) {
-      struct a_val *v = a_val(vm, &vm->abc.pair_type);
+      struct a_val *v = a_val(&vm->abc.pair_type);
       v->as_pair = a_pair(lv, rv);
       self->as_pair.val = v;
       return v;
@@ -206,12 +206,7 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
       }
       
       struct a_call_op *call = &a_emit(vm, A_CALL_OP)->as_call;
-
-      if (t) {
-	call->target = a_malloc(vm, sizeof(struct a_val));
-	a_copy(a_val_init(call->target, t->type), t);
-      }
-
+      if (t) { call->target = a_copy(a_val(t->type), t); }
       call->flags = A_CALL_CHECK | flags;
     }
     

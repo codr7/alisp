@@ -13,19 +13,21 @@
 struct a_vm *a_vm_init(struct a_vm *self) {
   self->next_type_id = 0;
   a_ls_init(&self->code);
-
+  a_ls_init(&self->free_vals);
+  
   a_scope_init(&self->main, self, NULL);
   a_ls_init(&self->scopes);
   a_push_scope(self, &self->main);
-
+  
   self->frame_count = 0;
   a_ls_init(&self->stack);
+  memset(self->regs, 0, sizeof(self->regs));
+
   a_abc_lib_init(&self->abc, self);
   a_lib_import(&self->abc.lib);
   a_math_lib_init(&self->math, self);
   a_lib_import(&self->math.lib);
 
-  memset(self->regs, 0, sizeof(self->regs));
   return self;
 }
 
@@ -35,14 +37,14 @@ void a_vm_deinit(struct a_vm *self) {
 
     if (v) {
       a_val_deref(v);
-      a_free(self, v);
+      a_val_free(v, self);
     }
   }
   
   a_ls_do(&self->stack, vls) {
     struct a_val *v = a_baseof(vls, struct a_val, ls);
     a_val_deref(v);
-    a_free(self, v);
+    a_val_free(v, self);
   }
 
   a_ls_do(&self->scopes, sls) {
@@ -59,6 +61,8 @@ void a_vm_deinit(struct a_vm *self) {
 
   a_lib_deinit(&self->math.lib);
   a_lib_deinit(&self->abc.lib);
+  
+  a_ls_do(&self->free_vals, ls) { a_free(self, a_baseof(ls, struct a_val, ls)); }
 }
 
 a_pc_t a_pc(struct a_vm *self) { return self->code.prev; }
@@ -123,7 +127,7 @@ void a_store(struct a_vm *self, a_reg_t reg, struct a_val *val) {
 
   if (prev) {
     a_val_deref(prev);
-    a_free(self, prev);
+    a_val_free(prev, self);
   }
   
   self->regs[reg] = val;

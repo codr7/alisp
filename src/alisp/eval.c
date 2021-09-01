@@ -72,7 +72,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
 
     if (!call->target) {
       a_val_deref(t);
-      a_free(self, t);
+      a_val_free(t, self);
     }
     
     A_DISPATCH(pc);

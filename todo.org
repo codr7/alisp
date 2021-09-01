@@ -44,11 +44,12 @@
 ** add LS_OP
 * add unsafe/u call flag
 ** skip arg/ret checks
+* add stack based fib
+** rename copy op to dup
+** add swap op
+** add dup/swap prims
 
 (func fibrecs [Int] [Int]
-   (cp) (if _.(< 2) _ (do 
-                         _.(- 1) (cp) 
-                         _.(fibrecs) 
-                         (swap) _.(- 1) 
-                         _.(fibrecs)
-                         _.(+ _)))))
+   (dup) (if _.(< 2) _ (do 
+                         _.(- 1) (dup) 
+                         _.(fibrecs).(+ (swap).(- 1).(fibrecs))))))

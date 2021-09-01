@@ -15,12 +15,7 @@ struct a_frame *a_frame_init(struct a_frame *self,
 
   for (a_reg_t *reg = func->regs; reg < func->regs + func->reg_count; reg++) {
     struct a_val *src = vm->regs[*reg];
-    
-    if (src) {
-      struct a_val *dst = a_malloc(vm, sizeof(struct a_val));
-      self->regs[*reg] = dst;
-      a_copy(a_val_init(dst, src->type), src);
-    }
+    if (src) { self->regs[*reg] = a_copy(a_val(src->type), src); }
   }
   
   return self;

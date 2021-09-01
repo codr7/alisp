@@ -18,7 +18,7 @@ static void test_push() {
   assert(v->type == &vm.abc.int_type);
   assert(v->as_int == 42);
   a_val_deref(v);
-  a_free(&vm, v);
+  a_val_free(v, &vm);
   a_vm_deinit(&vm);
 }
 
@@ -36,7 +36,7 @@ static void test_bind() {
   assert(v->type == &vm.abc.int_type);
   assert(v->as_int == 42);
   a_val_deref(v);
-  a_free(&vm, v);
+  a_val_free(v, &vm);
   a_vm_deinit(&vm);
 }
 
@@ -44,7 +44,7 @@ static a_pc_t test_func_foo_body(struct a_func *self, struct a_vm *vm, a_pc_t re
   struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_int += y->as_int;
   a_val_deref(y);
-  a_free(vm, y);
+  a_val_free(y, vm);
   return ret;
 }
 
@@ -62,7 +62,7 @@ static void test_func() {
 	      A_RET(&vm, &vm.abc.int_type));
 
   f.body = test_func_foo_body;
-  struct a_val *t = a_val_init(a_malloc(&vm, sizeof(struct a_val)), &vm.abc.func_type);
+  struct a_val *t = a_val(&vm.abc.func_type);
   t->as_func = a_func_ref(&f);
   a_emit(&vm, A_CALL_OP)->as_call.target = t;
   a_emit(&vm, A_STOP_OP);
@@ -76,7 +76,7 @@ static void test_func() {
   assert(v->type == &vm.abc.int_type);
   assert(v->as_int == 42);
   a_val_deref(v);
-  a_free(&vm, v);
+  a_val_free(v, &vm);
   a_func_deref(&f, &vm);
   a_vm_deinit(&vm);
 }
@@ -96,7 +96,7 @@ static void test_func_emit() {
   a_val_init(&a_emit(&vm, A_PUSH_OP)->as_push.val, &vm.abc.int_type)->as_int = 42;
   a_func_end(&f, &vm);
   
-  struct a_val *t = a_val_init(a_malloc(&vm, sizeof(struct a_val)), &vm.abc.func_type);
+  struct a_val *t = a_val(&vm.abc.func_type);
   t->as_func = a_func_ref(&f);
   a_emit(&vm, A_CALL_OP)->as_call.target = t;
   a_emit(&vm, A_STOP_OP);
@@ -107,7 +107,7 @@ static void test_func_emit() {
   assert(v->type == &vm.abc.int_type);
   assert(v->as_int == 42);
   a_val_deref(v);
-  a_free(&vm, v);
+  a_val_free(v, &vm);
   a_func_deref(&f, &vm);
   a_vm_deinit(&vm);
 }

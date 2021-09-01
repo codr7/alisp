@@ -91,9 +91,9 @@ static a_pc_t equals_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_pop(vm);
   a_push(vm, &vm->abc.bool_type)->as_bool = a_equals(x, y);
   a_val_deref(x);
-  a_free(vm, x);
+  a_val_free(x, vm);
   a_val_deref(y);
-  a_free(vm, y);
+  a_val_free(y, vm);
   return ret;
 }
 
@@ -101,9 +101,9 @@ static a_pc_t lt_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_pop(vm);
   a_push(vm, &vm->abc.bool_type)->as_bool = a_compare(x, y) == A_LT;
   a_val_deref(x);
-  a_free(vm, x);
+  a_val_free(x, vm);
   a_val_deref(y);
-  a_free(vm, y);
+  a_val_free(y, vm);
   return ret;
 }
 
@@ -111,9 +111,9 @@ static a_pc_t gt_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_pop(vm);
   a_push(vm, &vm->abc.bool_type)->as_bool = a_compare(x, y) == A_GT;
   a_val_deref(x);
-  a_free(vm, x);
+  a_val_free(x, vm);
   a_val_deref(y);
-  a_free(vm, y);
+  a_val_free(y, vm);
   return ret;
 }
 
@@ -130,7 +130,7 @@ static a_pc_t dump_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   a_dump(v);
   putc('\n', stdout);
   a_val_deref(v);
-  a_free(vm, v);
+  a_val_free(v, vm);
   return ret;
 }
 
@@ -276,9 +276,9 @@ static a_pc_t is_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_pop(vm);
   a_push(vm, &vm->abc.bool_type)->as_bool = a_is(x, y);
   a_val_deref(x);
-  a_free(vm, x);
+  a_val_free(x, vm);
   a_val_deref(y);
-  a_free(vm, y);
+  a_val_free(y, vm);
   return ret;
 }
 

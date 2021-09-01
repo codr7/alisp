@@ -127,7 +127,13 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 
   case A_COPY_OP: {
     struct a_val *v = a_peek(vm, self->as_copy.offset);
-    a_copy(a_push(vm, v->type), v);
+
+    if (v) {
+      a_copy(a_push(vm, v->type), v);
+    } else {
+      a_reset(vm);
+    }
+    
     break;
   }
     
@@ -143,7 +149,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
   }
 
   case A_LOAD_OP: {
-    a_push(vm, self->as_load.type ? self->as_load.type : &vm->abc.undef_type);
+    a_push(vm, self->as_load.type ? self->as_load.type : &vm->abc.undef_type)->undef = true;
     break;
   }
 

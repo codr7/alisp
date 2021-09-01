@@ -27,13 +27,14 @@ struct a_val {
   };
 };
 
-struct a_val *a_val(struct a_vm *vm, struct a_type *type);
+struct a_val *a_val(struct a_type *type);
 struct a_val *a_val_init(struct a_val *self, struct a_type *type);
 bool a_val_deref(struct a_val *self);
+void a_val_free(struct a_val *self, struct a_vm *vm);
 
 a_pc_t a_call(struct a_val *self, enum a_call_flags flags, a_pc_t ret);
 enum a_order a_compare(struct a_val *self, struct a_val *other);
-void a_copy(struct a_val *self, struct a_val *source);
+struct a_val *a_copy(struct a_val *self, struct a_val *source);
 void a_dump(struct a_val *self);
 bool a_equals(struct a_val *self, struct a_val *other);
 bool a_is(struct a_val *self, struct a_val *other);
