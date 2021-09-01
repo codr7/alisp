@@ -108,7 +108,7 @@ Values may be bound to identifiers at runtime using `let`.
 [42]
 ```
 
-Since `let` binds literals at compile time; the same thing could be accomplished within a scope using `ceval`, which evaluates its expression at during compilation.
+Since `let` binds literals at compile time; the same thing could be accomplished within a scope using `ceval`, which evaluates its expression during compilation and emits code for the results.
 
 ```
   (let [foo (ceval 35.(+ 7))]
