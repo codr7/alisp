@@ -57,5 +57,6 @@ bool a_form_deref(struct a_form *self, struct a_vm *vm);
 
 struct a_val *a_form_val(struct a_form *self, struct a_vm *vm);
 bool a_form_emit(struct a_form *self, struct a_vm *vm);
+bool a_form_eval(struct a_form *self, struct a_vm *vm);
 
 #endif

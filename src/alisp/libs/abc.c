@@ -8,6 +8,36 @@
 #include "alisp/string.h"
 #include "alisp/vm.h"
 
+static a_pc_t equals_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *y = a_pop(vm), *x = a_pop(vm);
+  a_push(vm, &vm->abc.bool_type)->as_bool = a_equals(x, y);
+  a_val_deref(x);
+  a_val_free(x, vm);
+  a_val_deref(y);
+  a_val_free(y, vm);
+  return ret;
+}
+
+static a_pc_t lt_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *y = a_pop(vm), *x = a_pop(vm);
+  a_push(vm, &vm->abc.bool_type)->as_bool = a_compare(x, y) == A_LT;
+  a_val_deref(x);
+  a_val_free(x, vm);
+  a_val_deref(y);
+  a_val_free(y, vm);
+  return ret;
+}
+
+static a_pc_t gt_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *y = a_pop(vm), *x = a_pop(vm);
+  a_push(vm, &vm->abc.bool_type)->as_bool = a_compare(x, y) == A_GT;
+  a_val_deref(x);
+  a_val_free(x, vm);
+  a_val_deref(y);
+  a_val_free(y, vm);
+  return ret;
+}
+
 static bool alias_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   struct a_ls *a = args->next;
   struct a_form *org = a_baseof(a, struct a_form, ls);
@@ -87,34 +117,30 @@ static bool d_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint
   return true;
 }
 
-static a_pc_t equals_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_pop(vm);
-  a_push(vm, &vm->abc.bool_type)->as_bool = a_equals(x, y);
-  a_val_deref(x);
-  a_val_free(x, vm);
-  a_val_deref(y);
-  a_val_free(y, vm);
-  return ret;
-}
+static bool def_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_ls *a = args;
+  struct a_form *kf = a_baseof((a = a->next), struct a_form, ls);
+  
+  if (kf->type != A_ID_FORM) {
+    a_fail("Invalid key form: %d", kf->type);
+    return false;
+  }
+  
+  struct a_string *k = kf->as_id.name;
+  struct a_form *vf = a_baseof((a = a->next), struct a_form, ls);
+  struct a_val *v = a_form_val(vf, vm);
+  if (!v) {
+    if (!a_form_eval(vf, vm)) { return false; }
+    v = a_pop(vm);
+  }      
 
-static a_pc_t lt_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_pop(vm);
-  a_push(vm, &vm->abc.bool_type)->as_bool = a_compare(x, y) == A_LT;
-  a_val_deref(x);
-  a_val_free(x, vm);
-  a_val_deref(y);
-  a_val_free(y, vm);
-  return ret;
-}
+  if (!v) {
+    a_fail("Missing value");
+    return false;
+  }
 
-static a_pc_t gt_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_pop(vm);
-  a_push(vm, &vm->abc.bool_type)->as_bool = a_compare(x, y) == A_GT;
-  a_val_deref(x);
-  a_val_free(x, vm);
-  a_val_deref(y);
-  a_val_free(y, vm);
-  return ret;
+  a_copy(a_scope_bind(a_scope(vm), k, v->type), v);
+  return true;
 }
 
 static bool do_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
@@ -346,6 +372,33 @@ static bool reset_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, 
   return true;
 }
 
+static bool static_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_goto_op *skip = &a_emit(vm, A_GOTO_OP)->as_goto;
+  a_pc_t pc = a_pc(vm);
+
+  a_ls_do(args, ls) {
+    if (!a_form_emit(a_baseof(ls, struct a_form, ls), vm)) { return false; }
+  }
+  
+  a_emit(vm, A_STOP_OP);
+  skip->pc = a_pc(vm);
+  if (!a_analyze(vm, pc)) { return false; }
+
+  struct a_ls *sp = vm->stack.prev;
+  if (!a_eval(vm, pc)) { return false; }
+  struct a_ls *next = sp->next;
+  
+  while (next != &vm->stack) {
+    struct a_val *v = a_baseof(a_ls_pop(sp = next), struct a_val, ls);
+    next = sp->next;  
+    a_copy(a_val_init(&a_emit(vm, A_PUSH_OP)->as_push.val, v->type), v);
+    a_val_deref(v);
+    a_val_free(v, vm);
+  }
+  
+  return true;
+}
+
 static bool swap_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   a_emit(vm, A_SWAP_OP);
   return true;
@@ -409,6 +462,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "alias"), 2, 2))->body = alias_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "bench"), 1, -1))->body = bench_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "d"), 0, 1))->body = d_body;
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "def"), 2, 2))->body = def_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "do"), 0, -1))->body = do_body;
 
   a_lib_bind_func(&self->lib,
@@ -429,6 +483,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "let"), 1, -1))->body = let_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "reset"), 0, 0))->body = reset_body;
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "static"), 0, -1))->body = static_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "swap"), 0, 0))->body = swap_body;
   return self;
 }

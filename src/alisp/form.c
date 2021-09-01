@@ -272,3 +272,13 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
   return true;
 }
 
+bool a_form_eval(struct a_form *self, struct a_vm *vm) {
+  struct a_goto_op *skip = &a_emit(vm, A_GOTO_OP)->as_goto;
+  a_pc_t pc = a_pc(vm);
+  if (!a_form_emit(self, vm)) { return false; }
+  a_emit(vm, A_STOP_OP);
+  skip->pc = a_pc(vm);
+  if (!a_analyze(vm, pc)) { return false; }
+  if (!a_eval(vm, pc)) { return false; }
+  return true;
+}

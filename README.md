@@ -18,7 +18,7 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v6
+Welcome to aLisp v7
 
 Return on empty line evaluates,
 (reset) clears the stack and Ctrl+D exits.
@@ -90,13 +90,29 @@ Values are pushed on the stack.
 ```
 
 ### bindings
-Values may be bound to identifiers using `let`, literals are automagically bound at compile time.
+Values may be bound to identifiers at runtime using `let`.
 
 ```
   (let [x 35 y 7]
     x.(+ y))
     
 [42]
+```
+
+`def` evaluates and binds the value at compile time.
+
+```
+  (def foo 35.(+ 7))
+  foo
+
+[42]
+```
+
+Since `let` binds literals at compile time, the same thing could be accomplished within a scope using `static`.
+
+```
+  (let [foo (static 35.(+ 7))]
+    foo)
 ```
 
 Bindings may be aliased at compile time using `alias`.

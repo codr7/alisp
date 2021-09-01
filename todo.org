@@ -2,6 +2,11 @@
 ** add a_lset a_func.mem
 *** index on args
 *** add if missing
+* add bool a_feval(vm, path)
+** add stream vm.path
+** add int a_push_path
+** add a_pop_path(int)
+** process ARGV & load files instead of repl
 * add separate func stacks
 ** store in frame
 ** move args on call
@@ -10,9 +15,10 @@
 * add test prim
 ** (test "..." [stack] body)
 ** add test script
-* add def prim
-** compile time binding
-** eval value if !a_form_val
+* add lambdas
+** ([x:Int] [Int] x)
+** capture in call parse
+** extract a_parse_func
 * add func op
 ** replaces skip goto in body
 ** reset & push unnamed args in analyze
@@ -44,3 +50,5 @@
 ** add LS_OP
 * add unsafe/u call flag
 ** skip arg/ret checks
+* add macros
+** rewrite def as macro

@@ -73,19 +73,24 @@ struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
   return op;
 }
 
-void a_analyze(struct a_vm *self, a_pc_t pc) {
+bool a_analyze(struct a_vm *self, a_pc_t pc) {
   struct a_ls stack = self->stack;
   a_ls_init(&self->stack);
+  bool ok = true;
   
   while (pc && pc != &self->code) {
     struct a_op *op = a_baseof(pc, struct a_op, pc);
-    pc = a_op_analyze(op, self);
+
+    if (!(pc = a_op_analyze(op, self))) {
+      ok = false;
+      break;
+    }
   }
   
   a_reset(self);
   self->stack = stack;
+  return ok;
 }
-
 
 struct a_scope *a_scope(struct a_vm *self) {
   return a_baseof(self->scopes.prev, struct a_scope, ls);
