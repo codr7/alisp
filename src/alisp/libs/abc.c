@@ -93,6 +93,33 @@ static bool bench_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, 
   return true;
 }
 
+static bool ceval_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_goto_op *skip = &a_emit(vm, A_GOTO_OP)->as_goto;
+  a_pc_t pc = a_pc(vm);
+
+  a_ls_do(args, ls) {
+    if (!a_form_emit(a_baseof(ls, struct a_form, ls), vm)) { return false; }
+  }
+  
+  a_emit(vm, A_STOP_OP);
+  skip->pc = a_pc(vm);
+  if (!a_analyze(vm, pc)) { return false; }
+
+  struct a_ls *sp = vm->stack.prev;
+  if (!a_eval(vm, pc)) { return false; }
+  struct a_ls *next = sp->next;
+  
+  while (next != &vm->stack) {
+    struct a_val *v = a_baseof(a_ls_pop(sp = next), struct a_val, ls);
+    next = sp->next;  
+    a_copy(a_val_init(&a_emit(vm, A_PUSH_OP)->as_push.val, v->type), v);
+    a_val_deref(v);
+    a_val_free(v, vm);
+  }
+  
+  return true;
+}
+
 static bool d_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   int count = 1;
   
@@ -372,33 +399,6 @@ static bool reset_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, 
   return true;
 }
 
-static bool static_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
-  struct a_goto_op *skip = &a_emit(vm, A_GOTO_OP)->as_goto;
-  a_pc_t pc = a_pc(vm);
-
-  a_ls_do(args, ls) {
-    if (!a_form_emit(a_baseof(ls, struct a_form, ls), vm)) { return false; }
-  }
-  
-  a_emit(vm, A_STOP_OP);
-  skip->pc = a_pc(vm);
-  if (!a_analyze(vm, pc)) { return false; }
-
-  struct a_ls *sp = vm->stack.prev;
-  if (!a_eval(vm, pc)) { return false; }
-  struct a_ls *next = sp->next;
-  
-  while (next != &vm->stack) {
-    struct a_val *v = a_baseof(a_ls_pop(sp = next), struct a_val, ls);
-    next = sp->next;  
-    a_copy(a_val_init(&a_emit(vm, A_PUSH_OP)->as_push.val, v->type), v);
-    a_val_deref(v);
-    a_val_free(v, vm);
-  }
-  
-  return true;
-}
-
 static bool swap_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   a_emit(vm, A_SWAP_OP);
   return true;
@@ -461,6 +461,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "alias"), 2, 2))->body = alias_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "bench"), 1, -1))->body = bench_body;
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "ceval"), 0, -1))->body = ceval_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "d"), 0, 1))->body = d_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "def"), 2, 2))->body = def_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "do"), 0, -1))->body = do_body;
@@ -483,7 +484,6 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "let"), 1, -1))->body = let_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "reset"), 0, 0))->body = reset_body;
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "static"), 0, -1))->body = static_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "swap"), 0, 0))->body = swap_body;
   return self;
 }

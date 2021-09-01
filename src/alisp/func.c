@@ -7,6 +7,39 @@
 #include "alisp/string.h"
 #include "alisp/vm.h"
 
+struct a_mem {
+  struct a_ls ls;
+  struct a_ls args;
+  struct a_ls rets;
+};
+
+static const void *mem_key(const struct a_ls *self) {
+  return &a_baseof(self, struct a_mem, ls)->args;
+}
+
+static enum a_order mem_compare(const void *x, const void *y) {
+  const struct a_ls *xls = x, *yls = y;
+  
+  for (;;) {
+    xls = xls->next;
+    yls = yls->next;
+    
+    if (xls == x && yls != y) { return A_LT; }
+    if (xls != x && yls == y) { return A_GT; }
+
+    switch (a_compare(a_baseof(xls, struct a_val, ls), a_baseof(yls, struct a_val, ls))) {
+    case A_LT:
+      return A_LT;
+    case A_GT:
+      return A_GT;
+    case A_EQ:
+      break;
+    }
+  }
+
+  return A_EQ;
+}
+
 struct a_func *a_func(struct a_vm *vm,
 		      struct a_string *name,
 		      struct a_args *args,
@@ -21,6 +54,7 @@ struct a_func *a_func_init(struct a_func *self,
   self->name = name;
   self->args = args;
   self->rets = rets;
+  a_lset_init(&self->mem, mem_key, mem_compare);
   self->start_pc = NULL;
   self->scope = NULL;
   self->reg_count = 0;

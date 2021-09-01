@@ -165,6 +165,8 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
 
       if (r->type == A_ID_FORM && strcmp(r->as_id.name->data, "d") == 0) {
 	flags |= A_CALL_DRETS;
+      } else if (r->type == A_ID_FORM && strcmp(r->as_id.name->data, "m") == 0) {
+	flags |= A_CALL_MEM;
       } else if (r->type == A_ID_FORM && strcmp(r->as_id.name->data, "t") == 0) {
 	flags |= A_CALL_TCO;
       } else {

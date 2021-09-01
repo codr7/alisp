@@ -108,14 +108,14 @@ Values may be bound to identifiers at runtime using `let`.
 [42]
 ```
 
-Since `let` binds literals at compile time, the same thing could be accomplished within a scope using `static`.
+Since `let` binds literals at compile time; the same thing could be accomplished within a scope using `ceval`, which evaluates its expression at during compilation.
 
 ```
-  (let [foo (static 35.(+ 7))]
+  (let [foo (ceval 35.(+ 7))]
     foo)
 ```
 
-Bindings may be aliased at compile time using `alias`.
+Bindings may be aliased using `alias`.
 
 ```
   Int.(alias foo)

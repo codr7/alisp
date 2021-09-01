@@ -1,7 +1,24 @@
-* add memoize/m call flag
-** add a_lset a_func.mem
-*** index on args
-*** add if missing
+* add memoize call flag
+** search for mem on call if call flag
+** bench
+** add if missing
+* add once prim
+** add A_ONCE_OP
+*** emit like bench
+** keep internal val in op
+** set on first eval
+* add quoting
+** add a_form_dump
+** add a_val *a_form_quote(form, vm)
+*** form_val if available
+*** default quote form
+**** add form type
+**** add A_QUOTE_FORM
+*** sym if id
+**** add a_sym_type
+**** add lset vm.syms
+***** check in a_sym()
+** add '-parser
 * add bool a_feval(vm, path)
 ** add stream vm.path
 ** add int a_push_path
@@ -39,9 +56,6 @@
 ** add struct a_error like form
 ** add a_error(vm, type, pos, spec, args)
 ** replace a_fail-calls
-* add quoting
-** add form.quote1-3
-** add '-parser
 * add multi support
 ** create automatically in func prim
 ** create automatically in lib import

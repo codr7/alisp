@@ -8,7 +8,7 @@ struct a_string;
 struct a_type;
 struct a_vm;
 
-enum a_call_flags {A_CALL_DRETS = 1, A_CALL_CHECK = 2, A_CALL_TCO = 4};
+enum a_call_flags {A_CALL_CHECK = 1, A_CALL_DRETS = 2, A_CALL_MEM = 4, A_CALL_TCO = 8};
 
 typedef uint16_t a_ref_count;
 typedef uint16_t a_reg_t;

@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include "alisp/limits.h"
+#include "alisp/lset.h"
 #include "alisp/types.h"
 
 #define A_ARG(vm, ...)							\
@@ -46,6 +47,7 @@ struct a_func {
   struct a_string *name;
   struct a_args *args;
   struct a_rets *rets;
+  struct a_lset mem;
   a_pc_t start_pc;
   struct a_scope *scope;
   a_reg_t regs[A_REG_COUNT];
