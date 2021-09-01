@@ -260,7 +260,7 @@ Dropping the binding and dealing directly with the stack is slightly faster.
 [420]
 ```
 
-Switching to a tail recursive implementation and increasing the number of repetitions to get more data.
+Let's switch to a tail recursive implementation and increase the number of repetitions to get more data.
 
 ``` 
 $ cd bench
@@ -268,7 +268,7 @@ $ python3 fibtail.py
 104
 ```
 
-Since the only recursive call is in tail position, `:t` may be used to trigger TCO and avoid blowing the call stack; the resulting code runs 3 times as slow.
+`:t` may be used to trigger TCO and avoid blowing the call stack, the resulting code runs 3 times as slow as Python3.
 
 ```
   (func fibtail [n:Int a:Int b:Int] [Int]
