@@ -12,6 +12,7 @@
 
 struct a_vm *a_vm_init(struct a_vm *self) {
   self->next_type_id = 0;
+  a_pool_init(&self->val_pool, self, A_VAL_PAGE_SIZE, sizeof(struct a_val));
   a_ls_init(&self->code);
   a_ls_init(&self->free_vals);
   
@@ -59,9 +60,9 @@ void a_vm_deinit(struct a_vm *self) {
     a_free(self, o);
   }
 
+  a_pool_deinit(&self->val_pool);
   a_lib_deinit(&self->math.lib);
-  a_lib_deinit(&self->abc.lib);
-  
+  a_lib_deinit(&self->abc.lib);  
   a_ls_do(&self->free_vals, ls) { a_free(self, a_baseof(ls, struct a_val, ls)); }
 }
 

@@ -282,29 +282,28 @@ Around twice as slow at the moment.
     (if n.(< 2) n n.(- 1).(fibrec).(+ n.(- 2).(fibrec))))
   (bench 100 (fibrec:d 20))
 
-[475]
+[401]
 ```
 
 Dropping the binding and dealing directly with the stack is slightly faster.
 
 ```
-  (func fibrecs [Int] [Int]
-    (if (dup).(< 2) _ (do _.(- 1) (dup).(fibrecs).(+ (swap).(- 1).(fibrecs)))))
-  (bench 100 (fibrecs:d 20))
+  (func fibrec-s [Int] [Int]
+    (if (dup).(< 2) _ (do _.(- 1) (dup).(fibrec-s).(+ (swap).(- 1).(fibrec-s)))))
+  (bench 100 (fibrec-s:d 20))
 
-[420]
+[344]
 ```
 
 Memoization is a nice solution for these kinds of problems, `:m` may be used to memoize calls.
 Note that I had to increase the number of repetitions by four orders of magnitude to get a similar measurable time.
 
 ```
-  (func fibrec [n:Int] [Int]
-    (if n.(< 2) n n.(- 1).(fibrec:m).(+ n.(- 2).(fibrec:m))))
-  (bench 1000000 (fibrec:d 20))
+  (func fibrec-m [n:Int] [Int]
+    (if n.(< 2) n n.(- 1).(fibrec-m:m).(+ n.(- 2).(fibrec-m:m))))
+  (bench 1000000 (fibrec-m:d 20))
 
-Disabled arg check: fibrec 2 [Int]
-[355]
+[323]
 ```
 
 Let's switch to a tail recursive implementation to get more data.
@@ -315,23 +314,22 @@ $ python3 fibtail.py
 104
 ```
 
-`:t` may be used to trigger TCO and avoid blowing the call stack, the resulting code runs 3 times as slow as Python3.
+`:t` may be used to trigger TCO and avoid blowing the call stack, the resulting code again runs roughly twice as slow as Python3.
 
 ```
   (func fibtail [n:Int a:Int b:Int] [Int]
     (if n.(= 0) a (if n.(= 1) b (fibtail:t n.(- 1) b a.(+ b)))))
   (bench 10000 (fibtail:d 70 0 1))
 
-[280]
+[224]
 ```
 
 When combining TCO with memoization, only memoized frames are skipped.
 
 ```
-  (func fibtail [n:Int a:Int b:Int] [Int]
-    (if n.(= 0) a (if n.(= 1) b (fibtail:m:t n.(- 1) b a.(+ b)))))
-  (bench 10000 (fibtail:d 70 0 1))
+  (func fibtail-m [n:Int a:Int b:Int] [Int]
+    (if n.(= 0) a (if n.(= 1) b (fibtail-m:m:t n.(- 1) b a.(+ b)))))
+  (bench 10000 (fibtail-m:d 70 0 1))
 
-[9]
+[6]
 ```
-

@@ -10,7 +10,7 @@ struct a_val *a_val(struct a_type *type) {
     return a_val_init(a_baseof(a_ls_pop(ls), struct a_val, ls), type);
   }
   
-  return a_val_init(a_malloc(type->vm, sizeof(struct a_val)), type);
+  return a_val_init(a_pool_alloc(&type->vm->val_pool), type);
 }
 
 struct a_val *a_val_init(struct a_val *self, struct a_type *type) {

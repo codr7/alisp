@@ -7,6 +7,7 @@
 #include "alisp/limits.h"
 #include "alisp/ls.h"
 #include "alisp/op.h"
+#include "alisp/pool.h"
 #include "alisp/scope.h"
 #include "alisp/val.h"
 
@@ -14,6 +15,7 @@
 
 struct a_vm {
   a_type_id next_type_id;
+  struct a_pool val_pool;
   struct a_abc_lib abc;
   struct a_math_lib math;
   
