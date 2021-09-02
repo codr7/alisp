@@ -1,10 +1,8 @@
-* add op_pool like val
-** bench
+* rename ls_form to list_form
 * add multi support
 ** create automatically in func prim
 ** create automatically in lib import
 ** specialize in a_op_analyze
-* rename ls_form to list_form
 * add head/tail multis
 ** head left for pair else val
 ** tail right for pair else NIL

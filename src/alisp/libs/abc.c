@@ -203,26 +203,26 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
   
   struct a_form *args_form = a_baseof((a = a->next), struct a_form, ls);
 
-  if (args_form->type != A_LS_FORM) {
+  if (args_form->type != A_LIST_FORM) {
     a_fail("Invalid function arguments: %d", args_form->type);
     return false;
   }
 
   struct a_form *rets_form = a_baseof((a = a->next), struct a_form, ls);
 
-  if (rets_form->type != A_LS_FORM) {
+  if (rets_form->type != A_LIST_FORM) {
     a_fail("Invalid function returns: %d", rets_form->type);
     return false;
   }
 
   uint8_t
-    farg_count = a_ls_count(&args_form->as_ls.items),
-    fret_count = a_ls_count(&rets_form->as_ls.items);
+    farg_count = a_ls_count(&args_form->as_list.items),
+    fret_count = a_ls_count(&rets_form->as_list.items);
   
   struct a_args *fargs = a_args(vm, farg_count); 
   struct a_arg *fap = fargs->items;
 
-  a_ls_do(&args_form->as_ls.items, als) {
+  a_ls_do(&args_form->as_list.items, als) {
     struct a_form *af = a_baseof(als, struct a_form, ls);
     fap->name = NULL;
     
@@ -263,7 +263,7 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
   struct a_rets *frets = a_rets(vm, fret_count);
   struct a_type **frp = frets->items;
   
-  a_ls_do(&rets_form->as_ls.items, rls) {
+  a_ls_do(&rets_form->as_list.items, rls) {
     struct a_form *rf = a_baseof(rls, struct a_form, ls);
     
     if (rf->type != A_ID_FORM) {
@@ -343,12 +343,12 @@ static a_pc_t is_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   struct a_form *bsf = a_baseof(args->next, struct a_form, ls);
 
-  if (bsf->type != A_LS_FORM) {
+  if (bsf->type != A_LIST_FORM) {
     a_fail("Invalid bindings: %d", bsf->type);
     return false;
   }
 
-  struct a_ls *bs = &bsf->as_ls.items, *b = bs->prev;
+  struct a_ls *bs = &bsf->as_list.items, *b = bs->prev;
   struct a_scope *s = a_begin(vm);
 
   while (b != bs) {

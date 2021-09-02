@@ -20,9 +20,9 @@ struct a_form *a_form_init(struct a_form *self, enum a_form_type type, struct a_
   case A_ID_FORM:
     self->as_id.name = NULL;
     break;
-  case A_LS_FORM:
-    a_ls_init(&self->as_ls.items);
-    self->as_ls.val = NULL;
+  case A_LIST_FORM:
+    a_ls_init(&self->as_list.items);
+    self->as_list.val = NULL;
     break;
   case A_PAIR_FORM:
     self->as_pair.left = self->as_pair.right = NULL;
@@ -54,12 +54,12 @@ bool a_form_deref(struct a_form *self, struct a_vm *vm) {
     a_val_deref(&self->as_lit.val);
     break;
 
-  case A_LS_FORM: {
-    a_ls_do(&self->as_ls.items, ls) { a_form_deref(a_baseof(ls, struct a_form, ls), vm); }
+  case A_LIST_FORM: {
+    a_ls_do(&self->as_list.items, ls) { a_form_deref(a_baseof(ls, struct a_form, ls), vm); }
 
-    if (self->as_ls.val) {
-      a_val_deref(self->as_ls.val);
-      a_val_free(self->as_ls.val, vm);
+    if (self->as_list.val) {
+      a_val_deref(self->as_list.val);
+      a_val_free(self->as_list.val, vm);
     }
 
     break;
@@ -97,11 +97,11 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
     break;
   }
     
-  case A_LS_FORM: {
-    if (self->as_ls.val) { return self->as_ls.val; }
+  case A_LIST_FORM: {
+    if (self->as_list.val) { return self->as_list.val; }
     bool lit = true;
 
-    a_ls_do(&self->as_ls.items, ls) {
+    a_ls_do(&self->as_list.items, ls) {
       if (!a_form_val(a_baseof(ls, struct a_form, ls), vm)) {
 	lit = false;
 	break;
@@ -113,12 +113,12 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
       v->as_pair.left = NULL;
       v->as_pair.right = NULL;
       
-      a_ls_do(&self->as_ls.items, ls) {
+      a_ls_do(&self->as_list.items, ls) {
 	struct a_val *src = a_form_val(a_baseof(ls, struct a_form, ls), vm);
 	struct a_val *dst = a_val(src->type);
 	a_copy(dst, src);
 
-	if (ls->next == &self->as_ls.items) {
+	if (ls->next == &self->as_list.items) {
 	  if (v->as_pair.left) {
 	    v->as_pair.right = dst;
 	  } else {
@@ -269,7 +269,7 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
     break;
   }
 
-  case A_LS_FORM: {
+  case A_LIST_FORM: {
     struct a_val *v = a_form_val(self, vm);
 
     if (v) {

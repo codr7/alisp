@@ -12,6 +12,7 @@
 
 struct a_vm *a_vm_init(struct a_vm *self) {
   self->next_type_id = 0;
+  a_pool_init(&self->op_pool, self, A_OP_PAGE_SIZE, sizeof(struct a_op));
   a_pool_init(&self->val_pool, self, A_VAL_PAGE_SIZE, sizeof(struct a_val));
   a_ls_init(&self->code);
   a_ls_init(&self->free_vals);
@@ -57,19 +58,18 @@ void a_vm_deinit(struct a_vm *self) {
   a_ls_do(&self->code, ols) {
     struct a_op *o = a_baseof(ols, struct a_op, pc);
     a_op_deinit(o);
-    a_free(self, o);
   }
 
   a_pool_deinit(&self->val_pool);
+  a_pool_deinit(&self->op_pool);
   a_lib_deinit(&self->math.lib);
   a_lib_deinit(&self->abc.lib);  
-  a_ls_do(&self->free_vals, ls) { a_free(self, a_baseof(ls, struct a_val, ls)); }
 }
 
 a_pc_t a_pc(struct a_vm *self) { return self->code.prev; }
 
 struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
-  struct a_op *op = a_op_init(a_malloc(self, sizeof(struct a_op)), op_type);
+  struct a_op *op = a_op_init(a_pool_alloc(&self->op_pool), op_type);
   a_ls_push(&self->code, &op->pc);
   return op;
 }

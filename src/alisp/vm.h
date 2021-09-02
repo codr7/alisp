@@ -15,7 +15,7 @@
 
 struct a_vm {
   a_type_id next_type_id;
-  struct a_pool val_pool;
+  struct a_pool op_pool, val_pool;
   struct a_abc_lib abc;
   struct a_math_lib math;
   

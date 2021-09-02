@@ -165,11 +165,11 @@ struct a_form *a_parse_int(struct a_parser *self) {
    return f;
 }
 
-struct a_form *a_parse_ls(struct a_parser *self) {
+struct a_form *a_parse_list(struct a_parser *self) {
   struct a_pos fpos = self->pos;
   if (!a_parser_check(self, '[')) { return NULL; }
   struct a_form *lsf = a_malloc(self->vm, sizeof(struct a_form));
-  a_form_init(lsf, A_LS_FORM, fpos);
+  a_form_init(lsf, A_LIST_FORM, fpos);
 
   while (true) {
     a_skip_space(self);
@@ -190,7 +190,7 @@ struct a_form *a_parse_ls(struct a_parser *self) {
       return NULL;
     }
 
-    a_ls_push(&lsf->as_ls.items, &f->ls);
+    a_ls_push(&lsf->as_list.items, &f->ls);
   }
 
   a_ls_push(&self->forms, &lsf->ls);

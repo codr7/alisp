@@ -10,7 +10,7 @@ struct a_form;
 struct a_string;
 struct a_vm;
 
-enum a_form_type {A_CALL_FORM, A_ID_FORM, A_LIT_FORM, A_LS_FORM, A_NOP_FORM, A_PAIR_FORM};
+enum a_form_type {A_CALL_FORM, A_ID_FORM, A_LIT_FORM, A_LIST_FORM, A_NOP_FORM, A_PAIR_FORM};
  
 struct a_call_form {
   struct a_form *target;
@@ -26,7 +26,7 @@ struct a_lit_form {
   struct a_val val;
 };
 
-struct a_ls_form {
+struct a_list_form {
   struct a_ls items;
   struct a_val *val;
 };
@@ -46,7 +46,7 @@ struct a_form {
     struct a_call_form as_call;
     struct a_id_form as_id;
     struct a_lit_form as_lit;
-    struct a_ls_form as_ls;
+    struct a_list_form as_list;
     struct a_pair_form as_pair;
   };
 };
