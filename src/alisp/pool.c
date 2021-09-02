@@ -1,8 +1,3 @@
-#include <assert.h>
-#include <inttypes.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include "alisp/fail.h"
 #include "alisp/pool.h"
 #include "alisp/vm.h"
 
@@ -25,9 +20,9 @@ void *a_pool_alloc(struct a_pool *self) {
     if (p->offset + self->slot_size <= self->page_size) {
       p->offset += self->slot_size;
       return (uint8_t *)p->slots + p->offset;
-    } else {
-      break;
     }
+
+    break;
   }
 
   struct a_page *p = a_malloc(self->vm, sizeof(struct a_page) + self->page_size);
