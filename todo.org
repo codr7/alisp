@@ -1,9 +1,14 @@
 * add op_pool like val
 ** bench
+* add multi support
+** create automatically in func prim
+** create automatically in lib import
+** specialize in a_op_analyze
+* add head/tail multis
+** head left for pair else val
+** tail right for pair else NIL
 * add type-of/isa prims
 ** readme/types
-* add real undef type
-** replace checks in a_val
 * add quoting
 ** add a_form_dump
 ** add a_val *a_form_quote(form, vm)
@@ -53,9 +58,6 @@
 ** add struct a_error like form
 ** add a_error(vm, type, pos, spec, args)
 ** replace a_fail-calls
-* add multi support
-** create automatically in func prim
-** create automatically in lib import
 * add line comments with ;
 * add support for dynamic lists
 ** add LS_OP

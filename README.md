@@ -6,7 +6,6 @@ aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom 
 ### quirks
 - Parens are used for calls, brackets for lists.
 - Infix calls are supported with `.` between first argument and call.
-- Lists are passed by reference.
 
 ### setup
 aLisp requires CMake and a C compiler to build.
