@@ -201,21 +201,25 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
 	}	
       }
     }
-    
-    if (tf->type != A_ID_FORM) {
+
+    if (tf->type != A_ID_FORM && tf->type != A_NOP_FORM) {
       a_fail("Invalid call target: %d", tf->type);
       return false;
     }
 
-    struct a_string *id = tf->as_id.name;
-    struct a_val *t = a_scope_find(a_scope(vm), id);
+    struct a_val *t = NULL;
 
-    if (!t) {
-      a_fail("Unknown call target: %s", id->data);
-      return false;
+    if (tf->type == A_ID_FORM) {
+      struct a_string *id = tf->as_id.name;
+      t = a_scope_find(a_scope(vm), id);
+
+      if (!t) {
+	a_fail("Unknown call target: %s", id->data);
+	return false;
+      }
     }
 
-    if (t->type == &vm->abc.prim_type) {
+    if (t && t->type == &vm->abc.prim_type) {
       if (flags) {
 	a_fail("Primitives don't support call flags: %d", flags);
 	return false;
@@ -227,7 +231,7 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
 	if (!a_form_emit(a_baseof(als, struct a_form, ls), vm)) { return false; }
       }
 
-      if (t->type == &vm->abc.reg_type) {
+      if (t && t->type == &vm->abc.reg_type) {
 	a_emit(vm, A_LOAD_OP)->as_load.reg = t->as_reg;
 	t = NULL;
       }

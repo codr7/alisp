@@ -107,7 +107,7 @@ Values may be bound to identifiers at runtime using `let`.
 [42]
 ```
 
-Bindings may be aliased using `alias`.
+Bindings may be aliased within the current scope using `alias`.
 
 ```
   Int.(alias foo)
@@ -204,8 +204,9 @@ Functions capture their defining environment.
 
 ```
   (let [bar 42]
-    (func foo [] [Int] bar))
-  (foo)
+    (func foo [] [Int] bar)
+    foo)
+  (_)
   
 [42]
 ```

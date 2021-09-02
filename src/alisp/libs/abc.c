@@ -287,7 +287,7 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
   }
   
   struct a_func *f = a_func(vm, name_form->as_id.name, fargs, frets);
-  struct a_val *v = a_scope_bind(&vm->main, f->name, &vm->abc.func_type);
+  struct a_val *v = a_scope_bind(a_scope(vm), f->name, &vm->abc.func_type);
 
   if (!v) {
     a_fail("Duplicate binding: %s", f->name->data);

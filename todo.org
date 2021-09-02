@@ -4,6 +4,7 @@
 ** create automatically in func prim
 ** create automatically in lib import
 ** specialize in a_op_analyze
+* rename ls_form to list_form
 * add head/tail multis
 ** head left for pair else val
 ** tail right for pair else NIL
@@ -38,6 +39,7 @@
 ** ([x:Int] [Int] x)
 ** capture in call parse
 ** extract a_parse_func
+** change capture example in readme
 * add func op
 ** replaces skip goto in body
 ** reset & push unnamed args in analyze
