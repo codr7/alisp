@@ -11,7 +11,7 @@ struct a_prim {
   struct a_string *name;
   int8_t min_args, max_args;
   bool (*body)(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count);
-  a_ref_count ref_count;
+  a_ref_count_t ref_count;
 };
 
 struct a_prim *a_prim(struct a_vm *vm,

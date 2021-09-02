@@ -10,9 +10,10 @@ struct a_vm;
 
 enum a_call_flags {A_CALL_CHECK = 1, A_CALL_DRETS = 2, A_CALL_MEM = 4, A_CALL_TCO = 8};
 
-typedef uint16_t a_ref_count;
+typedef uint16_t a_ref_count_t;
 typedef uint16_t a_reg_t;
 typedef struct a_ls *a_pc_t;
+typedef uint16_t a_type_id_t;
 
 struct a_type *a_bool_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 
@@ -26,6 +27,8 @@ struct a_type *a_int_type_init(struct a_type *self, struct a_vm *vm, struct a_st
 struct a_type *a_ls_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 
 struct a_type *a_meta_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
+
+struct a_type *a_multi_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 
 struct a_type *a_nil_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 

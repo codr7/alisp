@@ -17,11 +17,9 @@ struct a_string;
 struct a_val;
 struct a_vm;
 
-typedef uint16_t a_type_id;
-
 struct a_type {
   struct a_vm *vm;
-  a_type_id id;
+  a_type_id_t id;
   struct a_string *name;
   struct a_type *super[A_MAX_TYPE_ID]; 
   a_pc_t (*call_val)(struct a_val *val, enum a_call_flags flags, a_pc_t ret);

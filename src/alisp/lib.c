@@ -22,7 +22,7 @@ struct a_val *a_lib_bind(struct a_lib *self, struct a_string *key, struct a_type
   struct a_binding *b = a_malloc(self->vm, sizeof(struct a_binding));
   b->key = key;
 
-  if (!a_lset_insert(&self->bindings, &b->val.ls, false)) {
+  if (!a_lset_add(&self->bindings, &b->val.ls, false)) {
     a_free(self->vm, b);
     return NULL;
   }

@@ -15,7 +15,7 @@ struct a_scope {
   struct a_ls ls;
   struct a_lset bindings;
   a_reg_t next_reg;
-  a_ref_count ref_count;
+  a_ref_count_t ref_count;
 };
 
 struct a_scope *a_scope_init(struct a_scope *self, struct a_vm *vm, struct a_scope *outer);

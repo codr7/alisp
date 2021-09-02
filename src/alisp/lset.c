@@ -7,7 +7,7 @@ struct a_lset *a_lset_init(struct a_lset *self, a_lset_key key, a_compare_t comp
   return self;
 }
 
-struct a_ls *a_lset_insert(struct a_lset *self, struct a_ls *item, bool force) {
+struct a_ls *a_lset_add(struct a_lset *self, struct a_ls *item, bool force) {
   const void *key = self->key(item);
   
   a_ls_do(&self->items, ils) {

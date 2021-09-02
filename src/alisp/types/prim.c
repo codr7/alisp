@@ -8,7 +8,7 @@ static void copy_val(struct a_val *dst, struct a_val *src) {
   dst->as_prim = a_prim_ref(src->as_prim);
 }
 
-static void dump_val(struct a_val *val) { printf("Prim(%p)", val->as_prim); }
+static void dump_val(struct a_val *val) { printf("Prim(%s)", val->as_prim->name->data); }
 
 static bool deref_val(struct a_val *val) {
   return a_prim_deref(val->as_prim);

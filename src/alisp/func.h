@@ -43,17 +43,21 @@ struct a_rets {
   struct a_type *items[];
 };
 
+typedef a_type_id_t a_func_weight_t;
+
 struct a_func {
+  struct a_ls ls;
   struct a_string *name;
   struct a_args *args;
   struct a_rets *rets;
+  a_func_weight_t weight;
   struct a_lset mem;
   a_pc_t start_pc;
   struct a_scope *scope;
   a_reg_t regs[A_REG_COUNT];
   uint16_t reg_count;
   a_pc_t (*body)(struct a_func *self, struct a_vm *vm, a_pc_t ret);
-  a_ref_count ref_count;
+  a_ref_count_t ref_count;
 };
 
 struct a_func_mem {

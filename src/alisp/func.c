@@ -51,6 +51,12 @@ struct a_func *a_func_init(struct a_func *self,
   self->scope = NULL;
   self->reg_count = 0;
   self->body = NULL;
+  self->weight = 0;
+  
+  for (struct a_arg *a = self->args->items; a < self->args->items+self->args->count; a++) {
+    self->weight += a->type->id;
+  }
+  
   self->ref_count = 1;
   return self;
 }
@@ -217,7 +223,7 @@ void a_func_mem(struct a_func *self, struct a_vm *vm, struct a_func_mem *mem) {
     a_ls_push(mem->rets.next, &dst->ls);
   }
 
-  a_lset_insert(&self->mem, &mem->ls, false);
+  a_lset_add(&self->mem, &mem->ls, false);
 }
 
 struct a_args *a_args(struct a_vm *vm, uint8_t count) {

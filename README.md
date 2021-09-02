@@ -325,7 +325,7 @@ Dropping the binding and dealing directly with the stack is slightly faster.
 ```
 
 Memoization is a nice solution for these kinds of problems, `:m` may be used to memoize calls.
-Note that I had to increase the number of repetitions by four orders of magnitude to get a similar measurable time.
+Note that the number of repetitions increased by four orders of magnitude to get a similar measurable time.
 
 ```
   (func fibrec-m [n:Int] [Int]

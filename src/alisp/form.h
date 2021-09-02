@@ -40,7 +40,7 @@ struct a_form {
   struct a_ls ls;
   enum a_form_type type;
   struct a_pos pos;
-  a_ref_count ref_count;
+  a_ref_count_t ref_count;
   
   union {
     struct a_call_form as_call;

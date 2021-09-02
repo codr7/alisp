@@ -1,7 +1,4 @@
-* add multi support
-** add func weight
-*** sum arg type ids in init
-*** use to order funcs set
+* finish multi support
 ** extract bool a_bind_func(lset, func)
 ** use in func prim/lib bind/lib import
 ** specialize multi calls in a_op_analyze

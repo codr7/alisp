@@ -439,6 +439,9 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_type(&self->lib, a_meta_type_init(&self->meta_type, vm, a_string(vm, "Meta"),
 					       A_SUPER(&self->any_type)));
 
+  a_lib_bind_type(&self->lib, a_multi_type_init(&self->multi_type, vm, a_string(vm, "Multi"),
+						A_SUPER(&self->any_type)));
+
   a_lib_bind_type(&self->lib, a_nil_type_init(&self->nil_type, vm, a_string(vm, "Nil"),
 					      A_SUPER(&self->any_type)));
 

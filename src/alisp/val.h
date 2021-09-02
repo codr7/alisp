@@ -6,6 +6,7 @@
 #include "alisp/types.h"
 
 struct a_func;
+struct a_multi;
 struct a_prim;
 struct a_type;
 struct a_vm;
@@ -21,6 +22,7 @@ struct a_val {
     int as_int;
     struct a_ls *as_ls;
     struct a_type *as_meta;
+    struct a_multi *as_multi;
     struct a_pair as_pair;
     struct a_prim *as_prim;
     a_reg_t as_reg;
