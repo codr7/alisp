@@ -50,16 +50,24 @@ Values are pushed on the stack.
 `d` may be used to drop values.
 
 ```
-  1 2 3 (d)
-  
-[1 2]
+1 2 3 4 5
 
-  (d 2)
-  
-[]
+[1 2 3 4 5]
+
+  (d)
+
+[1 2 3 4]
+
+  (d 1)
+
+[1 2 4]
+
+  (d 1 2)
+
+[4]
 ```
 
-`d` may alternatively be specified as a call flag to drop all returned values.
+`d` may alternatively be specified as a call flag to drop returned values.
 
 ```
   35.(+ 7)

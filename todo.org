@@ -1,7 +1,10 @@
 * add multi support
-** create automatically in func prim
-** create automatically in lib import
-** specialize in a_op_analyze
+** add func weight
+*** sum arg type ids in init
+*** use to order funcs set
+** extract bool a_bind_func(lset, func)
+** use in func prim/lib bind/lib import
+** specialize multi calls in a_op_analyze
 * add head/tail multis
 ** head left for pair else val
 ** tail right for pair else NIL
@@ -69,4 +72,3 @@
 ** skip arg/ret checks
 * add macros
 ** rewrite def as macro
-

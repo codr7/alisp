@@ -80,13 +80,32 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
 
  DROP: {
     A_TRACE(DROP);
-    int count = a_baseof(pc, struct a_op, pc)->as_drop.count;
+    struct a_drop_op *op = &a_baseof(pc, struct a_op, pc)->as_drop;
+    int offset = op->offset;
+    
+    if (offset == -1) {
+      struct a_val *v = a_pop(self);
+
+      if (!v) {
+	a_fail("Missing offset");
+	return false;
+      }
+
+      if (v->type != &self->abc.int_type) {
+	a_fail("Invalid offset: %s", v->type->name->data);
+	return false;
+      }
+
+      offset = v->as_int;
+    }
+
+    int count = op->count;
 
     if (count == -1) {
       struct a_val *v = a_pop(self);
 
       if (!v) {
-	a_fail("Missing drop count");
+	a_fail("Missing count");
 	return false;
       }
 
@@ -98,7 +117,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
       count = v->as_int;
     }
 
-    if (!a_drop(self, count)) { return false; }    
+    if (!a_drop(self, offset, count)) { return false; }    
     A_DISPATCH(pc);    
   }
 
@@ -175,7 +194,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     }
 
     if (f->flags & A_CALL_MEM) { a_func_mem(f->func, self, f->mem); }
-    if (f->flags & A_CALL_DRETS) { a_drop(self, f->func->rets->count); }
+    if (f->flags & A_CALL_DRETS) { a_drop(self, 0, f->func->rets->count); }
     A_DISPATCH(f->ret);
   }
   

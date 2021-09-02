@@ -28,7 +28,7 @@ struct a_call_op {
 };
 
 struct a_drop_op {
-  int8_t count;
+  int8_t offset, count;
 };
 
 struct a_dup_op {

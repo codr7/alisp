@@ -146,7 +146,7 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
     struct a_ls *found = a_lset_find(&self->mem, sp->prev);
     
     if (found) {
-      a_drop(vm, self->args->count);
+      a_drop(vm, 0, self->args->count);
       
       a_ls_do(&a_baseof(found, struct a_func_mem, ls)->rets, ls) {
 	struct a_val *v = a_baseof(ls, struct a_val, ls);
@@ -170,7 +170,7 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
   if (self->body) {
     ret = self->body(self, vm, ret);
     if (mem) { a_func_mem(self, vm, mem); }
-    if (flags & A_CALL_DRETS) { a_drop(vm, self->rets->count); }
+    if (flags & A_CALL_DRETS) { a_drop(vm, 0, self->rets->count); }
     return ret;
   }
 

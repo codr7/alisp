@@ -28,10 +28,13 @@ void a_stack_type_dump(struct a_ls *stack) {
   putc(']', stdout);
 }
 
-bool a_drop(struct a_vm *self, int count) {
-  struct a_ls *vls = self->stack.prev;				   
+bool a_drop(struct a_vm *self, int offset, int count) {
+  struct a_ls *vls = self->stack.prev;
+
+  for (int i = 0; i < offset; i++) { vls = vls->prev; }
+  struct a_ls *prev = vls->prev;
   
-  for (int i = count; i > 0; vls = vls->prev, i--) {
+  for (int i = 0; i < count; vls = prev, prev = vls->prev, i++) {
     if (vls == &self->stack) { return false; }
     a_ls_pop(vls);
     struct a_val *v = a_baseof(vls, struct a_val, ls);

@@ -121,26 +121,48 @@ static bool ceval_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, 
 }
 
 static bool d_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_ls *a = args;
+  int offset = 0;
+
+  if ((a = a->next) != args) {
+    struct a_form *f = a_baseof(a, struct a_form, ls);
+    struct a_val *v = a_form_val(f, vm);
+
+    if (v) {
+      if (v->type != &vm->abc.int_type) {
+	a_fail("Invalid offset: %s", v->type->name->data);
+	return false;
+      }
+
+      offset = v->as_int;
+    } else {
+      a_form_emit(f, vm);
+      offset = -1;
+    }
+  }
+    
   int count = 1;
   
-  if (!a_ls_null(args)) {
-    struct a_form *a = a_baseof(args->next, struct a_form, ls);
-    struct a_val *v = a_form_val(a, vm);
-
+  if ((a = a->next) != args) {
+    struct a_form *f = a_baseof(a, struct a_form, ls);
+    struct a_val *v = a_form_val(f, vm);
+    
     if (v) {
       if (v->type != &vm->abc.int_type) {
 	a_fail("Invalid drop count: %s", v->type->name->data);
 	return false;
       }
-
+      
       count = v->as_int;
     } else {
-      a_form_emit(a, vm);
+      a_form_emit(f, vm);
       count = -1;
     }
   }
   
-  a_emit(vm, A_DROP_OP)->as_drop.count = count;
+  struct a_drop_op *op = &a_emit(vm, A_DROP_OP)->as_drop;
+  op->offset = offset;
+  op->count = count;
   return true;
 }
 
@@ -463,7 +485,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "alias"), 2, 2))->body = alias_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "bench"), 1, -1))->body = bench_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "ceval"), 0, -1))->body = ceval_body;
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "d"), 0, 1))->body = d_body;
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "d"), 0, 2))->body = d_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "def"), 2, 2))->body = def_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "do"), 0, -1))->body = do_body;
 

@@ -16,6 +16,7 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
   case A_BENCH_OP:
   case A_BRANCH_OP:
   case A_DROP_OP:
+    self->as_drop.offset = 0;
     self->as_drop.count = 1;
     break;
   case A_DUP_OP:
@@ -74,7 +75,7 @@ void a_op_deinit(struct a_op *self) {
 a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {  
   switch (self->type) {
   case A_BRANCH_OP: {
-    a_drop(vm, 1);
+    a_drop(vm, 0, 1);
     break;
   }
         
@@ -115,7 +116,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 	}
       }
 
-      a_drop(vm, f->args->count);
+      a_drop(vm, 0, f->args->count);
 
       if (!(op->flags & A_CALL_DRETS)) {
 	for (struct a_type **rt = f->rets->items; rt < f->rets->items + f->rets->count; rt++) {
@@ -130,7 +131,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
   }
     
   case A_DROP_OP: {
-    a_drop(vm, self->as_drop.count);
+    a_drop(vm, self->as_drop.offset, self->as_drop.count);
     break;
   }
 
@@ -197,7 +198,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
   }
 
   case A_STORE_OP: {
-    a_drop(vm, 1);
+    a_drop(vm, 0, 1);
     break;
   }
 
@@ -216,7 +217,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
   }
 
   case A_ZIP_OP: {
-    a_drop(vm, 2);
+    a_drop(vm, 0, 2);
     a_push(vm, &vm->abc.pair_type)->undef = true;
     break;
   }
