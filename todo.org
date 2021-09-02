@@ -1,4 +1,3 @@
-* rename ls_form to list_form
 * add multi support
 ** create automatically in func prim
 ** create automatically in lib import
