@@ -103,8 +103,7 @@ struct a_scope *a_push_scope(struct a_vm *self, struct a_scope *scope) {
 }
 
 struct a_scope *a_begin(struct a_vm *self) {
-  struct a_scope *s = a_malloc(self, sizeof(struct a_scope));
-  a_scope_init(s, self, a_scope(self));
+  struct a_scope *s = a_scope_init(a_malloc(self, sizeof(struct a_scope)), self, a_scope(self));
   return a_push_scope(self, s);
 }
 
