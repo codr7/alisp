@@ -200,18 +200,39 @@ New functions may be defined using `func`.
 [42]
 ```
 
+Function definitions are lexically scoped.
+
+```
+(func foo [] []
+      (func bar [] [] 42)
+      (bar))
+
+[]
+
+  (foo)
+
+[42]
+
+  (bar)
+
+Unknown call target: bar
+```
+
 Functions capture their defining environment.
 
 ```
   (let [bar 42]
     (func foo [] [Int] bar)
     foo)
+
+[Func(0x7f9cb36046f0)]
+
   (_)
   
 [42]
 ```
 
-Anonymous arguments are left on the stack.
+Anonymous arguments are left on stack.
 
 ```
   (func foo [Int] [Int] _.(+ 7))
@@ -220,7 +241,7 @@ Anonymous arguments are left on the stack.
 [42]
 ```
 
-Specifying names binds the values.
+Named arguments are bound and removed from the stack.
 
 ```
   (func foo [n:Int] [Int] n.(+ 7))
