@@ -14,6 +14,7 @@ struct a_multi {
   a_ref_count_t ref_count;
 };
 
+struct a_multi *a_multi(struct a_vm *vm, struct a_string *name, uint8_t arg_count);
 struct a_multi *a_multi_init(struct a_multi *self, struct a_string *name, uint8_t arg_count);
 struct a_multi *a_multi_ref(struct a_multi *self);
 bool a_multi_deref(struct a_multi *self, struct a_vm *vm);

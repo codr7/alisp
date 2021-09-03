@@ -110,7 +110,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 
 	if (applicable) {
 	  op->flags ^= A_CALL_CHECK;
-	  printf("Disabled arg check: %s %d ", f->name->data, op->flags);
+	  printf("Disabled arg check: %s ", f->name->data);
 	  a_stack_type_dump(&vm->stack);
 	  putc('\n', stdout);
 	}
@@ -187,7 +187,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 
       if (ok) {
 	op->check = false;
-	printf("Disabled ret check: %s", f->name->data);
+	printf("Disabled ret check: %s ", f->name->data);
 	a_stack_type_dump(&vm->stack);
 	putc('\n', stdout);
       }

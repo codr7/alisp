@@ -3,6 +3,7 @@
 #include "alisp/form.h"
 #include "alisp/func.h"
 #include "alisp/libs/abc.h"
+#include "alisp/multi.h"
 #include "alisp/prim.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
@@ -309,14 +310,26 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
   }
   
   struct a_func *f = a_func(vm, name_form->as_id.name, fargs, frets);
-  struct a_val *v = a_scope_bind(a_scope(vm), f->name, &vm->abc.func_type);
 
-  if (!v) {
-    a_fail("Duplicate binding: %s", f->name->data);
-    return false;
+  struct a_scope *s = a_scope(vm);
+  struct a_val *v = a_scope_find(s, f->name);
+
+  if (v) {
+    if (v->type == &vm->abc.func_type) {
+      a_val_init(v, &vm->abc.multi_type);
+      v->as_multi = a_multi(vm, f->name, f->args->count);
+      a_multi_add(v->as_multi, f);
+      a_func_deref(f, vm);
+    } else if (v->type == &vm->abc.multi_type) {
+      a_multi_add(v->as_multi, f);      
+    } else {
+      a_fail("Invalid func binding: %s", v->type->name->data);
+      return false;
+    }
+  } else {
+    a_scope_bind(a_scope(vm), f->name, &vm->abc.func_type)->as_func = f;
   }
-  
-  v->as_func = f;
+
   a_func_begin(f, vm);
 
   while ((a = a->next) != args) {
@@ -326,6 +339,18 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
   
   a_func_end(f, vm);
   return true;
+}
+
+static a_pc_t head_any_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  return ret;
+}
+
+static a_pc_t head_pair_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *p = a_pop(vm), *v = p->as_pair.left;
+  a_copy(a_push(vm, v->type), v);
+  a_val_deref(p);
+  a_val_free(p, vm);
+  return ret;
 }
 
 static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
@@ -499,6 +524,17 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "dup"), 0, 0))->body = dup_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "func"), 3, -1))->body = func_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func(vm, a_string(vm, "head"),
+			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
+			 A_RET(vm, &vm->abc.any_type)))->body = head_any_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func(vm, a_string(vm, "head"),
+			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.pair_type}),
+			 A_RET(vm, &vm->abc.any_type)))->body = head_pair_body;
+
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "if"), 2, 3))->body = if_body;
 
   a_lib_bind_func(&self->lib,

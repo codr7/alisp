@@ -1,10 +1,8 @@
-* finish multi support
-** extract bool a_bind_func(lset, func)
-** use in func prim/lib bind/lib import
-** specialize multi calls in a_op_analyze
-* add head/tail multis
-** head left for pair else val
+* add tail multis
 ** tail right for pair else NIL
+* add canical list map example
+* specialize multi calls in a_op_analyze
+* --
 * add type-of/isa prims
 ** readme/types
 * add quoting

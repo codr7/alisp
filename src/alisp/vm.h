@@ -11,7 +11,7 @@
 #include "alisp/scope.h"
 #include "alisp/val.h"
 
-#define A_VERSION 7
+#define A_VERSION 8
 
 struct a_vm {
   a_type_id_t next_type_id;

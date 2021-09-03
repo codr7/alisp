@@ -17,7 +17,7 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v7
+Welcome to aLisp v8
 
 Return on empty line evaluates,
 (reset) clears the stack and Ctrl+D exits.
@@ -256,6 +256,18 @@ Named arguments are bound and removed from the stack.
   (foo 35)
 
 [42]
+```
+
+### multiple dispatch
+When multiple function definitions share the same name, the most specific one is called.
+
+```
+  (func foo [x:Int] [Meta] Int)
+  (func foo [x:Any] [Meta] Any)
+
+  (foo 42)
+  (foo T)
+["Int" "Any"]
 ```
 
 ### types

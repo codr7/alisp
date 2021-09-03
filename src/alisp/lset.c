@@ -12,12 +12,12 @@ struct a_ls *a_lset_add(struct a_lset *self, struct a_ls *item, bool force) {
   
   a_ls_do(&self->items, ils) {
     switch (self->compare(key, self->key ? self->key(ils) : ils)) { 
-    case A_GT:
+    case A_LT:
       a_ls_push(ils, item);
       return item;
     case A_EQ:
       if (!force) { return NULL; }
-    case A_LT:
+    case A_GT:
       break;
     }
   }

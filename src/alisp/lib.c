@@ -2,6 +2,7 @@
 #include "alisp/fail.h"
 #include "alisp/func.h"
 #include "alisp/lib.h"
+#include "alisp/multi.h"
 #include "alisp/prim.h"
 #include "alisp/string.h"
 #include "alisp/vm.h"
@@ -31,9 +32,24 @@ struct a_val *a_lib_bind(struct a_lib *self, struct a_string *key, struct a_type
 }
 
 struct a_func *a_lib_bind_func(struct a_lib *self, struct a_func *func) {
-  struct a_val *v = a_lib_bind(self, func->name, &self->vm->abc.func_type);
-  if (!v) { return NULL; }
-  v->as_func = func;
+  struct a_val *v = a_lib_find(self, func->name);
+
+  if (v) {
+    if (v->type == &self->vm->abc.func_type) {
+      a_val_init(v, &self->vm->abc.multi_type);
+      v->as_multi = a_multi(self->vm, func->name, func->args->count);
+      a_multi_add(v->as_multi, func);
+      a_func_deref(func, self->vm);
+    } else if (v->type == &self->vm->abc.multi_type) {
+      a_multi_add(v->as_multi, func);      
+    } else {
+      return NULL;
+    }
+
+    return func;
+  }
+  
+  a_lib_bind(self, func->name, &self->vm->abc.func_type)->as_func = func;
   return func;
 }
 
@@ -47,6 +63,12 @@ struct a_prim *a_lib_bind_prim(struct a_lib *self, struct a_prim *prim) {
 struct a_type *a_lib_bind_type(struct a_lib *self, struct a_type *type) {
   a_lib_bind(self, type->name, &self->vm->abc.meta_type)->as_meta = type;
   return type;
+}
+
+struct a_val *a_lib_find(struct a_lib *self, const struct a_string *key) {
+  struct a_ls *found = a_lset_find(&self->bindings, key);
+  if (!found) { return NULL; }
+  return a_baseof(found, struct a_val, ls);
 }
 
 bool a_lib_import(struct a_lib *self) {
