@@ -1,6 +1,3 @@
-* add tail multis
-** tail right for pair else NIL
-* add canical list map example
 * specialize multi calls in a_op_analyze
 * add a_task
 ** bool done
@@ -73,3 +70,12 @@
 ** skip arg/ret checks
 * add macros
 ** rewrite def as macro
+
+(func map [in:List t:Target] [List]
+  (func helper [in:Any out:Any] [List]
+    (if (nil? in)
+      (reverse out)
+      (helper:t (tail in) (t (head in)):out)))
+  (helper:t in NIL))
+(func foo [Int] [Int] _.(+ 1))
+(map [1 2 3 4 5] foo)	

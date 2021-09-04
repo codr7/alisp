@@ -98,8 +98,8 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 	  struct a_val *sv = a_baseof(s, struct a_val, ls);
 
 	  if (!a_isa(sv->type, a->type)) {
-	    if (sv->type != &vm->abc.undef_type) {
-	      a_fail("Func not applicable: %s", f->name->data);
+	    if (!sv->undef) {
+	      a_fail("Func not applicable: %s %s %s", f->name->data, sv->type->name->data, a->type->name->data);
 	      return NULL;
 	    }
 	    
@@ -175,7 +175,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 	struct a_val *sv = a_baseof(s, struct a_val, ls);
 	
 	if (!a_isa(sv->type, *r)) {
-	  if (sv->type != &vm->abc.undef_type) {
+	  if (!sv->undef) {
 	    a_fail("Invalid func result: %s %s", f->name->data, sv->type->name->data);
 	    return NULL;
 	  }

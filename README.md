@@ -17,7 +17,7 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v8
+Welcome to aLisp v9
 
 Return on empty line evaluates,
 (reset) clears the stack and Ctrl+D exits.
@@ -198,6 +198,23 @@ List literals may be specified by enclosing code in brackets.
 [NIL 1:NIL 1:2 1:2:3]
 ```
 
+The canonical tail recursive transformation goes something like this:
+
+```
+  (func map [in:List t:Target] [List]
+    (func helper [in:Any out:Any] [List]
+      (if (nil? in)
+        (reverse out)
+        (helper:t (tail in) (t (head in)):out)))
+    (helper:t in NIL))
+
+  (func inc [Int] [Int] _.(+ 1))
+
+  (map [1 2 3] inc)
+
+[2:3:4]
+```
+
 ### functions
 New functions may be defined using `func`.
 
@@ -277,10 +294,11 @@ The following types are provided out of the box, adding more is trivial.
 - Bool: Any - Boolean values
 - Func: Any Target - Functions as values
 - Int: Any Num - Integer values
+- List - List values
 - Meta: Any - Types as values
 - Multi: Any Target - Dispatchers as values
-- Nil: Any - Missing values
-- Pair: Any - Pair values
+- Nil: Any List - Missing values
+- Pair: Any List - Pair values
 - Prim: Any - Primitives as values
 - Reg: Any - Registers as values
 - Target: Any - Callable values

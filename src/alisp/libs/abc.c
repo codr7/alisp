@@ -263,19 +263,19 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
     }
 
     if (af->type == A_ID_FORM) {
-         struct a_val *v = a_scope_find(a_scope(vm), af->as_id.name);
+      struct a_val *v = a_scope_find(a_scope(vm), af->as_id.name);
 
-	 if (!v) {
-	   a_fail("Unknown argument type: %s", af->as_id.name->data);
-	   return false;
-	 }
+      if (!v) {
+	a_fail("Unknown argument type: %s", af->as_id.name->data);
+	return false;
+      }
 	 
-	 if (v->type != &vm->abc.meta_type) {
-	   a_fail("Invalid argument type: %s", v->type->name->data);
-	   return false;
-	 }
+      if (v->type != &vm->abc.meta_type) {
+	a_fail("Invalid argument type: %s", v->type->name->data);
+	return false;
+      }
 
-	 fap->type = v->as_meta;
+      fap->type = v->as_meta;
     } else {
       a_fail("Invalid argument: %d", af->type);
       return false;
@@ -442,9 +442,61 @@ static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
   return true;
 }
 
+static a_pc_t nil_any_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *v = a_peek(vm, 0);
+  a_val_deref(v);
+  a_val_init(v, &vm->abc.bool_type)->as_bool = false; 
+  return ret;
+}
+
+static a_pc_t nil_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *v = a_peek(vm, 0);
+  a_val_init(v, &vm->abc.bool_type)->as_bool = true; 
+  return ret;
+}
+
 static bool reset_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   a_emit(vm, A_RESET_OP);
   return true;
+}
+
+static a_pc_t reverse_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *lst = a_peek(vm, 0);
+  if (lst->type == &vm->abc.nil_type || lst->as_pair.right->type == &vm->abc.nil_type) { return ret; }
+  struct a_val *v = lst;
+  int count = 0;
+
+  for (;;) {
+    if (v->type == &vm->abc.pair_type) {
+      count++;
+      v = v->as_pair.right;
+    } else {
+      if (v->type != &vm->abc.nil_type) { count++; }
+      break;
+    }
+  }
+
+  struct a_val **vs = a_malloc(vm, count*sizeof(struct a_val *)), **p = vs;
+  v = lst;
+  
+  for (;;) {
+    if (v->type == &vm->abc.pair_type) {
+      *p++ = v->as_pair.left;
+      v = v->as_pair.right;
+    } else {
+      if (v->type != &vm->abc.nil_type) { *p = v; }
+      break;
+    }
+  }
+
+  for (struct a_val **l = vs, **r = vs+count-1; l < r; l++, r--) {
+    struct a_val tmp = **l;
+    **l = **r;
+    **r = tmp;
+  }
+
+  a_free(vm, vs);
+  return ret;
 }
 
 static bool swap_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
@@ -471,8 +523,9 @@ static a_pc_t tail_pair_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_init(&self->lib, vm, a_string(vm, "abc"));
   a_lib_bind_type(&self->lib, a_type_init(&self->any_type, vm, a_string(vm, "Any"), A_SUPER(NULL)));
-  a_lib_bind_type(&self->lib, a_type_init(&self->num_type, vm, a_string(vm, "Num"), A_SUPER(NULL)));
-  a_lib_bind_type(&self->lib, a_type_init(&self->target_type, vm, a_string(vm, "Target"), A_SUPER(NULL)));
+  a_lib_bind_type(&self->lib, a_type_init(&self->list_type, vm, a_string(vm, "List"), A_SUPER(&self->any_type)));
+  a_lib_bind_type(&self->lib, a_type_init(&self->num_type, vm, a_string(vm, "Num"), A_SUPER(&self->any_type)));
+  a_lib_bind_type(&self->lib, a_type_init(&self->target_type, vm, a_string(vm, "Target"), A_SUPER(&self->any_type)));
   
   a_lib_bind_type(&self->lib, a_bool_type_init(&self->bool_type, vm, a_string(vm, "Bool"),
 					       A_SUPER(&self->any_type)));
@@ -487,13 +540,13 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 						A_SUPER(&self->any_type, &self->target_type)));
 
   a_lib_bind_type(&self->lib, a_nil_type_init(&self->nil_type, vm, a_string(vm, "Nil"),
-					      A_SUPER(&self->any_type)));
+					      A_SUPER(&self->any_type, &self->list_type)));
 
   a_lib_bind_type(&self->lib, a_func_type_init(&self->func_type, vm, a_string(vm, "Func"),
 					       A_SUPER(&self->any_type, &self->target_type)));
   
   a_lib_bind_type(&self->lib, a_pair_type_init(&self->pair_type, vm, a_string(vm, "Pair"),
-					       A_SUPER(&self->any_type)));
+					       A_SUPER(&self->any_type, &self->list_type)));
 
   a_lib_bind_type(&self->lib, a_reg_type_init(&self->reg_type, vm, a_string(vm, "Reg"),
 					      A_SUPER(&self->any_type)));
@@ -564,7 +617,24 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 			 A_RET(vm, &vm->abc.bool_type)))->body = is_body;
 
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "let"), 1, -1))->body = let_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func(vm, a_string(vm, "nil?"),
+			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
+			 A_RET(vm, &vm->abc.bool_type)))->body = nil_any_body;
+  
+  a_lib_bind_func(&self->lib,
+		  a_func(vm, a_string(vm, "nil?"),
+			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.nil_type}),
+			 A_RET(vm, &vm->abc.bool_type)))->body = nil_body;
+
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "reset"), 0, 0))->body = reset_body;
+			 
+  a_lib_bind_func(&self->lib,
+		  a_func(vm, a_string(vm, "reverse"),
+			 A_ARG(vm, {a_string(vm, "lst"), &vm->abc.list_type}),
+			 A_RET(vm, &vm->abc.list_type)))->body = reverse_body;
+
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "swap"), 0, 0))->body = swap_body;
 
   a_lib_bind_func(&self->lib,
@@ -573,8 +643,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 			 A_RET(vm, &vm->abc.nil_type)))->body = tail_any_body;
 
   a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, "tail"),
-			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.pair_type}),
+		  a_func(vm, a_string(vm, "tail"), A_ARG(vm, {a_string(vm, "val"), &vm->abc.pair_type}),
 			 A_RET(vm, &vm->abc.any_type)))->body = tail_pair_body;
 
   return self;

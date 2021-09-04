@@ -1,13 +1,20 @@
 #include "alisp/type.h"
 #include "alisp/fail.h"
 #include "alisp/func.h"
+#include "alisp/stack.h"
 #include "alisp/string.h"
 #include "alisp/val.h"
+#include "alisp/vm.h"
 
 static a_pc_t call_val(struct a_val *val, enum a_call_flags flags, a_pc_t ret) {
+  struct a_vm *vm = val->type->vm;
   struct a_func *f = val->as_func;
-  if ((flags & A_CALL_CHECK) && !a_func_applicable(f, val->type->vm)) { a_fail("Func not applicable: %s", f->name->data); }
-  return a_func_call(f, val->type->vm, flags, ret);
+  if ((flags & A_CALL_CHECK) && !a_func_applicable(f, vm)) {
+    a_stack_dump(&vm->stack);
+    a_fail("Func not applicable: %s", f->name->data);
+    return NULL;
+  }
+  return a_func_call(f, vm, flags, ret);
 }
 
 static void copy_val(struct a_val *dst, struct a_val *src) {
