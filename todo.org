@@ -1,4 +1,5 @@
-* add a_task
+* add tasks
+** struct a_task
 ** bool done
 ** ls args
 ** func body
@@ -34,10 +35,6 @@
 * add func op
 ** replaces skip goto in body
 ** reset & push unnamed args in analyze
-* add registers to analyze
-** backup/restore
-** set/get in store/load
-** clear on fence/func/goto/ret/stop
 * capture stored registers in func
 ** scan code for STORE & push reg
 * add strings
