@@ -66,9 +66,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
       return false;
     }
 
-    if (!(pc = a_call(t, call->flags, pc))) {
-      return false;
-    }
+    if (!(pc = a_call(t, call->flags, pc))) { return false; }
 
     if (!call->target) {
       a_val_deref(t);

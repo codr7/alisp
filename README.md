@@ -267,21 +267,23 @@ When multiple function definitions share the same name, the most specific one is
 
   (foo 42)
   (foo T)
-["Int" "Any"]
+[Int Any]
 ```
 
 ### types
 The following types are provided out of the box, adding more is trivial.
 
-- Any - Any value
-- Bool - Boolean values
-- Func - Functions as values
-- Int - Integer values
-- Meta - Types as values
-- Nil - Missing values
-- Pair - Pair values
-- Prim - Primitives as values
-- Reg - Registers as values
+- Any  - Any value
+- Bool: Any - Boolean values
+- Func: Any Target - Functions as values
+- Int: Any Num - Integer values
+- Meta: Any - Types as values
+- Multi: Any Target - Dispatchers as values
+- Nil: Any - Missing values
+- Pair: Any - Pair values
+- Prim: Any - Primitives as values
+- Reg: Any - Registers as values
+- Target: Any - Callable values
 
 ### compile time evaluation
 `ceval` may be used to evaluate forms at compile time and emit code to push their results.

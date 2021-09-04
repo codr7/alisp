@@ -59,5 +59,6 @@ a_pc_t a_multi_call(struct a_multi *self, struct a_vm *vm, enum a_call_flags fla
     if (a_func_applicable(f, vm)) { return a_func_call(f, vm, flags, ret); }
   }
 
+  a_fail("Not applicable: %s", self->name->data);
   return NULL;
 }

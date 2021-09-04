@@ -2,6 +2,12 @@
 ** tail right for pair else NIL
 * add canical list map example
 * specialize multi calls in a_op_analyze
+* add a_task
+** bool done
+** ls args
+** func body
+** add vm.tasks
+** add yield prim
 * --
 * add type-of/isa prims
 ** readme/types

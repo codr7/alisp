@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include "alisp/fail.h"
 #include "alisp/form.h"
@@ -451,27 +452,45 @@ static bool swap_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
   return true;
 }
 
+static a_pc_t tail_any_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *v = a_pop(vm);
+  a_push(vm, &vm->abc.nil_type);
+  a_val_deref(v);
+  a_val_free(v, vm);
+  return ret;
+}
+
+static a_pc_t tail_pair_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *p = a_pop(vm), *v = p->as_pair.right;
+  a_copy(a_push(vm, v->type), v);
+  a_val_deref(p);
+  a_val_free(p, vm);
+  return ret;
+}
+
 struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_init(&self->lib, vm, a_string(vm, "abc"));
   a_lib_bind_type(&self->lib, a_type_init(&self->any_type, vm, a_string(vm, "Any"), A_SUPER(NULL)));
+  a_lib_bind_type(&self->lib, a_type_init(&self->num_type, vm, a_string(vm, "Num"), A_SUPER(NULL)));
+  a_lib_bind_type(&self->lib, a_type_init(&self->target_type, vm, a_string(vm, "Target"), A_SUPER(NULL)));
   
   a_lib_bind_type(&self->lib, a_bool_type_init(&self->bool_type, vm, a_string(vm, "Bool"),
 					       A_SUPER(&self->any_type)));
   
   a_lib_bind_type(&self->lib, a_int_type_init(&self->int_type, vm, a_string(vm, "Int"),
-					      A_SUPER(&self->any_type)));
+					      A_SUPER(&self->any_type, &self->num_type)));
   
   a_lib_bind_type(&self->lib, a_meta_type_init(&self->meta_type, vm, a_string(vm, "Meta"),
 					       A_SUPER(&self->any_type)));
 
   a_lib_bind_type(&self->lib, a_multi_type_init(&self->multi_type, vm, a_string(vm, "Multi"),
-						A_SUPER(&self->any_type)));
+						A_SUPER(&self->any_type, &self->target_type)));
 
   a_lib_bind_type(&self->lib, a_nil_type_init(&self->nil_type, vm, a_string(vm, "Nil"),
 					      A_SUPER(&self->any_type)));
 
   a_lib_bind_type(&self->lib, a_func_type_init(&self->func_type, vm, a_string(vm, "Func"),
-					       A_SUPER(&self->any_type)));
+					       A_SUPER(&self->any_type, &self->target_type)));
   
   a_lib_bind_type(&self->lib, a_pair_type_init(&self->pair_type, vm, a_string(vm, "Pair"),
 					       A_SUPER(&self->any_type)));
@@ -547,5 +566,16 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "let"), 1, -1))->body = let_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "reset"), 0, 0))->body = reset_body;
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "swap"), 0, 0))->body = swap_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func(vm, a_string(vm, "tail"),
+			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
+			 A_RET(vm, &vm->abc.nil_type)))->body = tail_any_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func(vm, a_string(vm, "tail"),
+			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.pair_type}),
+			 A_RET(vm, &vm->abc.any_type)))->body = tail_pair_body;
+
   return self;
 }
