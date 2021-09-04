@@ -226,9 +226,9 @@ New functions may be defined using `func`.
 Function definitions are lexically scoped.
 
 ```
-(func foo [] []
-      (func bar [] [] 42)
-      (bar))
+  (func foo [] []
+    (func bar [] [] 42)
+    (bar))
 
 []
 
