@@ -19,6 +19,7 @@ struct a_multi *a_multi_init(struct a_multi *self, struct a_string *name, uint8_
 struct a_multi *a_multi_ref(struct a_multi *self);
 bool a_multi_deref(struct a_multi *self, struct a_vm *vm);
 bool a_multi_add(struct a_multi *self, struct a_func *func);
+struct a_func *a_multi_specialize(struct a_multi *self, struct a_vm *vm);
 a_pc_t a_multi_call(struct a_multi *self, struct a_vm *vm, enum a_call_flags flags, a_pc_t ret);
 
 #endif

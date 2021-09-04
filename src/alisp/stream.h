@@ -15,6 +15,7 @@ void a_stream_deinit(struct a_stream *self);
 void a_stream_reset(struct a_stream *self);
 void a_stream_grow(struct a_stream *self, uint64_t length);
 void a_stream_printf(struct a_stream *self, const char *spec, ...);
+void a_stream_vprintf(struct a_stream *self, const char *spec, va_list args);
 void a_stream_putc(struct a_stream *self, char c);
 char a_stream_getc(struct a_stream *self);
 void a_stream_ungetc(struct a_stream *self);

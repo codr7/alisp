@@ -53,12 +53,22 @@ bool a_multi_add(struct a_multi *self, struct a_func *func) {
   return a_lset_add(&self->funcs, &a_func_ref(func)->ls, false);
 }
 
-a_pc_t a_multi_call(struct a_multi *self, struct a_vm *vm, enum a_call_flags flags, a_pc_t ret) {
+struct a_func *a_multi_specialize(struct a_multi *self, struct a_vm *vm) {
   a_ls_do(&self->funcs.items, ls) {
     struct a_func *f = a_baseof(ls, struct a_func, ls);
-    if (a_func_applicable(f, vm)) { return a_func_call(f, vm, flags, ret); }
+    if (a_func_applicable(f, vm)) { return f; }
   }
 
-  a_fail("Not applicable: %s", self->name->data);
   return NULL;
+}
+
+a_pc_t a_multi_call(struct a_multi *self, struct a_vm *vm, enum a_call_flags flags, a_pc_t ret) {
+  struct a_func *f = a_multi_specialize(self, vm);
+
+  if (!f) {
+    a_fail("Not applicable: %s", self->name->data);
+    return NULL;
+  }
+
+  return a_func_call(f, vm, flags, ret);
 }

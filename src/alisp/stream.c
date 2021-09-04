@@ -38,7 +38,11 @@ void a_stream_grow(struct a_stream *self, uint64_t length) {
 void a_stream_printf(struct a_stream *self, const char *spec, ...) {
   va_list args;
   va_start(args, spec);
+  a_stream_vprintf(self, spec, args);
+  va_end(args);
+}
 
+void a_stream_vprintf(struct a_stream *self, const char *spec, va_list args) {
   va_list len_args;
   va_copy(len_args, args);
   int len = vsnprintf(NULL, 0, spec, len_args);
@@ -46,7 +50,6 @@ void a_stream_printf(struct a_stream *self, const char *spec, ...) {
 
   a_stream_grow(self, self->length + len);
   vsnprintf(self->data + self->length, len + 1, spec, args);
-  va_end(args);
   self->length += len;
 }
 

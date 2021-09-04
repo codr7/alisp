@@ -1,11 +1,14 @@
-* specialize multi calls in a_op_analyze
+* add lambdas
+** ([x:Int] [Int] x)
+** capture in call parse
+** extract parser
+** update readme (capture/list map)
 * add a_task
 ** bool done
 ** ls args
 ** func body
 ** add vm.tasks
 ** add yield prim
-* --
 * add type-of/isa prims
 ** readme/types
 * add quoting
@@ -33,11 +36,6 @@
 * add test prim
 ** (test "..." [stack] body)
 ** add test script
-* add lambdas
-** ([x:Int] [Int] x)
-** capture in call parse
-** extract a_parse_func
-** change capture example in readme
 * add func op
 ** replaces skip goto in body
 ** reset & push unnamed args in analyze
@@ -70,12 +68,3 @@
 ** skip arg/ret checks
 * add macros
 ** rewrite def as macro
-
-(func map [in:List t:Target] [List]
-  (func helper [in:Any out:Any] [List]
-    (if (nil? in)
-      (reverse out)
-      (helper:t (tail in) (t (head in)):out)))
-  (helper:t in NIL))
-(func foo [Int] [Int] _.(+ 1))
-(map [1 2 3 4 5] foo)	
