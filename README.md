@@ -247,10 +247,6 @@ Functions capture their defining environment.
   (let [bar 42]
     (func foo [] [Int] bar)
     foo)
-
-[Func(0x7f9cb36046f0)]
-
-  (_)
   
 [42]
 ```
