@@ -283,7 +283,7 @@ When multiple function definitions share the same name, the most specific one is
 ```
 
 ### anonymous functions
-Anonymous functions may be created by simply skipping the `func` keyword.
+Anonymous functions may be created by simply skipping the `func` keyword and name.
 
 ```
   ([] [Int] 42)
@@ -311,6 +311,16 @@ The following types are provided out of the box, adding more is trivial.
 - Reg: Any - Registers as values
 - Target: Any - Callable values
 
+### debugging
+`dump` may be used to dump any value to `stdout`.
+
+```
+  (dump [42 T Int])
+
+[42 T Int]
+[]
+```
+
 ### compile time evaluation
 `ceval` may be used to evaluate forms at compile time and emit code to push their results.
 
@@ -323,16 +333,6 @@ The following types are provided out of the box, adding more is trivial.
   (foo)
   
 [42]
-```
-
-### debugging
-`dump` may be used to dump any value to `stdout`.
-
-```
-  (dump [42 T Int])
-
-[42 T Int]
-[]
 ```
 
 ### performance
