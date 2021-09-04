@@ -8,6 +8,7 @@
 #include "alisp/prim.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
+#include "alisp/utils.h"
 #include "alisp/vm.h"
 
 static a_pc_t equals_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
@@ -216,27 +217,19 @@ static bool dup_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
   return true;
 }
 
-static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
-  struct a_ls *a = args->next;
-  struct a_form *name_form = a_baseof(a, struct a_form, ls);
-
-  if (name_form->type != A_ID_FORM) {
-    a_fail("Invalid function name: %d", name_form->type);
-    return false;
-  }
-  
-  struct a_form *args_form = a_baseof((a = a->next), struct a_form, ls);
+static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_string *name, struct a_vm *vm) {
+  struct a_form *args_form = a_baseof(a, struct a_form, ls);
 
   if (args_form->type != A_LIST_FORM) {
     a_fail("Invalid function arguments: %d", args_form->type);
-    return false;
+    return NULL;
   }
 
   struct a_form *rets_form = a_baseof((a = a->next), struct a_form, ls);
 
   if (rets_form->type != A_LIST_FORM) {
     a_fail("Invalid function returns: %d", rets_form->type);
-    return false;
+    return NULL;
   }
 
   uint8_t
@@ -255,7 +248,7 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
 
       if (nf->type != A_ID_FORM) {
 	a_fail("Invalid argument name: %d", nf->type);
-	return false;
+	return NULL;
       }
       
       fap->name = nf->as_id.name;
@@ -267,18 +260,18 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
 
       if (!v) {
 	a_fail("Unknown argument type: %s", af->as_id.name->data);
-	return false;
+	return NULL;
       }
 	 
       if (v->type != &vm->abc.meta_type) {
 	a_fail("Invalid argument type: %s", v->type->name->data);
-	return false;
+	return NULL;
       }
 
       fap->type = v->as_meta;
     } else {
       a_fail("Invalid argument: %d", af->type);
-      return false;
+      return NULL;
     }
 
     fap++;
@@ -292,54 +285,68 @@ static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
     
     if (rf->type != A_ID_FORM) {
       a_fail("Invalid return: %d", rf->type);
-      return false;
+      return NULL;
     }
 
     struct a_val *v = a_scope_find(a_scope(vm), rf->as_id.name);
 
     if (!v) {
       a_fail("Unknown return type: %s", rf->as_id.name->data);
-      return false;
+      return NULL;
     }
 
     if (v->type != &vm->abc.meta_type) {
       a_fail("Invalid return type: %s", v->type->name->data);
-      return false;
+      return NULL;
     }
     
     *frp++ = v->as_meta;
   }
   
-  struct a_func *f = a_func(vm, name_form->as_id.name, fargs, frets);
+  struct a_func *f = a_func(vm, name, fargs, frets);
 
-  struct a_scope *s = a_scope(vm);
-  struct a_val *v = a_scope_find(s, f->name);
+  if (name) {
+    struct a_scope *s = a_scope(vm);
+    struct a_val *v = a_scope_find(s, name);
 
-  if (v) {
-    if (v->type == &vm->abc.func_type) {
-      a_val_init(v, &vm->abc.multi_type);
-      v->as_multi = a_multi(vm, f->name, f->args->count);
-      a_multi_add(v->as_multi, f);
-      a_func_deref(f, vm);
-    } else if (v->type == &vm->abc.multi_type) {
-      a_multi_add(v->as_multi, f);      
+    if (v) {
+      if (v->type == &vm->abc.func_type) {
+	a_val_init(v, &vm->abc.multi_type);
+	v->as_multi = a_multi(vm, f->name, f->args->count);
+	a_multi_add(v->as_multi, f);
+	a_func_deref(f, vm);
+      } else if (v->type == &vm->abc.multi_type) {
+	a_multi_add(v->as_multi, f);      
+      } else {
+	a_fail("Invalid func binding: %s", v->type->name->data);
+	return NULL;
+      }
     } else {
-      a_fail("Invalid func binding: %s", v->type->name->data);
-      return false;
+      a_scope_bind(a_scope(vm), f->name, &vm->abc.func_type)->as_func = f;
     }
-  } else {
-    a_scope_bind(a_scope(vm), f->name, &vm->abc.func_type)->as_func = f;
   }
-
+  
   a_func_begin(f, vm);
 
   while ((a = a->next) != args) {
     struct a_form *f = a_baseof(a, struct a_form, ls);
-    if (!a_form_emit(f, vm)) { return false; }
+    if (!a_form_emit(f, vm)) { return NULL; }
   }
   
   a_func_end(f, vm);
-  return true;
+  return f;
+}
+
+static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_ls *a = args->next;
+  struct a_form *name_form = a_baseof(a, struct a_form, ls);
+
+  if (name_form->type != A_ID_FORM) {
+    a_fail("Invalid function name: %d", name_form->type);
+    return false;
+  }
+
+  return parse_func(args, a->next, name_form->as_id.name, vm);
 }
 
 static a_pc_t head_any_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
@@ -386,6 +393,14 @@ static a_pc_t is_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   a_val_deref(y);
   a_val_free(y, vm);
   return ret;
+}
+
+static bool lambda_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_func *f = parse_func(args, args->next, NULL, vm);
+  if (!f) { return false; }
+  f->name = a_format(vm, "%p", f);
+  a_val_init(&a_emit(vm, A_PUSH_OP)->as_push.val, &vm->abc.func_type)->as_func = f;
+  return true;
 }
 
 static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
@@ -615,6 +630,8 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 			       {a_string(vm, "x"), &vm->abc.any_type},
 			       {a_string(vm, "y"), &vm->abc.any_type}),
 			 A_RET(vm, &vm->abc.bool_type)))->body = is_body;
+
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "lambda"), 2, -1))->body = lambda_body;
 
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "let"), 1, -1))->body = let_body;
 

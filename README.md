@@ -208,9 +208,7 @@ The canonical tail recursive transformation goes something like this:
         (helper:t (tail in) (t (head in)):out)))
     (helper:t in NIL))
 
-  (func inc [Int] [Int] _.(+ 1))
-
-  (map [1 2 3] inc)
+  (map [1 2 3] ([Int] [Int] _.(+ 1)))
 
 [2:3:4]
 ```
@@ -284,7 +282,21 @@ When multiple function definitions share the same name, the most specific one is
 
   (foo 42)
   (foo T)
+
 [Int Any]
+```
+
+### anonymous functions
+Anonymous functions may be created by simply skipping the `func` keyword.
+
+```
+  ([] [Int] 42)
+
+[Func(0x7fcecbc094f0)]
+
+  (_)
+
+[42]
 ```
 
 ### types

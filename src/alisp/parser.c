@@ -81,8 +81,10 @@ bool a_parser_next(struct a_parser *self) {
 }
 
 struct a_form *a_parser_peek_next(struct a_parser *self) {
+  struct a_ls *fls = self->forms.next;
+  if (fls != &self->forms) { return a_baseof(fls, struct a_form, ls); }
   if (!a_parser_next(self)) { return NULL; }
-  struct a_ls *fls = self->forms.prev;
+  fls = self->forms.prev;
   if (fls == &self->forms) { return NULL; }
   return a_baseof(fls, struct a_form, ls);
 }

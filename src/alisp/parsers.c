@@ -37,6 +37,12 @@ struct a_form *a_parse_call(struct a_parser *self) {
     return NULL;
   }
 
+  if (t->type == A_LIST_FORM) {
+    a_ls_push(self->forms.next, &t->ls);
+    a_parser_push(self, A_ID_FORM, t->pos)->as_id.name = a_string(self->vm, "lambda");
+    t = a_parser_pop_last(self); 
+  }
+
   struct a_form *cf = a_malloc(self->vm, sizeof(struct a_form));
   a_form_init(cf, A_CALL_FORM, fpos)->as_call.target = t;
   
