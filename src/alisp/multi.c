@@ -16,32 +16,14 @@ static enum a_order funcs_compare(const void *x, const void *y) {
 }
 
 struct a_multi *a_multi(struct a_vm *vm, struct a_string *name, uint8_t arg_count) {
-  return a_multi_init(a_malloc(vm, sizeof(struct a_multi)), name, arg_count);
+  return a_multi_init(a_pool_alloc(&vm->multi_pool), name, arg_count);
 }
 
 struct a_multi *a_multi_init(struct a_multi *self, struct a_string *name, uint8_t arg_count) {
   self->name = name;
   self->arg_count = arg_count;
   a_lset_init(&self->funcs, funcs_key, funcs_compare);
-  self->ref_count = 1;
   return self;
-}
-
-struct a_multi *a_multi_ref(struct a_multi *self) {
-  self->ref_count++;
-  return self;
-}
-
-bool a_multi_deref(struct a_multi *self, struct a_vm *vm) {
-  assert(self->ref_count);
-  if (--self->ref_count) { return false; }
-
-  a_ls_do(&self->funcs.items, ls) {
-    struct a_func *f = a_baseof(ls, struct a_func, ls);
-    if (a_func_deref(f, vm)) { a_free(vm, f); }
-  }
-
-  return true;
 }
 
 bool a_multi_add(struct a_multi *self, struct a_func *func) {
@@ -50,7 +32,7 @@ bool a_multi_add(struct a_multi *self, struct a_func *func) {
     return false;
   }
 
-  return a_lset_add(&self->funcs, &a_func_ref(func)->ls, false);
+  return a_lset_add(&self->funcs, &func->ls, false);
 }
 
 struct a_func *a_multi_specialize(struct a_multi *self, struct a_vm *vm) {

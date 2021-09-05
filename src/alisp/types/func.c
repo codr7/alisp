@@ -17,11 +17,7 @@ static a_pc_t call_val(struct a_val *val, enum a_call_flags flags, a_pc_t ret) {
   return a_func_call(f, vm, flags, ret);
 }
 
-static void copy_val(struct a_val *dst, struct a_val *src) {
-  dst->as_func = a_func_ref(src->as_func);
-}
-
-static bool deref_val(struct a_val *val) { return a_func_deref(val->as_func, val->type->vm); }
+static void copy_val(struct a_val *dst, struct a_val *src) { dst->as_func = src->as_func; }
 
 static void dump_val(struct a_val *val) { printf("Func(%s)", val->as_func->name->data); }
 
@@ -32,7 +28,6 @@ struct a_type *a_func_type_init(struct a_type *self,
   a_type_init(self, vm, name, super);
   self->call_val = call_val;
   self->copy_val = copy_val;
-  self->deref_val = deref_val;
   self->dump_val = dump_val;
   return self;
 }

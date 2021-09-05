@@ -36,7 +36,7 @@ struct a_func *a_func(struct a_vm *vm,
 		      struct a_string *name,
 		      struct a_args *args,
 		      struct a_rets *rets) {
-  return a_func_init(a_malloc(vm, sizeof(struct a_func)), name, args, rets);
+  return a_func_init(a_pool_alloc(&vm->func_pool), name, args, rets);
 }
 
 struct a_func *a_func_init(struct a_func *self,
@@ -57,39 +57,7 @@ struct a_func *a_func_init(struct a_func *self,
     self->weight += a->type->id;
   }
   
-  self->ref_count = 1;
   return self;
-}
-
-struct a_func *a_func_ref(struct a_func *self) {
-  self->ref_count++;
-  return self;
-}
-
-bool a_func_deref(struct a_func *self, struct a_vm *vm) {
-  assert(self->ref_count);
-  if (--self->ref_count) { return false; }
-  a_free(vm, self->args);
-  a_free(vm, self->rets);
-  if (self->scope) { a_scope_deref(self->scope); }
-
-  a_ls_do(&self->mem.items, ls) {
-    struct a_func_mem *m = a_baseof(ls, struct a_func_mem, ls);
-
-    a_ls_do(&m->args, ls) {
-      struct a_val *v = a_baseof(ls, struct a_val, ls);
-      a_val_deref(v);
-      a_val_free(v, vm);
-    }
-
-    a_ls_do(&m->rets, ls) {
-      struct a_val *v = a_baseof(ls, struct a_val, ls);
-      a_val_deref(v);
-      a_val_free(v, vm);
-    }
-  }
-  
-  return true;
 }
 
 static a_reg_t push_reg(struct a_func *self, a_reg_t reg) {

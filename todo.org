@@ -1,11 +1,16 @@
-* remove func/prim ref_count
-** add type/func/prim pools
+* switch func args/rets to fixed max sizes
+** switch from alloc to fixed sizes
+** pass by value
 * add fix type
 ** uint64
 ** max 8 decimals
 ** add parser
 *** period digit
 * add or/and prims
+* add tuples
+** <42 T Int>
+** length
+** allocate items like string
 * add binding pool
 ** add vm.free_bindings like val
 ** use in scope/lib

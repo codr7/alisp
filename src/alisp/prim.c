@@ -7,7 +7,7 @@
 struct a_prim *a_prim(struct a_vm *vm,
 		      struct a_string *name,
 		      int8_t min_args, int8_t max_args) {
-  return a_prim_init(a_malloc(vm, sizeof(struct a_prim)), name, min_args, max_args);
+  return a_prim_init(a_pool_alloc(&vm->prim_pool), name, min_args, max_args);
 }
 
 
@@ -18,19 +18,7 @@ struct a_prim *a_prim_init(struct a_prim *self,
   self->min_args = min_args;
   self->max_args = max_args;
   self->body = NULL;
-  self->ref_count = 1;
   return self;
-}
-
-struct a_prim *a_prim_ref(struct a_prim *self) {
-  self->ref_count++;
-  return self;
-}
-
-bool a_prim_deref(struct a_prim *self) {
-  assert(self->ref_count);
-  if (--self->ref_count) { return false; }
-  return true;
 }
 
 bool a_prim_call(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {

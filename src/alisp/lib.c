@@ -49,15 +49,11 @@ struct a_func *a_lib_bind_func(struct a_lib *self, struct a_func *func) {
 	a_fail("Failed adding func: %s", func->name->data);
 	return NULL;
       }
-      
-      a_func_deref(func, self->vm);
     } else if (v->type == &self->vm->abc.multi_type) {
       if (!a_multi_add(v->as_multi, func)) {
 	a_fail("Failed adding func: %s", func->name->data);
 	return NULL;
       }
-
-      a_func_deref(func, self->vm);
     } else {
       a_fail("Invalid func binding: %s", v->type->name->data);
       return NULL;

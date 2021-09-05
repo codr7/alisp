@@ -287,7 +287,6 @@ static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_str
 	a_val_init(v, &vm->abc.multi_type);
 	v->as_multi = a_multi(vm, f->name, f->args->count);
 	a_multi_add(v->as_multi, f);
-	a_func_deref(f, vm);
       } else if (v->type == &vm->abc.multi_type) {
 	a_multi_add(v->as_multi, f);      
       } else {

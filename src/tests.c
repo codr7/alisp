@@ -63,7 +63,7 @@ static void test_func() {
 
   f.body = test_func_foo_body;
   struct a_val *t = a_val(&vm.abc.func_type);
-  t->as_func = a_func_ref(&f);
+  t->as_func = &f;
   a_emit(&vm, A_CALL_OP)->as_call.target = t;
   a_emit(&vm, A_STOP_OP);
 
@@ -77,7 +77,6 @@ static void test_func() {
   assert(v->as_int == 42);
   a_val_deref(v);
   a_val_free(v, &vm);
-  a_func_deref(&f, &vm);
   a_vm_deinit(&vm);
 }
 
@@ -97,7 +96,7 @@ static void test_func_emit() {
   a_func_end(&f, &vm);
   
   struct a_val *t = a_val(&vm.abc.func_type);
-  t->as_func = a_func_ref(&f);
+  t->as_func = &f;
   a_emit(&vm, A_CALL_OP)->as_call.target = t;
   a_emit(&vm, A_STOP_OP);
   a_eval(&vm, pc);
@@ -108,7 +107,6 @@ static void test_func_emit() {
   assert(v->as_int == 42);
   a_val_deref(v);
   a_val_free(v, &vm);
-  a_func_deref(&f, &vm);
   a_vm_deinit(&vm);
 }
 
