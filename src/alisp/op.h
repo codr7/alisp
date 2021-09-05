@@ -11,7 +11,7 @@ enum a_op_type {
   A_DROP_OP, A_DUP_OP,
   A_FENCE_OP, A_GOTO_OP, A_LOAD_OP, A_PUSH_OP,
   A_RESET_OP, A_RET_OP,
-  A_STORE_OP, A_SWAP_OP, A_ZIP_OP};
+  A_STORE_OP, A_SWAP_OP, A_TEST_OP, A_ZIP_OP};
 
 struct a_bench_op {
   int reps;
@@ -61,6 +61,12 @@ struct a_swap_op {
   int8_t offset;
 };
 
+struct a_test_op {
+  struct a_string *desc;
+  struct a_ls stack;
+  a_pc_t end_pc;
+};
+
 struct a_op {
   struct a_ls pc;
   enum a_op_type type;
@@ -77,11 +83,11 @@ struct a_op {
     struct a_ret_op as_ret;
     struct a_store_op as_store;
     struct a_swap_op as_swap;
+    struct a_test_op as_test;
   };
 };
 
 struct a_op *a_op_init(struct a_op *self, enum a_op_type type);
-void a_op_deinit(struct a_op *self);
 a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm);
 
 #endif

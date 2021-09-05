@@ -505,6 +505,65 @@ static a_pc_t tail_pair_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
+static bool test_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_ls *a = args;
+  struct a_form *desc_form = a_baseof((a = a->next), struct a_form, ls);
+  struct a_val *desc = a_form_val(desc_form, vm);
+  
+  if (!desc) {
+    a_fail("Missing description");
+    return false;
+  }
+
+  if (desc->type != &vm->abc.string_type) {
+    a_fail("Invalid description: %s", desc->type->name->data);
+    return false;
+  }
+  
+  struct a_form *stack_form = a_baseof((a = a->next), struct a_form, ls);
+  struct a_val *stack = a_form_val(stack_form, vm);
+  
+  if (!stack) {
+    a_fail("Missing stack");
+    return false;
+  }
+
+  if (stack->type != &vm->abc.pair_type) {
+    a_fail("Invalid stack: %s", stack->type->name->data);
+    return false;
+  }
+  
+  struct a_test_op *op = &a_emit(vm, A_TEST_OP)->as_test;
+  op->desc = desc->as_string;
+  
+  struct a_val *src = stack;
+
+  for (;;) {
+    if (src->type == &vm->abc.pair_type) {
+      struct a_val *dst = a_val(src->as_pair.left->type);
+      a_copy(dst, src->as_pair.left);
+      a_ls_push(&op->stack, &dst->ls);
+      src = src->as_pair.right;
+    } else {
+      if (src->type != &vm->abc.nil_type) {
+	struct a_val *dst = a_val(src->type);
+	a_copy(dst, src);
+	a_ls_push(&op->stack, &dst->ls);
+      }
+      
+      break;
+    }
+  }
+  
+  while ((a = a->next) != args) {
+    if (!a_form_emit(a_baseof(a, struct a_form, ls), vm)) { return false; }
+  }
+
+  a_emit(vm, A_STOP_OP);
+  op->end_pc = a_pc(vm);
+  return true;
+}
+
 static bool unbind_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   struct a_form *id = a_baseof(args->next, struct a_form, ls);
 
@@ -547,7 +606,10 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 
   a_lib_bind_type(&self->lib, a_reg_type_init(&self->reg_type, vm, a_string(vm, "Reg"),
 					      A_SUPER(&self->any_type)));
-  
+
+  a_lib_bind_type(&self->lib, a_string_type_init(&self->string_type, vm, a_string(vm, "String"),
+						 A_SUPER(&self->any_type)));
+
   a_lib_bind_type(&self->lib, a_prim_type_init(&self->prim_type, vm, a_string(vm, "Prim"),
 					       A_SUPER(&self->any_type)));
 
@@ -643,6 +705,8 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_func(&self->lib,
 		  a_func(vm, a_string(vm, "tail"), A_ARG(vm, {a_string(vm, "val"), &vm->abc.pair_type}),
 			 A_RET(vm, &vm->abc.any_type)))->body = tail_pair_body;
+
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "test"), 2, -1))->body = test_body;
 
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "unbind"), 1, 1))->body = unbind_body;
 

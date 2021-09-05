@@ -1,10 +1,12 @@
 #include <assert.h>
+#include <errno.h>
 #include <stdio.h>
 #include "alisp/fail.h"
 #include "alisp/form.h"
 #include "alisp/frame.h"
 #include "alisp/func.h"
 #include "alisp/multi.h"
+#include "alisp/parser.h"
 #include "alisp/prim.h"
 #include "alisp/scope.h"
 #include "alisp/stack.h"
@@ -57,11 +59,6 @@ void a_vm_deinit(struct a_vm *self) {
     struct a_scope *s = a_baseof(sls, struct a_scope, ls);
     a_scope_deref(s);
     if (s != &self->main) { a_free(self, s); }
-  }
-
-  a_ls_do(&self->code, ols) {
-    struct a_op *o = a_baseof(ols, struct a_op, pc);
-    a_op_deinit(o);
   }
 
   a_pool_deinit(&self->val_pool);
@@ -149,6 +146,28 @@ void a_store(struct a_vm *self, a_reg_t reg, struct a_val *val) {
 
 }
 
+bool a_include(struct a_vm *self, const char *path) {
+  FILE *in = fopen(path, "r");
+  if (!in) { a_fail("Failed opening file: %d", errno); }
+  a_pc_t pc = a_pc(self);
+
+  struct a_parser parser;
+  a_parser_init(&parser, self, a_string(self, path));
+  while (!feof(in)) { a_stream_getline(&parser.in, in); }
+  fclose(in);
+  
+  while (a_parser_next(&parser));
+  struct a_form *f;
+    
+  while ((f = a_parser_pop(&parser))) {
+    if (!a_form_emit(f, self)) { return false; }
+    if (a_form_deref(f, self)) { a_free(self, f); }
+  }
+  
+  a_emit(self, A_STOP_OP);
+  return (a_pc(self) == pc) ? true : a_analyze(self, pc) && a_eval(self, pc);
+}
+	     
 void *a_malloc(struct a_vm *vm, uint32_t size) { return malloc(size); }
 
 void a_free(struct a_vm *vm, void *p) { free(p); }

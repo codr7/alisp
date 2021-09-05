@@ -19,7 +19,13 @@
 
 bool a_eval(struct a_vm *self, a_pc_t pc) {
   static const void* dispatch[] = {&&STOP,
-    &&BENCH, &&BRANCH, &&CALL, &&DROP, &&DUP, &&FENCE, &&GOTO, &&LOAD, &&PUSH, &&RESET, &&RET, &&STORE, &&SWAP, &&ZIP
+    &&BENCH, &&BRANCH,
+    &&CALL,
+    &&DROP, &&DUP,
+    &&FENCE, &&GOTO, &&LOAD, &&PUSH,
+    &&RESET, &&RET,
+    &&STORE, &&SWAP,
+    &&TEST, &&ZIP
   };
   
   A_DISPATCH(pc);
@@ -222,6 +228,38 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     a_ls_push(&x->ls, a_ls_pop(&y->ls));
     a_ls_push(&self->stack, a_ls_pop(&x->ls));
     A_DISPATCH(pc);    
+  }
+
+ TEST: {
+    A_TRACE(BENCH);
+    struct a_test_op *op = &a_baseof(pc, struct a_op, pc)->as_test;
+    struct a_ls stack = self->stack;
+    a_ls_init(&self->stack);
+    printf("Testing %s...", op->desc->data);
+    bool ok = true;
+    if (!a_eval(self, pc)) { return false; }
+
+    for (struct a_ls *exp = op->stack.prev, *act = self->stack.prev; exp != &op->stack; exp = exp->prev, act = act->prev) {
+      if (act == &self->stack || !a_equals(a_baseof(act, struct a_val, ls), a_baseof(exp, struct a_val, ls))) {
+	ok = false;
+	break;
+      }
+    }
+
+    if (ok) {
+      printf("success!\n");
+    } else {
+	printf("failure!\n");
+	printf("Expected: ");
+	a_stack_dump(&op->stack);
+	printf("\nActual:   ");
+	a_stack_dump(&self->stack);
+	putc('\n', stdout);
+    }
+    
+    a_reset(self);
+    self->stack = stack;
+    A_DISPATCH(op->end_pc);
   }
 
  ZIP: {

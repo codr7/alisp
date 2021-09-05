@@ -196,8 +196,15 @@ struct a_form *a_parse_int(struct a_parser *self) {
   
   while ((c = a_stream_getc(&self->in))) {
     if (c == '.') {
+      c = a_stream_getc(&self->in);
       a_stream_ungetc(&self->in);
-      return a_parse_fix(self, neg ? -v : v);
+	
+      if (c) {
+	a_stream_ungetc(&self->in);
+	if (isdigit(c)) { return a_parse_fix(self, neg ? -v : v); }
+      }
+      
+      break;
     }
     
     if (!isdigit(c)) {
@@ -268,5 +275,29 @@ struct a_form *a_parse_pair(struct a_parser *self) {
   struct a_form *f = a_parser_push(self, A_PAIR_FORM, l->pos);
   f->as_pair.left = l;
   f->as_pair.right = r;
+  return f;
+}
+
+struct a_form *a_parse_string(struct a_parser *self) {
+  struct a_pos fpos = self->pos;
+  if (!a_parser_check(self, '"')) { return NULL; }
+  struct a_stream out;
+  a_stream_init(&out);
+  char c = 0;
+  
+  while ((c = a_stream_getc(&self->in))) {
+    self->pos.column++;
+    if (c == '"') { break; }
+    a_stream_putc(&out, c);
+  }
+
+  if (c != '"') {
+    a_fail("Open string");
+    return NULL;
+  }
+  
+  struct a_form *f = a_parser_push(self, A_LIT_FORM, fpos);
+  a_val_init(&f->as_lit.val, &self->vm->abc.string_type)->as_string = a_string(self->vm, out.data);
+  a_stream_deinit(&out);
   return f;
 }

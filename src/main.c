@@ -1,29 +1,25 @@
 #include <stdio.h>
 #include "alisp/parser.h"
-#include "alisp/parsers.h"
 #include "alisp/stack.h"
 #include "alisp/stream.h"
 #include "alisp/string.h"
 #include "alisp/vm.h"
 
-int main() {
+int main(int argc, char *argv[]) {
+  struct a_vm vm;
+  a_vm_init(&vm);
+
+  if (argc > 1) {
+    if (!a_include(&vm, argv[1])) { return -1; }
+    return 0;
+  }
+
   printf("Welcome to aLisp v%d\n\n", A_VERSION);
   printf("Return on empty line evaluates,\n");
   printf("(reset) clears the stack and Ctrl+D exits.\n\n");
 	 
-  struct a_vm vm;
-  a_vm_init(&vm);
-  a_emit(&vm, A_STOP_OP);
-  
   struct a_parser parser;
   a_parser_init(&parser, &vm, a_string(&vm, "repl"));
-  a_parser_add_prefix(&parser, a_skip_space);
-  a_parser_add_prefix(&parser, a_parse_int);
-  a_parser_add_prefix(&parser, a_parse_call);
-  a_parser_add_prefix(&parser, a_parse_list);
-  a_parser_add_prefix(&parser, a_parse_id);
-  a_parser_add_suffix(&parser, a_parse_dot);
-  a_parser_add_suffix(&parser, a_parse_pair);
   
   while (!feof(stdin)) {
     printf("  ");
@@ -35,14 +31,13 @@ int main() {
     struct a_form *f;
     
     while ((f = a_parser_pop(&parser))) {
-      a_form_emit(f, &vm);
+      if (!a_form_emit(f, &vm)) { return -1; }
       a_form_deref(f, &vm);
     }
     
     if (a_pc(&vm) != pc) {
       a_emit(&vm, A_STOP_OP);
-      a_analyze(&vm, pc);
-      a_eval(&vm, pc);
+      if (!a_analyze(&vm, pc) || !a_eval(&vm, pc)) { return -1; }
     }
     
     a_stack_dump(&vm.stack);

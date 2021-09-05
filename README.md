@@ -365,6 +365,7 @@ The following types are provided out of the box, adding more is trivial.
 - Pair: Any List - Pair values
 - Prim: Any - Primitives as values
 - Reg: Any - Registers as values
+- String: Any - String values
 - Target: Any - Callable values
 
 ### debugging
@@ -377,13 +378,38 @@ The following types are provided out of the box, adding more is trivial.
 []
 ```
 
+### testing
+
+`test` runs the specified body and checks the stack against specified suffix, it fails with specified message on mismatch.
+
+```
+  (test "insanity" [4] 1.(+ 2))
+
+Testing insanity...failure!
+Expected: [4]
+Actual:   [3]
+[]
+```
+
+aLisp includes a modest but growing [test suite](https://github.com/codr7/alisp/blob/main/src/tests.alisp).
+
+```
+$ cd alisp/build
+$ ./alisp ../src/tests.alisp
+Testing int add...success!
+Testing int sub...success!
+Testing fix...success!
+Testing fix add...success!
+Testing fix sub...success!
+```
+
 ### compile time evaluation
 `ceval` may be used to evaluate forms at compile time and emit code to push their results.
 
 ```
-  (func foo [] [Int] (ceval 35.(+ 7) (dup).(dump)))
+  (func foo [] [Int] (ceval (dump "here!") 35.(+ 7)))
 
-42
+"here!"
 []
 
   (foo)

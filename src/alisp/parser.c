@@ -1,4 +1,5 @@
 #include "alisp/parser.h"
+#include "alisp/parsers.h"
 #include "alisp/vm.h"
 
 struct a_parser *a_parser_init(struct a_parser *self, struct a_vm *vm, struct a_string *source) {
@@ -8,6 +9,16 @@ struct a_parser *a_parser_init(struct a_parser *self, struct a_vm *vm, struct a_
   a_ls_init(&self->suffix);
   a_ls_init(&self->forms);
   a_stream_init(&self->in);
+
+  a_parser_add_prefix(self, a_skip_space);
+  a_parser_add_prefix(self, a_parse_int);
+  a_parser_add_prefix(self, a_parse_call);
+  a_parser_add_prefix(self, a_parse_string);  
+  a_parser_add_prefix(self, a_parse_list);
+  a_parser_add_prefix(self, a_parse_id);
+  a_parser_add_suffix(self, a_parse_dot);
+  a_parser_add_suffix(self, a_parse_pair);
+
   return self;
 }
 

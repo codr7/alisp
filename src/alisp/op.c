@@ -12,10 +12,16 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
 
   switch (self->type) {
   case A_CALL_OP:
+    self->as_call.target = NULL;
     self->as_call.flags = 0;
     break;
   case A_BENCH_OP:
+    self->as_bench.reps = 1;
+    self->as_bench.end_pc = NULL;
+    break;
   case A_BRANCH_OP:
+    self->as_branch.right_pc = NULL;
+    break;
   case A_DROP_OP:
     self->as_drop.offset = 0;
     self->as_drop.count = 1;
@@ -23,54 +29,37 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
   case A_DUP_OP:
     self->as_dup.offset = 0;
     break;
+  case A_GOTO_OP:
+    self->as_goto.pc = NULL;
+    break;
   case A_LOAD_OP:
+    self->as_load.reg = -1;
     self->as_load.type = NULL;
     break;
   case A_RET_OP:
     self->as_ret.func = NULL;
     self->as_ret.check = true;
     break;
-  case A_FENCE_OP:
-  case A_GOTO_OP:
-  case A_PUSH_OP:
-  case A_RESET_OP:
-  case A_STOP_OP:
   case A_STORE_OP:
+    self->as_store.reg = -1;
+    break;
   case A_SWAP_OP:
     self->as_swap.offset = 0;
     break;
+  case A_TEST_OP:
+    self->as_test.desc = NULL;
+    a_ls_init(&self->as_test.stack);
+    self->as_test.end_pc = NULL;
+    break;
+  case A_FENCE_OP:
+  case A_PUSH_OP:
+  case A_RESET_OP:
+  case A_STOP_OP:
   case A_ZIP_OP:
     break;
   }
 
   return self;
-}
-
-void a_op_deinit(struct a_op *self) {
-  switch (self->type) {
-  case A_CALL_OP: {
-    struct a_val *t = self->as_call.target;
-    if (t) { a_val_deref(t); }
-    break;
-  }
-  case A_PUSH_OP:
-    a_val_deref(&self->as_push.val);
-    break;
-  case A_BENCH_OP:
-  case A_BRANCH_OP:
-  case A_DROP_OP:
-  case A_DUP_OP:
-  case A_FENCE_OP:
-  case A_GOTO_OP:
-  case A_LOAD_OP:
-  case A_STOP_OP:
-  case A_RESET_OP:
-  case A_RET_OP:
-  case A_STORE_OP:
-  case A_SWAP_OP:
-  case A_ZIP_OP:
-    break;
-  }
 }
 
 a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {  
@@ -245,6 +234,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
   }
     
   case A_BENCH_OP:
+  case A_TEST_OP:
     break;
   }
 

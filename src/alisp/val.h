@@ -9,6 +9,7 @@
 struct a_func;
 struct a_multi;
 struct a_prim;
+struct a_string;
 struct a_type;
 struct a_vm;
 
@@ -28,6 +29,7 @@ struct a_val {
     struct a_pair as_pair;
     struct a_prim *as_prim;
     a_reg_t as_reg;
+    struct a_string *as_string;
   };
 };
 
