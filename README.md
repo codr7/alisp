@@ -17,7 +17,7 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v9
+Welcome to aLisp v10
 
 Return on empty line evaluates,
 (reset) clears the stack and Ctrl+D exits.
