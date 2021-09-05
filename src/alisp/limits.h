@@ -3,6 +3,7 @@
 
 #define A_FRAME_COUNT 128
 #define A_MAX_ARGS 8
+#define A_MAX_FIX_SCALE 8
 #define A_MAX_RETS 8
 #define A_REG_COUNT 128
 

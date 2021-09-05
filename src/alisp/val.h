@@ -1,6 +1,7 @@
 #ifndef ALISP_VAL_H
 #define ALISP_VAL_H
 
+#include "alisp/fix.h"
 #include "alisp/ls.h"
 #include "alisp/pair.h"
 #include "alisp/types.h"
@@ -18,8 +19,9 @@ struct a_val {
   
   union  {
     bool as_bool;
+    struct a_fix as_fix;
     struct a_func *as_func;
-    int as_int;
+    int64_t as_int;
     struct a_ls *as_ls;
     struct a_type *as_meta;
     struct a_multi *as_multi;

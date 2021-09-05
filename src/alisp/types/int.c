@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <stdio.h>
 #include "alisp/type.h"
 #include "alisp/val.h"
@@ -9,7 +10,7 @@ static enum a_order compare_val(struct a_val *x, struct a_val *y) {
 
 static void copy_val(struct a_val *dst, struct a_val *src) { dst->as_int = src->as_int; }
 
-static void dump_val(struct a_val *val) { printf("%d", val->as_int); }
+static void dump_val(struct a_val *val) { printf("%" PRId64, val->as_int); }
 
 static bool is_val(struct a_val *x, struct a_val *y) { return x->as_int == y->as_int; }
 

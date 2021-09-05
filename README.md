@@ -177,6 +177,52 @@ Every value has a boolean representation; most are true but zero, empty lists et
 [2]
 ```
 
+### fixpoints
+Fixpoint literals are scaled to the specified number of decimals.
+
+```
+  1.5
+
+[1.5]
+```
+
+Addition and subtraction keep the maximum operand scale.
+
+```
+  1.5.(+ 0.75)
+
+[2.25]
+```
+
+`fix` may be used to scale integers.
+
+```
+  (fix 225 2)
+
+[2.25]
+```
+
+`scale-of` may be used to get the scale of a fixpoint.
+
+```
+  (scale-of 2.25)
+
+[2]
+```
+
+`trunc` and `frac` may be used to get integral and fractional parts.
+
+```
+  (trunc 2.25)
+
+[2]
+```
+```
+  (frac 2.25)
+
+[0.25]
+```
+
 ### pairs
 Pairs may be formed using `:`.
 
@@ -309,6 +355,7 @@ The following types are provided out of the box, adding more is trivial.
 
 - Any  - Any value
 - Bool: Any - Boolean values
+- Fix: Any Num - Fixpoint values
 - Func: Any Target - Functions as values
 - Int: Any Num - Integer values
 - List - List values

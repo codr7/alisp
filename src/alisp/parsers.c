@@ -102,6 +102,42 @@ struct a_form *a_parse_dot(struct a_parser *self) {
   return call;
 }
 
+struct a_form *a_parse_fix(struct a_parser *self, int64_t trunc) {
+  struct a_pos fpos = self->pos;
+  if (!a_parser_check(self, '.')) { return NULL; }
+
+  char c = a_stream_getc(&self->in);
+  if (!c) { return false; }
+  a_stream_ungetc(&self->in);
+  
+  if (!isdigit(c)) {
+      a_stream_ungetc(&self->in);
+      return false;
+  }
+
+  int64_t v = 0;
+  int n = 0;
+  
+  while ((c = a_stream_getc(&self->in))) {
+    if (!isdigit(c)) {
+      a_stream_ungetc(&self->in);
+      break;
+    }
+    
+    v *= 10;
+    v += c - '0';
+    self->pos.column++;
+    n++;
+  }
+
+  if (!n) { return NULL; }
+  int scale = self->pos.column - fpos.column - 1;
+  struct a_form *f = a_parser_push(self, A_LIT_FORM, fpos);
+  if (trunc < 0) { v = -v; }
+  a_val_init(&f->as_lit.val, &self->vm->math.fix_type)->as_fix = a_fix(trunc*a_pow(scale) + v, scale);
+  return f;  
+}
+
 struct a_form *a_parse_id(struct a_parser *self) {
   struct a_pos fpos = self->pos;
   struct a_stream out;
@@ -133,7 +169,7 @@ struct a_form *a_parse_id(struct a_parser *self) {
 }
 
 struct a_form *a_parse_int(struct a_parser *self) {
-  int v = 0;
+  int64_t v = 0;
   bool neg = false;
   struct a_pos fpos = self->pos;
   
@@ -156,18 +192,26 @@ struct a_form *a_parse_int(struct a_parser *self) {
       a_stream_ungetc(&self->in);    
   }
 
-   while ((c = a_stream_getc(&self->in))) {
-     if (!isdigit(c)) {
-       a_stream_ungetc(&self->in);
-       break;
-     }
+  int n = 0;
+  
+  while ((c = a_stream_getc(&self->in))) {
+    if (c == '.') {
+      a_stream_ungetc(&self->in);
+      return a_parse_fix(self, neg ? -v : v);
+    }
+    
+    if (!isdigit(c)) {
+      a_stream_ungetc(&self->in);
+      break;
+    }
+    
+    v *= 10;
+    v += c - '0';
+    self->pos.column++;
+    n++;
+  }
 
-     v *= 10;
-     v += c - '0';
-     self->pos.column++;
-   }
-
-   if (self->pos.column == fpos.column) { return NULL; }
+   if (!n) { return NULL; }
    struct a_form *f = a_parser_push(self, A_LIT_FORM, fpos);
    a_val_init(&f->as_lit.val, &self->vm->abc.int_type)->as_int = neg ? -v : v;
    return f;

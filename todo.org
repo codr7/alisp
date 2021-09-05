@@ -1,29 +1,14 @@
-* add fix type
-** uint64
-** max 8 decimals
-** add parser
-*** period digit
-* add or/and prims
-* add tuples
-** <42 T Int>
-** length
-** allocate items like string
-* add binding pool
-** add vm.free_bindings like val
-** use in scope/lib
-** extract a_binding()/a_binding_free()
-* move free into deref
-** scope/form
-*** grep remove free calls 
-* move val_deref into val_free
-*** grep remove deref calls
-* add scope pool
-** vm.free_scopes like val
 * add test prim
 ** (test "..." [stack] body)
 ** compare to stack prefix
 ** add test script
 *** run examples from README
+* add or/and prims
+* move free into deref
+** scope/form
+*** grep remove free calls 
+* move val_deref into val_free
+*** grep remove deref calls
 * add io.open
 ** add enums
 *** (enum OpenMode RD RW RD-OW APP RD-APP)
@@ -83,3 +68,11 @@
 ** skip arg/ret checks
 * add macros
 ** rewrite def as macro
+* add binding pool
+** add vm.free_bindings like val
+** use in scope/lib
+** extract a_binding()/a_binding_free()
+* add scope pool
+** vm.free_scopes like val
+* handle register target inside call op
+** replace LOAD in call form emit

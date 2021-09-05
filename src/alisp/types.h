@@ -17,6 +17,8 @@ typedef uint16_t a_type_id_t;
 
 struct a_type *a_bool_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 
+struct a_type *a_fix_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
+
 struct a_type *a_func_type_init(struct a_type *self,
 				struct a_vm *vm,
 				struct a_string *name,
