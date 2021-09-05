@@ -1,8 +1,11 @@
 * remove func/prim ref_count
 ** add type/func/prim pools
-* add unbind prim
-** (let [foo 42] (unbind foo) foo)
-** add to readme/bindings
+* add fix type
+** uint64
+** max 8 decimals
+** add parser
+*** period digit
+* add or/and prims
 * add binding pool
 ** add vm.free_bindings like val
 ** use in scope/lib
@@ -57,7 +60,6 @@
 ** scan code for STORE & push reg
 * add strings
 * add iterators
-* add or/and prims
 * add recoverable errors
 ** add vm.errors
 ** add struct a_error like form

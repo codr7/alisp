@@ -124,6 +124,17 @@ Bindings may be aliased within the current scope using `alias`.
 [Int]
 ```
 
+Bindings may be removed from the current scope using `unbind`.
+```
+  +
+
+[Func(+)]
+
+  (unbind +) +
+
+Unknown id: +
+```
+
 ### equality
 `is` returns `T` if both arguments are the same value.
 

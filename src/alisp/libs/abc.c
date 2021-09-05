@@ -535,6 +535,18 @@ static a_pc_t tail_pair_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
+static bool unbind_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_form *id = a_baseof(args->next, struct a_form, ls);
+
+  if (id->type != A_ID_FORM) {
+    a_fail("Invalid id: %d", id->type);
+    return false;
+  }
+
+  a_scope_unbind(a_scope(vm), id->as_id.name);
+  return true;
+}
+
 struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_init(&self->lib, vm, a_string(vm, "abc"));
   a_lib_bind_type(&self->lib, a_type_init(&self->any_type, vm, a_string(vm, "Any"), A_SUPER(NULL)));
@@ -662,6 +674,8 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_func(&self->lib,
 		  a_func(vm, a_string(vm, "tail"), A_ARG(vm, {a_string(vm, "val"), &vm->abc.pair_type}),
 			 A_RET(vm, &vm->abc.any_type)))->body = tail_pair_body;
+
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "unbind"), 1, 1))->body = unbind_body;
 
   return self;
 }
