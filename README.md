@@ -1,7 +1,7 @@
 ## aLisp
 
 ### intro
-aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom Lisp implemented in portable C. The current version weighs in at 4 kloc and supports all features described in this document.
+aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom Lisp implemented in portable C. The current version weighs in at 5 kloc and supports all features described in this document.
 
 ### quirks
 - Parens are used for calls, brackets for lists.
