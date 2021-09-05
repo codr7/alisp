@@ -203,12 +203,12 @@ The canonical tail recursive transformation goes something like this:
 ```
   (func map [in:List t:Target] [List]
     (func helper [in:Any out:Any] [List]
-      (if (nil? in)
-        (reverse out)
-        (helper:t (tail in) (t (head in)):out)))
+      (if in.(nil?)
+        out.(reverse)
+        (helper:t in.(tail) (t in.(head)):out)))
     (helper:t in NIL))
 
-  (map [1 2 3] ([Int] [Int] _.(+ 1)))
+  [1 2 3].(map ([Int] [Int] _.(+ 1)))
 
 [2:3:4]
 ```

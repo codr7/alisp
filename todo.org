@@ -1,3 +1,24 @@
+* remove func/prim ref_count
+** add type/func/prim pools
+* add unbind prim
+** (let [foo 42] (unbind foo) foo)
+** add to readme/bindings
+* add binding pool
+** add vm.free_bindings like val
+** use in scope/lib
+** extract a_binding()/a_binding_free()
+* move free into deref
+** scope/form
+* add scope pool/free_scopes
+* add test prim
+** (test "..." [stack] body)
+** compare to stack prefix
+** add test script
+*** run examples from README
+* add io.open
+** add enums
+*** (enum OpenMode RD RW RD-OW APP RD-APP)
+** add R/W/RWFile
 * add tasks
 ** struct a_task
 ** bool done
@@ -29,9 +50,6 @@
 ** move args on call
 ** move rets on returnb
 ** add a_ls_splice(self, fst, lst)
-* add test prim
-** (test "..." [stack] body)
-** add test script
 * add func op
 ** replaces skip goto in body
 ** reset & push unnamed args in analyze
@@ -40,9 +58,6 @@
 * add strings
 * add iterators
 * add or/and prims
-* add unbind prim
-** (let [foo 42] (unbind foo) foo)
-** add to readme/bindings
 * add recoverable errors
 ** add vm.errors
 ** add struct a_error like form
