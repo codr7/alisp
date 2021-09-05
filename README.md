@@ -115,8 +115,8 @@ Values may be bound to identifiers at runtime using `let`.
 [42]
 ```
 ```
-  (def foo Int)
-  foo
+  (def Foo Int)
+  Foo
   
 [Int]
 ```
