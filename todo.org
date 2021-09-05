@@ -1,3 +1,6 @@
+* add include prim
+** (include "x" "y" "z")
+** call a_include on args
 * add or/and prims
 * move free into deref
 ** scope/form
@@ -29,11 +32,6 @@
 **** add lset vm.syms
 ***** check in a_sym()
 ** add '-parser
-* add bool a_feval(vm, path)
-** add stream vm.path
-** add int a_push_path
-** add a_pop_path(int)
-** process ARGV & load files instead of repl
 * add separate func stacks
 ** store in frame
 ** move args on call
