@@ -1,6 +1,3 @@
-* switch func args/rets to fixed max sizes
-** switch from alloc to fixed sizes
-** pass by value
 * add fix type
 ** uint64
 ** max 8 decimals

@@ -177,7 +177,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
 
     struct a_ls *sp = self->stack.prev;
     
-    for (struct a_type **r = f->func->rets->items+f->func->rets->count-1; r >= f->func->rets->items; r--, sp = sp->prev) {
+    for (struct a_type **r = f->func->rets.items+f->func->rets.count-1; r >= f->func->rets.items; r--, sp = sp->prev) {
       if (sp == &self->stack) {
 	a_fail("Not enough return values on stack");
 	return false;
@@ -192,7 +192,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     }
 
     if (f->flags & A_CALL_MEM) { a_func_mem(f->func, self, f->mem); }
-    if (f->flags & A_CALL_DRETS) { a_drop(self, 0, f->func->rets->count); }
+    if (f->flags & A_CALL_DRETS) { a_drop(self, 0, f->func->rets.count); }
     A_DISPATCH(f->ret);
   }
   

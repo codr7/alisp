@@ -27,7 +27,7 @@ struct a_multi *a_multi_init(struct a_multi *self, struct a_string *name, uint8_
 }
 
 bool a_multi_add(struct a_multi *self, struct a_func *func) {
-  if (func->args->count != self->arg_count) {
+  if (func->args.count != self->arg_count) {
     a_fail("Func has wrong number of arguments");
     return false;
   }

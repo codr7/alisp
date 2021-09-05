@@ -2,6 +2,8 @@
 #define ALISP_LIMITS_H
 
 #define A_FRAME_COUNT 128
+#define A_MAX_ARGS 8
+#define A_MAX_RETS 8
 #define A_REG_COUNT 128
 
 #define A_FUNC_PAGE_SIZE 256

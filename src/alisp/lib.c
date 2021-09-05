@@ -38,7 +38,7 @@ struct a_func *a_lib_bind_func(struct a_lib *self, struct a_func *func) {
     if (v->type == &self->vm->abc.func_type) {
       struct a_func *prev = v->as_func;
       a_val_init(v, &self->vm->abc.multi_type);
-      v->as_multi = a_multi(self->vm, func->name, func->args->count);
+      v->as_multi = a_multi(self->vm, func->name, func->args.count);
       
       if (!a_multi_add(v->as_multi, prev)) {
 	a_fail("Failed adding func: %s", prev->name->data);

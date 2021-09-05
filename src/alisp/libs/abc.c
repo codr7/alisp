@@ -205,12 +205,8 @@ static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_str
     return NULL;
   }
 
-  uint8_t
-    farg_count = a_ls_count(&args_form->as_list.items),
-    fret_count = a_ls_count(&rets_form->as_list.items);
-  
-  struct a_args *fargs = a_args(vm, farg_count); 
-  struct a_arg *fap = fargs->items;
+  struct a_args fargs = A_ARG(vm);
+  struct a_arg *fap = fargs.items;
 
   a_ls_do(&args_form->as_list.items, als) {
     struct a_form *af = a_baseof(als, struct a_form, ls);
@@ -248,10 +244,11 @@ static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_str
     }
 
     fap++;
+    fargs.count++;
   }
   
-  struct a_rets *frets = a_rets(vm, fret_count);
-  struct a_type **frp = frets->items;
+  struct a_rets frets = A_RET(vm);
+  struct a_type **frp = frets.items;
   
   a_ls_do(&rets_form->as_list.items, rls) {
     struct a_form *rf = a_baseof(rls, struct a_form, ls);
@@ -274,6 +271,7 @@ static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_str
     }
     
     *frp++ = v->as_meta;
+    frets.count++;
   }
   
   struct a_func *f = a_func(vm, name, fargs, frets);
@@ -285,7 +283,7 @@ static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_str
     if (v) {
       if (v->type == &vm->abc.func_type) {
 	a_val_init(v, &vm->abc.multi_type);
-	v->as_multi = a_multi(vm, f->name, f->args->count);
+	v->as_multi = a_multi(vm, f->name, f->args.count);
 	a_multi_add(v->as_multi, f);
       } else if (v->type == &vm->abc.multi_type) {
 	a_multi_add(v->as_multi, f);      

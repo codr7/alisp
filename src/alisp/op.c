@@ -91,7 +91,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 	  struct a_ls *s = vm->stack.prev;
 	  bool applicable = true;
 	
-	  for (struct a_arg *a = f->args->items + f->args->count-1; a >= f->args->items; a--, s = s->prev) {
+	  for (struct a_arg *a = f->args.items + f->args.count-1; a >= f->args.items; a--, s = s->prev) {
 	    if (s == &vm->stack) {
 	      applicable = false;
 	      break;
@@ -118,10 +118,10 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 	  }
 	}
 
-	a_drop(vm, 0, f->args->count);
+	a_drop(vm, 0, f->args.count);
 
 	if (!(op->flags & A_CALL_DRETS)) {
-	  for (struct a_type **rt = f->rets->items; rt < f->rets->items + f->rets->count; rt++) {
+	  for (struct a_type **rt = f->rets.items; rt < f->rets.items + f->rets.count; rt++) {
 	    a_push(vm, *rt)->undef = true;
 	  }
 	}
@@ -179,7 +179,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
       struct a_ls *s = vm->stack.prev;
       bool ok = true;
 	
-      for (struct a_type **r = f->rets->items + f->rets->count-1; r >= f->rets->items; r--, s = s->prev) {
+      for (struct a_type **r = f->rets.items + f->rets.count-1; r >= f->rets.items; r--, s = s->prev) {
 	if (s == &vm->stack) {
 	  ok = false;
 	  break;
