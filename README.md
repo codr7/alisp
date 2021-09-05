@@ -114,17 +114,15 @@ Values may be bound to identifiers at runtime using `let`.
 
 [42]
 ```
-
-Bindings may be aliased within the current scope using `alias`.
-
 ```
-  Int.(alias foo)
+  (def foo Int)
   foo
   
 [Int]
 ```
 
 Bindings may be removed from the current scope using `unbind`.
+
 ```
   +
 

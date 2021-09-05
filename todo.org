@@ -12,7 +12,11 @@
 ** extract a_binding()/a_binding_free()
 * move free into deref
 ** scope/form
-* add scope pool/free_scopes
+*** grep remove free calls 
+* move val_deref into val_free
+*** grep remove deref calls
+* add scope pool
+** vm.free_scopes like val
 * add test prim
 ** (test "..." [stack] body)
 ** compare to stack prefix
