@@ -1,6 +1,9 @@
-* add include prim
-** (include "x" "y" "z")
-** call a_include on args
+* add import prim
+** add lib type
+** bind abc/math
+** don't include anything automatically in scripts
+** change a_lib_import to take single string arg
+*** extract a_lib_import_all
 * add or/and prims
 * move free into deref
 ** scope/form
@@ -68,3 +71,11 @@
 ** vm.free_scopes like val
 * handle register target inside call op
 ** replace LOAD in call form emit
+
+Jag har rest runt i Europa dom senaste 10 åren, sedan ashramet för att vara exakt.
+Jag har inte så många kontakter kvar och alla är väldigt rädda och misstänksamma mot främlingar nuförtiden.
+Så dom senaste två åren har jag mer eller mindre suttit hemma och stirrat in i väggen 24/7.
+Det stora skämtet är att jag är inte här för min egen skull; jag behöver ett sammanhang, riktiga människor, för att livet ska kännas meningsfullt.
+Julen är värsta mardrömmen, kunde jag sova igenom hela eländet så hade jag gjort det.
+
+

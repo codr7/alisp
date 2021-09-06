@@ -355,6 +355,22 @@ static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uin
   return true;
 }
 
+static bool include_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  a_ls_do(args, a) {
+    struct a_form *f = a_baseof(a, struct a_form, ls);
+    struct a_val *v = a_form_val(f, vm);
+
+    if (!v || v->type != &vm->abc.string_type) {
+      a_fail("Invalid path");
+      return false;
+    }
+
+    a_include(vm, v->as_string->data);
+  }
+
+  return true;
+}
+
 static a_pc_t is_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_pop(vm);
   a_push(vm, &vm->abc.bool_type)->as_bool = a_is(x, y);
@@ -666,6 +682,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 			 A_RET(vm, &vm->abc.any_type)))->body = head_pair_body;
 
   a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "if"), 2, 3))->body = if_body;
+  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "include"), 0, -1))->body = include_body;
 
   a_lib_bind_func(&self->lib,
 		  a_func(vm, a_string(vm, "is"),

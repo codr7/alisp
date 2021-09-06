@@ -95,6 +95,26 @@ Values are pushed on the stack.
 
 [1 3 2]
 ```
+### scripts
+`alisp` will load and evaluate the contents of the file pointed to by it's first argument if any.
+
+./test.alisp
+```
+(dump 42)
+```
+```
+$ ./alisp test.alisp
+42
+```
+
+`include` may be used to inline the contents of additional files.
+
+```
+  (include "test.alisp")
+
+42
+[]
+```
 
 ### bindings
 Values may be bound to identifiers at runtime using `let`.

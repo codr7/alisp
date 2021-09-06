@@ -149,7 +149,6 @@ void a_store(struct a_vm *self, a_reg_t reg, struct a_val *val) {
 bool a_include(struct a_vm *self, const char *path) {
   FILE *in = fopen(path, "r");
   if (!in) { a_fail("Failed opening file: %d", errno); }
-  a_pc_t pc = a_pc(self);
 
   struct a_parser parser;
   a_parser_init(&parser, self, a_string(self, path));
@@ -164,10 +163,16 @@ bool a_include(struct a_vm *self, const char *path) {
     if (a_form_deref(f, self)) { a_free(self, f); }
   }
   
-  a_emit(self, A_STOP_OP);
-  return (a_pc(self) == pc) ? true : a_analyze(self, pc) && a_eval(self, pc);
+  return true;
 }
-	     
+
+bool a_feval(struct a_vm *self, const char *path) {
+  a_pc_t pc = a_pc(self);
+  if (!a_include(self, path)) { return false; }  
+  a_emit(self, A_STOP_OP);
+  return a_analyze(self, pc) && a_eval(self, pc);
+}
+
 void *a_malloc(struct a_vm *vm, uint32_t size) { return malloc(size); }
 
 void a_free(struct a_vm *vm, void *p) { free(p); }

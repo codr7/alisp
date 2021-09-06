@@ -10,7 +10,7 @@ int main(int argc, char *argv[]) {
   a_vm_init(&vm);
 
   if (argc > 1) {
-    if (!a_include(&vm, argv[1])) { return -1; }
+    if (!a_feval(&vm, argv[1])) { return -1; }
     return 0;
   }
 

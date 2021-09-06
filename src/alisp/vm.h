@@ -49,7 +49,9 @@ struct a_frame *a_push_frame(struct a_vm *self,
 
 struct a_frame *a_pop_frame(struct a_vm *self);
 void a_store(struct a_vm *self, a_reg_t reg, struct a_val *val);
+
 bool a_include(struct a_vm *self, const char *path);
+bool a_feval(struct a_vm *self, const char *path);
 
 void *a_malloc(struct a_vm *vm, uint32_t size);
 void a_free(struct a_vm *vm, void *p);

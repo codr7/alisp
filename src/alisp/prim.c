@@ -24,8 +24,7 @@ struct a_prim *a_prim_init(struct a_prim *self,
 bool a_prim_call(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   assert(self->body);
   
-  if ((self->min_args != -1 && arg_count < self->min_args) ||
-      (self->max_args != -1 && arg_count > self->max_args)) {
+  if ((arg_count < self->min_args) || (self->max_args != -1 && arg_count > self->max_args)) {
     a_fail("Wrong number of arguments: %" PRIu8, arg_count);
     return false;
   }
