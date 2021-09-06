@@ -1,3 +1,9 @@
+* bayes
+** add *(float int)
+** add /(float int)
+** readme
+* move val_deref into val_free
+*** grep remove deref calls
 * add map iter
 * add for prim
 * add import prim
@@ -6,8 +12,6 @@
 ** don't include anything automatically in scripts
 ** change a_lib_import to take single string arg
 *** extract a_lib_import_all
-* move val_deref into val_free
-*** grep remove deref calls
 * move free into deref
 ** scope/form
 *** grep remove free calls 

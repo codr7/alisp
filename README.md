@@ -408,7 +408,7 @@ The following types are provided out of the box, adding more is trivial.
 
 - Any  - Any value
 - Bool: Any - Boolean values
-- Fix: Num - Fixed point values
+- Fix: Num - Fix point values
 - Float: Num - Floating point values
 - Func: Target - Functions as values
 - Int: Num Seq - Integer values
@@ -416,6 +416,7 @@ The following types are provided out of the box, adding more is trivial.
 - Meta: Any - Types as values
 - Multi: Target - Dispatchers as values
 - Nil: List - Missing values
+- Num: Any - Numeric values
 - Pair: List - Pair values
 - Prim: Any - Primitives as values
 - Reg: Any - Registers as values
