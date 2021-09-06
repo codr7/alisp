@@ -21,8 +21,9 @@ struct a_val {
   union  {
     bool as_bool;
     struct a_fix as_fix;
+    a_float_t as_float;
     struct a_func *as_func;
-    int64_t as_int;
+    a_int_t as_int;
     struct a_ls *as_ls;
     struct a_type *as_meta;
     struct a_multi *as_multi;

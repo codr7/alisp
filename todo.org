@@ -1,15 +1,17 @@
+* add map iter
+* add for prim
 * add import prim
 ** add lib type
 ** bind abc/math
 ** don't include anything automatically in scripts
 ** change a_lib_import to take single string arg
 *** extract a_lib_import_all
-* add or/and prims
+* move val_deref into val_free
+*** grep remove deref calls
 * move free into deref
 ** scope/form
 *** grep remove free calls 
-* move val_deref into val_free
-*** grep remove deref calls
+* add or/and prims
 * add io.open
 ** add enums
 *** (enum OpenMode RD RW RD-OW APP RD-APP)
@@ -72,10 +74,26 @@
 * handle register target inside call op
 ** replace LOAD in call form emit
 
-Jag har rest runt i Europa dom senaste 10 åren, sedan ashramet för att vara exakt.
-Jag har inte så många kontakter kvar och alla är väldigt rädda och misstänksamma mot främlingar nuförtiden.
-Så dom senaste två åren har jag mer eller mindre suttit hemma och stirrat in i väggen 24/7.
-Det stora skämtet är att jag är inte här för min egen skull; jag behöver ett sammanhang, riktiga människor, för att livet ska kännas meningsfullt.
-Julen är värsta mardrömmen, kunde jag sova igenom hela eländet så hade jag gjort det.
+(defun bayesian-spam-probability (feature &optional
+                                  (assumed-probability 1/2)
+                                  (weight 1))
+  (let ((basic-probability (spam-probability feature))
+        (data-points (+ (spam-count feature) (ham-count feature))))
+    (/ (+ (* weight assumed-probability)
+          (* data-points basic-probability))
+       (+ weight data-points))))
 
+(defun fisher (probs number-of-probs)
+  "The Fisher computation described by Robinson."
+  (inverse-chi-square 
+   (* -2 (log (reduce #'* probs)))
+   (* 2 number-of-probs)))
 
+(defun inverse-chi-square (value degrees-of-freedom)
+  (assert (evenp degrees-of-freedom))
+  (min 
+   (loop with m = (/ value 2)
+      for i below (/ degrees-of-freedom 2)
+      for prob = (exp (- m)) then (* prob (/ m i))
+      summing prob)
+   1.0))

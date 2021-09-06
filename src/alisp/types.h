@@ -10,6 +10,8 @@ struct a_vm;
 
 enum a_call_flags {A_CALL_CHECK = 1, A_CALL_DRETS = 2, A_CALL_MEM = 4, A_CALL_TCO = 8};
 
+typedef long double a_float_t;
+typedef int64_t a_int_t;
 typedef uint16_t a_ref_count_t;
 typedef uint16_t a_reg_t;
 typedef struct a_ls *a_pc_t;
@@ -18,6 +20,11 @@ typedef uint16_t a_type_id_t;
 struct a_type *a_bool_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 
 struct a_type *a_fix_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
+
+struct a_type *a_float_type_init(struct a_type *self,
+				 struct a_vm *vm,
+				 struct a_string *name,
+				 struct a_type *super[]);
 
 struct a_type *a_func_type_init(struct a_type *self,
 				struct a_vm *vm,

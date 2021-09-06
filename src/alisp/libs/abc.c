@@ -595,36 +595,39 @@ static bool unbind_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args,
 struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_init(&self->lib, vm, a_string(vm, "abc"));
   a_lib_bind_type(&self->lib, a_type_init(&self->any_type, vm, a_string(vm, "Any"), A_SUPER(NULL)));
-  a_lib_bind_type(&self->lib, a_type_init(&self->list_type, vm, a_string(vm, "List"), A_SUPER(&self->any_type)));
   a_lib_bind_type(&self->lib, a_type_init(&self->num_type, vm, a_string(vm, "Num"), A_SUPER(&self->any_type)));
+  a_lib_bind_type(&self->lib, a_type_init(&self->seq_type, vm, a_string(vm, "Seq"), A_SUPER(&self->any_type)));
   a_lib_bind_type(&self->lib, a_type_init(&self->target_type, vm, a_string(vm, "Target"), A_SUPER(&self->any_type)));
-  
+
+  a_lib_bind_type(&self->lib, a_type_init(&self->list_type, vm, a_string(vm, "List"),
+					  A_SUPER(&self->seq_type)));
+
   a_lib_bind_type(&self->lib, a_bool_type_init(&self->bool_type, vm, a_string(vm, "Bool"),
 					       A_SUPER(&self->any_type)));
   
   a_lib_bind_type(&self->lib, a_func_type_init(&self->func_type, vm, a_string(vm, "Func"),
-					       A_SUPER(&self->any_type, &self->target_type)));
+					       A_SUPER(&self->target_type)));
 
   a_lib_bind_type(&self->lib, a_int_type_init(&self->int_type, vm, a_string(vm, "Int"),
-					      A_SUPER(&self->any_type, &self->num_type)));
+					      A_SUPER(&self->num_type, &self->seq_type)));
   
   a_lib_bind_type(&self->lib, a_meta_type_init(&self->meta_type, vm, a_string(vm, "Meta"),
 					       A_SUPER(&self->any_type)));
 
   a_lib_bind_type(&self->lib, a_multi_type_init(&self->multi_type, vm, a_string(vm, "Multi"),
-						A_SUPER(&self->any_type, &self->target_type)));
+						A_SUPER(&self->target_type)));
 
   a_lib_bind_type(&self->lib, a_nil_type_init(&self->nil_type, vm, a_string(vm, "Nil"),
-					      A_SUPER(&self->any_type, &self->list_type)));
+					      A_SUPER(&self->list_type)));
   
   a_lib_bind_type(&self->lib, a_pair_type_init(&self->pair_type, vm, a_string(vm, "Pair"),
-					       A_SUPER(&self->any_type, &self->list_type)));
+					       A_SUPER(&self->list_type)));
 
   a_lib_bind_type(&self->lib, a_reg_type_init(&self->reg_type, vm, a_string(vm, "Reg"),
 					      A_SUPER(&self->any_type)));
 
   a_lib_bind_type(&self->lib, a_string_type_init(&self->string_type, vm, a_string(vm, "String"),
-						 A_SUPER(&self->any_type)));
+						 A_SUPER(&self->seq_type)));
 
   a_lib_bind_type(&self->lib, a_prim_type_init(&self->prim_type, vm, a_string(vm, "Prim"),
 					       A_SUPER(&self->any_type)));

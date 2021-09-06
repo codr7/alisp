@@ -17,7 +17,7 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v10
+Welcome to aLisp v11
 
 Return on empty line evaluates,
 (reset) clears the stack and Ctrl+D exits.
@@ -214,18 +214,26 @@ Addition and subtraction keep the maximum operand scale.
 [2.25]
 ```
 
-`fix` may be used to scale integers.
+`fix` may be used to convert integers to fixpoints.
 
 ```
-  (fix 225 2)
+  (fix 42 2)
 
-[2.25]
+[42.00]
+```
+
+Fixpoints may be converted to integers using `int`.
+
+```
+  (fix 42 2).(int)
+
+[42]
 ```
 
 `scale-of` may be used to get the scale of a fixpoint.
 
 ```
-  (scale-of 2.25)
+  2.25.(scale-of)
 
 [2]
 ```
@@ -233,15 +241,40 @@ Addition and subtraction keep the maximum operand scale.
 `trunc` and `frac` may be used to get integral and fractional parts.
 
 ```
-  (trunc 2.25)
+  2.25.(trunc)
 
-[2]
+[2.00]
 ```
 ```
-  (frac 2.25)
+  2.25.(frac)
 
 [0.25]
 ```
+
+### floats
+`float` may be used to convert integers and fixpoints to floats.
+
+```
+  42.(float)
+
+[42.000000]
+```
+
+Floats may be converted to integers using `int`.
+
+```
+  42.(float).(int)
+
+[42]
+```
+
+Dividing integers results in a float.
+
+```
+  1.(/ 2)
+[0.500000]
+```
+
 
 ### pairs
 Pairs may be formed using `:`.
@@ -375,17 +408,19 @@ The following types are provided out of the box, adding more is trivial.
 
 - Any  - Any value
 - Bool: Any - Boolean values
-- Fix: Any Num - Fixpoint values
-- Func: Any Target - Functions as values
-- Int: Any Num - Integer values
-- List - List values
+- Fix: Num - Fixed point values
+- Float: Num - Floating point values
+- Func: Target - Functions as values
+- Int: Num Seq - Integer values
+- List: Seq - List values
 - Meta: Any - Types as values
-- Multi: Any Target - Dispatchers as values
-- Nil: Any List - Missing values
-- Pair: Any List - Pair values
+- Multi: Target - Dispatchers as values
+- Nil: List - Missing values
+- Pair: List - Pair values
 - Prim: Any - Primitives as values
 - Reg: Any - Registers as values
-- String: Any - String values
+- Seq: Any - Sequence values
+- String: Seq - String values
 - Target: Any - Callable values
 
 ### debugging
