@@ -15,11 +15,11 @@
 
 struct a_vm {
   a_type_id_t next_type_id;
-  struct a_pool func_pool, multi_pool, op_pool, prim_pool, val_pool;
+  struct a_pool form_pool, func_pool, multi_pool, op_pool, prim_pool, val_pool;
   struct a_abc_lib abc;
   struct a_math_lib math;
   
-  struct a_ls code, free_vals, scopes, stack;  
+  struct a_ls code, free_forms, free_vals, scopes, stack;  
   struct a_scope main;
 
   struct a_frame frames[A_FRAME_COUNT];

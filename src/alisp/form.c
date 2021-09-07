@@ -6,6 +6,14 @@
 #include "alisp/string.h"
 #include "alisp/vm.h"
 
+struct a_form *a_form(struct a_vm *vm, enum a_form_type type, struct a_pos pos) {
+  struct a_form *f = a_ls_null(&vm->free_forms)
+    ? a_pool_alloc(&vm->form_pool)
+    : a_baseof(a_ls_pop(vm->free_forms.next), struct a_form, ls);
+  
+  return a_form_init(f, type, pos);
+}
+
 struct a_form *a_form_init(struct a_form *self, enum a_form_type type, struct a_pos pos) {
   self->type = type;
   self->pos = pos;
@@ -73,6 +81,7 @@ bool a_form_deref(struct a_form *self, struct a_vm *vm) {
     break;
   }
 
+  a_ls_push(vm->free_forms.next, &self->ls);
   return true;
 }
 

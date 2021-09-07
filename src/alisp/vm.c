@@ -4,6 +4,7 @@
 #include "alisp/fail.h"
 #include "alisp/form.h"
 #include "alisp/frame.h"
+#include "alisp/form.h"
 #include "alisp/func.h"
 #include "alisp/multi.h"
 #include "alisp/parser.h"
@@ -15,12 +16,14 @@
 
 struct a_vm *a_vm_init(struct a_vm *self) {
   self->next_type_id = 0;
+  a_pool_init(&self->form_pool, self, A_FORM_PAGE_SIZE, sizeof(struct a_form));
   a_pool_init(&self->func_pool, self, A_FUNC_PAGE_SIZE, sizeof(struct a_func));
   a_pool_init(&self->multi_pool, self, A_MULTI_PAGE_SIZE, sizeof(struct a_multi));
   a_pool_init(&self->op_pool, self, A_OP_PAGE_SIZE, sizeof(struct a_op));
   a_pool_init(&self->prim_pool, self, A_PRIM_PAGE_SIZE, sizeof(struct a_prim));
   a_pool_init(&self->val_pool, self, A_VAL_PAGE_SIZE, sizeof(struct a_val));
   a_ls_init(&self->code);
+  a_ls_init(&self->free_forms);
   a_ls_init(&self->free_vals);
   
   a_scope_init(&self->main, self, NULL);
@@ -61,6 +64,8 @@ void a_vm_deinit(struct a_vm *self) {
   a_pool_deinit(&self->op_pool);
   a_pool_deinit(&self->multi_pool);
   a_pool_deinit(&self->func_pool);
+  a_pool_deinit(&self->form_pool);
+
   a_lib_deinit(&self->math.lib);
   a_lib_deinit(&self->abc.lib);  
 }
@@ -149,7 +154,7 @@ bool a_include(struct a_vm *self, const char *path) {
     
   while ((f = a_parser_pop(&parser))) {
     if (!a_form_emit(f, self)) { return false; }
-    if (a_form_deref(f, self)) { a_free(self, f); }
+    a_form_deref(f, self);
   }
   
   return true;

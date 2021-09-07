@@ -62,7 +62,6 @@ struct a_form *a_parse_call(struct a_parser *self) {
     
     if (!f) {
       a_form_deref(cf, self->vm);
-      a_free(self->vm, cf);
       a_fail("Open call form");
       return NULL;
     }
@@ -244,7 +243,6 @@ struct a_form *a_parse_list(struct a_parser *self) {
       
     if (!f) {
       a_form_deref(lsf, self->vm);
-      a_free(self->vm, lsf);
       a_fail("Open ls form");
       return NULL;
     }

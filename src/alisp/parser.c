@@ -32,8 +32,7 @@ void a_parser_deinit(struct a_parser *self) {
   }
 
   a_ls_do(&self->forms, ls) {
-    struct a_form *f = a_baseof(ls, struct a_form, ls);
-    if (a_form_deref(f, self->vm)) { a_free(self->vm, f); }
+    a_form_deref(a_baseof(ls, struct a_form, ls), self->vm);
   }
 }
 
@@ -52,8 +51,7 @@ struct a_form_parser *a_parser_add_suffix(struct a_parser *self, a_parser_body b
 }
 
 struct a_form *a_parser_push(struct a_parser *self, enum a_form_type type, struct a_pos pos) {
-  struct a_form *f = a_malloc(self->vm, sizeof(struct a_form));
-  a_form_init(f, type, pos);
+  struct a_form *f = a_form(self->vm, type, pos);
   a_ls_push(&self->forms, &f->ls);
   return f;
 }

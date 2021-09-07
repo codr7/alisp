@@ -1,3 +1,5 @@
+* move free into scope_deref
+*** grep remove free calls 
 * bayes
 ** add *(float int)
 ** add /(float int)
@@ -10,9 +12,6 @@
 ** don't include anything automatically in scripts
 ** change a_lib_import to take single string arg
 *** extract a_lib_import_all
-* move free into deref
-** scope/form
-*** grep remove free calls 
 * add or/and prims
 * add io.open
 ** add enums
