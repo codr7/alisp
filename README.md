@@ -1,4 +1,6 @@
-## aLisp <script src="https://liberapay.com/acodr/widgets/button.js"></script>
+## aLisp
+
+[![Liberapay](https://liberapay.com/assets/widgets/donate.svg")]("https://liberapay.com/acodr/donate")
 
 ### intro
 aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom Lisp implemented in portable C. The current version weighs in at 5 kloc and supports all features described in this document.
