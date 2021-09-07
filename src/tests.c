@@ -17,7 +17,6 @@ static void test_push() {
   struct a_val *v = a_pop(&vm);
   assert(v->type == &vm.abc.int_type);
   assert(v->as_int == 42);
-  a_val_deref(v);
   a_val_free(v, &vm);
   a_vm_deinit(&vm);
 }
@@ -35,7 +34,6 @@ static void test_bind() {
   struct a_val *v = a_pop(&vm);
   assert(v->type == &vm.abc.int_type);
   assert(v->as_int == 42);
-  a_val_deref(v);
   a_val_free(v, &vm);
   a_vm_deinit(&vm);
 }
@@ -43,7 +41,6 @@ static void test_bind() {
 static a_pc_t test_func_foo_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_int += y->as_int;
-  a_val_deref(y);
   a_val_free(y, vm);
   return ret;
 }
@@ -75,7 +72,6 @@ static void test_func() {
   assert(v);
   assert(v->type == &vm.abc.int_type);
   assert(v->as_int == 42);
-  a_val_deref(v);
   a_val_free(v, &vm);
   a_vm_deinit(&vm);
 }
@@ -105,7 +101,6 @@ static void test_func_emit() {
   assert(v);
   assert(v->type == &vm.abc.int_type);
   assert(v->as_int == 42);
-  a_val_deref(v);
   a_val_free(v, &vm);
   a_vm_deinit(&vm);
 }

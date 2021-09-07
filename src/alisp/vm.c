@@ -42,16 +42,11 @@ struct a_vm *a_vm_init(struct a_vm *self) {
 void a_vm_deinit(struct a_vm *self) {  
   for (int i = 0; i < A_REG_COUNT; i++) {
     struct a_val *v = self->regs[i];
-
-    if (v) {
-      a_val_deref(v);
-      a_val_free(v, self);
-    }
+    if (v) { a_val_free(v, self); }
   }
   
   a_ls_do(&self->stack, vls) {
     struct a_val *v = a_baseof(vls, struct a_val, ls);
-    a_val_deref(v);
     a_val_free(v, self);
   }
 
@@ -136,14 +131,8 @@ struct a_frame *a_pop_frame(struct a_vm *self) {
 
 void a_store(struct a_vm *self, a_reg_t reg, struct a_val *val) {
   struct a_val *prev = self->regs[reg];
-
-  if (prev) {
-    a_val_deref(prev);
-    a_val_free(prev, self);
-  }
-  
+  if (prev) { a_val_free(prev, self); }
   self->regs[reg] = val;
-
 }
 
 bool a_include(struct a_vm *self, const char *path) {

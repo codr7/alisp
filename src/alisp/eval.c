@@ -73,12 +73,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     }
 
     if (!(pc = a_call(t, call->flags, pc))) { return false; }
-
-    if (!call->target) {
-      a_val_deref(t);
-      a_val_free(t, self);
-    }
-    
+    if (!call->target) { a_val_free(t, self); }
     A_DISPATCH(pc);
   }
 
@@ -273,9 +268,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
 
     if (r->type == &self->abc.nil_type) {
       a_copy(a_push(self, l->type), l);
-      a_val_deref(l);
       a_val_free(l, self);
-      a_val_deref(r);
       a_val_free(r, self);
     } else {
       a_pair_init(&a_push(self, &self->abc.pair_type)->as_pair, l, r);

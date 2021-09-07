@@ -51,17 +51,12 @@ bool a_form_deref(struct a_form *self, struct a_vm *vm) {
     a_ls_do(&self->as_call.args, ls) { a_form_deref(a_baseof(ls, struct a_form, ls), vm); }
     break;
   case A_LIT_FORM:
-    a_val_deref(&self->as_lit.val);
+    a_deref(&self->as_lit.val);
     break;
 
   case A_LIST_FORM: {
     a_ls_do(&self->as_list.items, ls) { a_form_deref(a_baseof(ls, struct a_form, ls), vm); }
-
-    if (self->as_list.val) {
-      a_val_deref(self->as_list.val);
-      a_val_free(self->as_list.val, vm);
-    }
-
+    if (self->as_list.val) { a_val_free(self->as_list.val, vm); }
     break;
   }
     
@@ -69,12 +64,7 @@ bool a_form_deref(struct a_form *self, struct a_vm *vm) {
     a_form_deref(self->as_pair.left, vm);
     a_form_deref(self->as_pair.right, vm);
     struct a_val *v = self->as_pair.val;
-
-    if (v) {
-      a_val_deref(v);
-      a_val_free(v, vm);
-    }
-    
+    if (v) { a_val_free(v, vm); }
     break;
   }
     

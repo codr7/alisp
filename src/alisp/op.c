@@ -118,7 +118,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 	struct a_func *f = a_multi_specialize(op->target->as_multi, vm);
 	
 	if (f) {
-	  a_val_deref(op->target);
+	  a_deref(op->target);
 	  a_val_init(op->target, &vm->abc.func_type)->as_func = f;
 	  printf("Specialized multi: %s ", f->name->data);
 	  a_stack_type_dump(&vm->stack);

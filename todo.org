@@ -2,8 +2,6 @@
 ** add *(float int)
 ** add /(float int)
 ** readme
-* move val_deref into val_free
-*** grep remove deref calls
 * add map iter
 * add for prim
 * add import prim
@@ -41,6 +39,8 @@
 **** add lset vm.syms
 ***** check in a_sym()
 ** add '-parser
+** add string refcounting
+*** switch pos source to sym
 * add separate func stacks
 ** store in frame
 ** move args on call
@@ -101,3 +101,5 @@
       for prob = (exp (- m)) then (* prob (/ m i))
       summing prob)
    1.0))
+
+Ett förtydligande bara, känn dig fri att nå mig när som helst, om inte Slacken funkar så har du mitt nummer.

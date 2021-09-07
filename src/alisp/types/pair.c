@@ -1,6 +1,7 @@
 #include "alisp/stack.h"
 #include "alisp/type.h"
 #include "alisp/val.h"
+#include "alisp/vm.h"
 
 static enum a_order compare_val(struct a_val *x, struct a_val *y) {
   switch (a_compare(x->as_pair.left, y->as_pair.left)) {
@@ -27,7 +28,12 @@ static enum a_order compare_val(struct a_val *x, struct a_val *y) {
 static void copy_val(struct a_val *dst, struct a_val *src) { dst->as_pair = src->as_pair; }
 
 static bool deref_val(struct a_val *val) {
-  return a_val_deref(val->as_pair.left) && a_val_deref(val->as_pair.right);
+  struct a_pair *self = &val->as_pair;
+  bool l = a_deref(self->left), r = a_deref(self->right);
+  if (l && r) { return true; }
+  if (l) { self->left = a_val(&val->type->vm->abc.nil_type); }
+  if (r) { self->right = a_val(&val->type->vm->abc.nil_type); }
+  return false;
 }
 
 static void dump_val(struct a_val *val) { a_pair_dump(&val->as_pair); }

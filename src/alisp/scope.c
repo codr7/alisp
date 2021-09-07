@@ -56,7 +56,6 @@ bool a_scope_unbind(struct a_scope *self, struct a_string *key) {
   struct a_val *v = a_scope_find(self, key);
   if (!v) { return false; }
   a_ls_pop(&v->ls);
-  a_val_deref(v);
   a_val_free(v, self->vm);
   return true;
 }

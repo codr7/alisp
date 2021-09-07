@@ -12,7 +12,6 @@ static a_pc_t fix_float_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *scale = a_pop(vm), *val = a_peek(vm, 0);
   a_int_t s = scale->as_int;
   a_val_init(val, &vm->math.fix_type)->as_fix = a_fix(val->as_float*a_pow(s), s);
-  a_val_deref(scale);
   a_val_free(scale, vm);
   return ret;
 }
@@ -21,7 +20,6 @@ static a_pc_t fix_int_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *scale = a_pop(vm), *val = a_peek(vm, 0);
   a_int_t s = scale->as_int;
   a_val_init(val, &vm->math.fix_type)->as_fix = a_fix(val->as_int*a_pow(s), s);
-  a_val_deref(scale);
   a_val_free(scale, vm);
   return ret;
 }
@@ -48,7 +46,6 @@ static a_pc_t trunc_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 static a_pc_t fix_add_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_fix = a_fix_add(x->as_fix, y->as_fix);
-  a_val_deref(y);
   a_val_free(y, vm);
   return ret;
 }
@@ -56,7 +53,6 @@ static a_pc_t fix_add_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 static a_pc_t fix_sub_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_fix = a_fix_sub(x->as_fix, y->as_fix);
-  a_val_deref(y);
   a_val_free(y, vm);
   return ret;
 }
@@ -77,7 +73,6 @@ static a_pc_t float_fix_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 static a_pc_t float_add_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_float += y->as_float;
-  a_val_deref(y);
   a_val_free(y, vm);
   return ret;
 }
@@ -85,7 +80,6 @@ static a_pc_t float_add_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 static a_pc_t float_sub_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_float -= y->as_float;
-  a_val_deref(y);
   a_val_free(y, vm);
   return ret;
 }
@@ -93,7 +87,6 @@ static a_pc_t float_sub_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 static a_pc_t float_mul_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_float *= y->as_float;
-  a_val_deref(y);
   a_val_free(y, vm);
   return ret;
 }
@@ -101,7 +94,6 @@ static a_pc_t float_mul_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 static a_pc_t float_div_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_float /= y->as_float;
-  a_val_deref(y);
   a_val_free(y, vm);
   return ret;
 }
@@ -121,7 +113,6 @@ static a_pc_t int_float_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 static a_pc_t int_add_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_int += y->as_int;
-  a_val_deref(y);
   a_val_free(y, vm);
   return ret;
 }
@@ -129,7 +120,6 @@ static a_pc_t int_add_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 static a_pc_t int_sub_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_int -= y->as_int;
-  a_val_deref(y);
   a_val_free(y, vm);
   return ret;
 }
@@ -137,7 +127,6 @@ static a_pc_t int_sub_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 static a_pc_t int_mul_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   x->as_int *= y->as_int;
-  a_val_deref(y);
   a_val_free(y, vm);
   return ret;
 }
@@ -145,7 +134,6 @@ static a_pc_t int_mul_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 static a_pc_t int_div_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
   a_val_init(x, &vm->math.float_type)->as_float = x->as_int/(a_float_t)y->as_int;
-  a_val_deref(y);
   a_val_free(y, vm);
   return ret;
 }

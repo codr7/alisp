@@ -19,11 +19,8 @@ struct a_val *a_val_init(struct a_val *self, struct a_type *type) {
   return self;
 }
 
-bool a_val_deref(struct a_val *self) {
-  return (self->type->deref_val && !self->undef) ? self->type->deref_val(self) : true;
-}
-
 void a_val_free(struct a_val *self, struct a_vm *vm) {
+  a_deref(self);
   a_ls_push(vm->free_vals.next, &self->ls);
 }
 
@@ -47,6 +44,10 @@ struct a_val *a_copy(struct a_val *self, struct a_val *source) {
   }
   
   return self;
+}
+
+bool a_deref(struct a_val *self) {
+  return (self->type->deref_val && !self->undef) ? self->type->deref_val(self) : true;
 }
 
 void a_dump(struct a_val *self) {
