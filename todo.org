@@ -1,9 +1,7 @@
-* move free into scope_deref
-*** grep remove free calls 
 * bayes
+** build/x.lisp
 ** add *(float int)
 ** add /(float int)
-** readme
 * add map iter
 * add for prim
 * add import prim

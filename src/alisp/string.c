@@ -5,17 +5,21 @@
 #include "alisp/vm.h"
 
 struct a_string *a_string(struct a_vm *vm, const char *data) {
+  struct a_ls *found = a_lset_find(&vm->strings, data);
+  if (found) { return a_baseof(found, struct a_string, ls); }
   a_string_length length = strlen(data);
   struct a_string *s = a_malloc(vm, sizeof(struct a_string)+length+1);
-  s->vm = vm;
   s->length = length;
   strncpy(s->data, data, length);
   s->data[length] = 0;
+  a_lset_add(&vm->strings, &s->ls, false);
   return s;
 }
 
-enum a_order a_string_compare(const struct a_string *self, const struct a_string *other) {
-  int ord = strcmp(self->data, other->data);
-  if (ord < 0) { return A_LT; }
-  return ord ? A_GT : A_EQ;
+void a_string_free(struct a_string *self, struct a_vm *vm) { a_free(vm, self); }
+
+enum a_order a_string_compare(const struct a_string *left, const struct a_string *right) {
+  if (left == right) { return A_EQ; }  
+  return (strcmp(left->data, right->data) < 0) ? A_LT : A_GT;
 }
+

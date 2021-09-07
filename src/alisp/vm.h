@@ -5,7 +5,7 @@
 #include "alisp/libs/abc.h"
 #include "alisp/libs/math.h"
 #include "alisp/limits.h"
-#include "alisp/ls.h"
+#include "alisp/lset.h"
 #include "alisp/op.h"
 #include "alisp/pool.h"
 #include "alisp/scope.h"
@@ -19,7 +19,9 @@ struct a_vm {
   struct a_abc_lib abc;
   struct a_math_lib math;
   
-  struct a_ls code, free_forms, free_vals, scopes, stack;  
+  struct a_ls code, free_forms, free_vals, scopes, stack;
+  struct a_lset strings;
+  
   struct a_scope main;
 
   struct a_frame frames[A_FRAME_COUNT];

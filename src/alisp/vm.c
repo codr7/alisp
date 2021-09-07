@@ -12,7 +12,11 @@
 #include "alisp/scope.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
+#include "alisp/utils.h"
 #include "alisp/vm.h"
+
+static const void *strings_key(const struct a_ls *ls) { return a_baseof(ls, struct a_string, ls)->data; }
+static enum a_order strings_compare(const void *x, const void *y) { return a_strcmp(x, y); }
 
 struct a_vm *a_vm_init(struct a_vm *self) {
   self->next_type_id = 0;
@@ -25,7 +29,8 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_ls_init(&self->code);
   a_ls_init(&self->free_forms);
   a_ls_init(&self->free_vals);
-  
+  a_lset_init(&self->strings, strings_key, strings_compare);
+
   a_scope_init(&self->main, self, NULL);
   a_ls_init(&self->scopes);
   a_push_scope(self, &self->main);
@@ -43,6 +48,11 @@ struct a_vm *a_vm_init(struct a_vm *self) {
 }
 
 void a_vm_deinit(struct a_vm *self) {  
+  a_ls_do(&self->strings.items, ls) {
+    struct a_string *s = a_baseof(ls, struct a_string, ls);
+    a_string_free(s, self);
+  }
+
   for (int i = 0; i < A_REG_COUNT; i++) {
     struct a_val *v = self->regs[i];
     if (v) { a_val_free(v, self); }

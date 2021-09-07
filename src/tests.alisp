@@ -1,6 +1,8 @@
 (test "int add" [42] 35.(+ 7))
 (test "int sub" [35] 42.(- 7))
 
-(test "fix" [2.25] (fix 225 2))
+(test "fix" [42.00] (fix 42 2))
 (test "fix add" [2.25] 1.5.(+ 0.75))
 (test "fix sub" [2.25] 2.5.(- 0.25))
+
+(test "string is" [T] "foo".(is "foo"))

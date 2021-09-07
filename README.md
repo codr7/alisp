@@ -100,7 +100,7 @@ Values are pushed on the stack.
 
 ./test.alisp
 ```
-(dump 42)
+42.(dump)
 ```
 ```
 $ ./alisp test.alisp
@@ -110,7 +110,7 @@ $ ./alisp test.alisp
 `include` may be used to inline the contents of additional files.
 
 ```
-  (include "test.alisp")
+  "test.alisp".(include)
 
 42
 []
@@ -148,7 +148,7 @@ Bindings may be removed from the current scope using `unbind`.
 
 [Func(+)]
 
-  (unbind +) +
+  +.(unbind) +
 
 Unknown id: +
 ```
@@ -162,7 +162,7 @@ Unknown id: +
 [F]
 ```
 
-`=` returns `T` if both arguments are equal.
+`=` returns `T` only if both arguments are equal.
 
 ```
   [].=([])
@@ -275,6 +275,14 @@ Dividing integers results in a float.
 [0.500000]
 ```
 
+### strings
+Strings are immutable and unique, two strings with the same contents will always be the same value.
+
+```
+  "foo".(is "foo")
+
+[T]
+```
 
 ### pairs
 Pairs may be formed using `:`.
@@ -363,7 +371,7 @@ Anonymous arguments are left on stack.
 
 ```
   (func foo [Int] [Int] _.(+ 7))
-  (foo 35)
+  35.(foo)
 
 [42]
 ```
@@ -372,7 +380,7 @@ Named arguments are bound and removed from the stack.
 
 ```
   (func foo [n:Int] [Int] n.(+ 7))
-  (foo 35)
+  35.(foo)
 
 [42]
 ```
@@ -384,8 +392,8 @@ When multiple function definitions share the same name, the most specific one is
   (func foo [x:Int] [Meta] Int)
   (func foo [x:Any] [Meta] Any)
 
-  (foo 42)
-  (foo T)
+  42.(foo)
+  T.(foo)
 
 [Int Any]
 ```
@@ -398,7 +406,7 @@ Anonymous functions may be created by simply skipping the `func` keyword and nam
 
 [Func(0x7fcecbc094f0)]
 
-  (_)
+  _.()
 
 [42]
 ```
