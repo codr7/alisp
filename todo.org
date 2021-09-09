@@ -1,9 +1,11 @@
+* implement iter_val for Int
+* add map iter
+* add for prim
+* --
 * bayes
 ** build/x.lisp
 ** add *(float int)
 ** add /(float int)
-* add map iter
-* add for prim
 * add import prim
 ** add lib type
 ** bind abc/math
@@ -48,7 +50,6 @@
 ** reset & push unnamed args in analyze
 * capture stored registers in func
 ** scan code for STORE & push reg
-* add iterators
 * add recoverable errors
 ** add vm.errors
 ** add struct a_error like form
@@ -99,4 +100,5 @@
       summing prob)
    1.0))
 
-Ett förtydligande bara, känn dig fri att nå mig när som helst, om inte Slacken funkar så har du mitt nummer.
+
+

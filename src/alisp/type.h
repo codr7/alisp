@@ -29,6 +29,7 @@ struct a_type {
   void (*dump_val)(struct a_val *val);
   bool (*equals_val)(struct a_val *x, struct a_val *y);
   bool (*is_val)(struct a_val *x, struct a_val *y);
+  struct a_iter *(*iter_val)(struct a_val *val);
   bool (*true_val)(struct a_val *val);
 };
 

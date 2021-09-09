@@ -7,6 +7,7 @@
 #include "alisp/types.h"
 
 struct a_func;
+struct a_iter;
 struct a_multi;
 struct a_prim;
 struct a_string;
@@ -24,6 +25,7 @@ struct a_val {
     a_float_t as_float;
     struct a_func *as_func;
     a_int_t as_int;
+    struct a_iter *as_iter;
     struct a_ls *as_ls;
     struct a_type *as_meta;
     struct a_multi *as_multi;

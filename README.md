@@ -422,6 +422,7 @@ The following types are provided out of the box, adding more is trivial.
 - Float: Num - Floating point values
 - Func: Target - Functions as values
 - Int: Num Seq - Integer values
+- Iter: Seq - Iterator values
 - List: Seq - List values
 - Meta: Any - Types as values
 - Multi: Target - Dispatchers as values

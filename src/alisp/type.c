@@ -32,6 +32,7 @@ struct a_type *a_type_init(struct a_type *self, struct a_vm *vm, struct a_string
   self->dump_val = NULL;
   self->equals_val = equals_val;
   self->is_val = NULL;
+  self->iter_val = NULL;
   self->true_val = true_val;
   return self;
 }

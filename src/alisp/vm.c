@@ -6,6 +6,7 @@
 #include "alisp/frame.h"
 #include "alisp/form.h"
 #include "alisp/func.h"
+#include "alisp/iter.h"
 #include "alisp/multi.h"
 #include "alisp/parser.h"
 #include "alisp/prim.h"
@@ -22,12 +23,14 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   self->next_type_id = 0;
   a_pool_init(&self->form_pool, self, A_FORM_PAGE_SIZE, sizeof(struct a_form));
   a_pool_init(&self->func_pool, self, A_FUNC_PAGE_SIZE, sizeof(struct a_func));
+  a_pool_init(&self->func_pool, self, A_ITER_PAGE_SIZE, sizeof(struct a_iter));
   a_pool_init(&self->multi_pool, self, A_MULTI_PAGE_SIZE, sizeof(struct a_multi));
   a_pool_init(&self->op_pool, self, A_OP_PAGE_SIZE, sizeof(struct a_op));
   a_pool_init(&self->prim_pool, self, A_PRIM_PAGE_SIZE, sizeof(struct a_prim));
   a_pool_init(&self->val_pool, self, A_VAL_PAGE_SIZE, sizeof(struct a_val));
   a_ls_init(&self->code);
   a_ls_init(&self->free_forms);
+  a_ls_init(&self->free_iters);
   a_ls_init(&self->free_vals);
   a_lset_init(&self->strings, strings_key, strings_compare);
 
@@ -72,6 +75,7 @@ void a_vm_deinit(struct a_vm *self) {
   a_pool_deinit(&self->val_pool);
   a_pool_deinit(&self->prim_pool);
   a_pool_deinit(&self->op_pool);
+  a_pool_deinit(&self->iter_pool);
   a_pool_deinit(&self->multi_pool);
   a_pool_deinit(&self->func_pool);
   a_pool_deinit(&self->form_pool);

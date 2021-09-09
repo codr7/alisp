@@ -597,7 +597,10 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 
   a_lib_bind_type(&self->lib, a_int_type_init(&self->int_type, vm, a_string(vm, "Int"),
 					      A_SUPER(&self->num_type, &self->seq_type)));
-  
+
+  a_lib_bind_type(&self->lib, a_iter_type_init(&self->iter_type, vm, a_string(vm, "Iter"),
+					       A_SUPER(&self->seq_type)));
+
   a_lib_bind_type(&self->lib, a_meta_type_init(&self->meta_type, vm, a_string(vm, "Meta"),
 					       A_SUPER(&self->any_type)));
 
