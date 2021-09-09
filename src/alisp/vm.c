@@ -23,7 +23,7 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   self->next_type_id = 0;
   a_pool_init(&self->form_pool, self, A_FORM_PAGE_SIZE, sizeof(struct a_form));
   a_pool_init(&self->func_pool, self, A_FUNC_PAGE_SIZE, sizeof(struct a_func));
-  a_pool_init(&self->func_pool, self, A_ITER_PAGE_SIZE, sizeof(struct a_iter));
+  a_pool_init(&self->iter_pool, self, A_ITER_PAGE_SIZE, sizeof(struct a_iter));
   a_pool_init(&self->multi_pool, self, A_MULTI_PAGE_SIZE, sizeof(struct a_multi));
   a_pool_init(&self->op_pool, self, A_OP_PAGE_SIZE, sizeof(struct a_op));
   a_pool_init(&self->prim_pool, self, A_PRIM_PAGE_SIZE, sizeof(struct a_prim));
