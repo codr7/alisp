@@ -6,7 +6,7 @@
 #include "alisp/string.h"
 #include "alisp/vm.h"
 
-struct a_form *a_form(struct a_vm *vm, enum a_form_type type, struct a_pos pos) {
+struct a_form *a_form_new(struct a_vm *vm, enum a_form_type type, struct a_pos pos) {
   struct a_form *f = a_ls_null(&vm->free_forms)
     ? a_pool_alloc(&vm->form_pool)
     : a_baseof(a_ls_pop(vm->free_forms.next), struct a_form, ls);
@@ -108,13 +108,13 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
     }
 
     if (lit) {
-      struct a_val *out = a_val(&vm->abc.pair_type), *v = out;
+      struct a_val *out = a_val_new(&vm->abc.pair_type), *v = out;
       v->as_pair.left = NULL;
       v->as_pair.right = NULL;
       
       a_ls_do(&self->as_list.items, ls) {
 	struct a_val *src = a_form_val(a_baseof(ls, struct a_form, ls), vm);
-	struct a_val *dst = a_val(src->type);
+	struct a_val *dst = a_val_new(src->type);
 	a_copy(dst, src);
 
 	if (ls->next == &self->as_list.items) {
@@ -124,7 +124,7 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
 	    v->as_pair.left = dst;
 	  }
 	} else if (v->as_pair.left) {
-	  v = v->as_pair.right = a_val(&vm->abc.pair_type);
+	  v = v->as_pair.right = a_val_new(&vm->abc.pair_type);
 	  v->as_pair.left = dst;
 	  v->as_pair.right = NULL;
 	} else {
@@ -135,7 +135,7 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
       if (!v->as_pair.left && !v->as_pair.right) {
 	out->type = &vm->abc.nil_type;
       } else if (!v->as_pair.right) {
-	v->as_pair.right = a_val(&vm->abc.nil_type);
+	v->as_pair.right = a_val_new(&vm->abc.nil_type);
       }
       
       return out;
@@ -152,8 +152,8 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
       *rv = a_form_val(self->as_pair.right, vm);
 
     if (lv && rv) {
-      struct a_val *v = a_val(&vm->abc.pair_type);
-      v->as_pair = a_pair(lv, rv);
+      struct a_val *v = a_val_new(&vm->abc.pair_type);
+      v->as_pair = a_pair_new(lv, rv);
       self->as_pair.val = v;
       return v;
     }
@@ -236,7 +236,7 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
       }
       
       struct a_call_op *call = &a_emit(vm, A_CALL_OP)->as_call;
-      if (t) { call->target = a_copy(a_val(t->type), t); }
+      if (t) { call->target = a_copy(a_val_new(t->type), t); }
       call->flags = A_CALL_CHECK | flags;
     }
     

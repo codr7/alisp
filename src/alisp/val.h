@@ -36,7 +36,7 @@ struct a_val {
   };
 };
 
-struct a_val *a_val(struct a_type *type);
+struct a_val *a_val_new(struct a_type *type);
 struct a_val *a_val_init(struct a_val *self, struct a_type *type);
 void a_val_free(struct a_val *self, struct a_vm *vm);
 
@@ -47,6 +47,7 @@ bool a_deref(struct a_val *self);
 void a_dump(struct a_val *self);
 bool a_equals(struct a_val *self, struct a_val *other);
 bool a_is(struct a_val *self, struct a_val *other);
+struct a_iter *a_iter(struct a_val *self);
 bool a_true(struct a_val *self);
 
 #endif

@@ -2,7 +2,7 @@
 #include "alisp/iter.h"
 #include "alisp/vm.h"
 
-struct a_iter *a_iter(struct a_vm *vm, a_iter_body_t body) {
+struct a_iter *a_iter_new(struct a_vm *vm, a_iter_body_t body) {
   a_ls_do(&vm->free_iters, ls) {
     return a_iter_init(a_baseof(a_ls_pop(ls), struct a_iter, ls), body);
   }

@@ -59,7 +59,7 @@ static void test_func() {
 	      A_RET(&vm, &vm.abc.int_type));
 
   f.body = test_func_foo_body;
-  struct a_val *t = a_val(&vm.abc.func_type);
+  struct a_val *t = a_val_new(&vm.abc.func_type);
   t->as_func = &f;
   a_emit(&vm, A_CALL_OP)->as_call.target = t;
   a_emit(&vm, A_STOP_OP);
@@ -91,7 +91,7 @@ static void test_func_emit() {
   a_val_init(&a_emit(&vm, A_PUSH_OP)->as_push.val, &vm.abc.int_type)->as_int = 42;
   a_func_end(&f, &vm);
   
-  struct a_val *t = a_val(&vm.abc.func_type);
+  struct a_val *t = a_val_new(&vm.abc.func_type);
   t->as_func = &f;
   a_emit(&vm, A_CALL_OP)->as_call.target = t;
   a_emit(&vm, A_STOP_OP);

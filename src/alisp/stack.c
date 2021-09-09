@@ -55,7 +55,7 @@ struct a_val *a_pop(struct a_vm *self) {
 }
 
 struct a_val *a_push(struct a_vm *self, struct a_type *type) {
-  struct a_val *v = a_val(type);
+  struct a_val *v = a_val_new(type);
   a_ls_push(&self->stack, &v->ls);
   return v;
 }

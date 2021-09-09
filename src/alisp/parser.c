@@ -51,7 +51,7 @@ struct a_form_parser *a_parser_add_suffix(struct a_parser *self, a_parser_body b
 }
 
 struct a_form *a_parser_push(struct a_parser *self, enum a_form_type type, struct a_pos pos) {
-  struct a_form *f = a_form(self->vm, type, pos);
+  struct a_form *f = a_form_new(self->vm, type, pos);
   a_ls_push(&self->forms, &f->ls);
   return f;
 }

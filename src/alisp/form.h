@@ -51,7 +51,7 @@ struct a_form {
   };
 };
 
-struct a_form *a_form(struct a_vm *vm, enum a_form_type type, struct a_pos pos);
+struct a_form *a_form_new(struct a_vm *vm, enum a_form_type type, struct a_pos pos);
 
 struct a_form *a_form_init(struct a_form *self, enum a_form_type type, struct a_pos pos);
 struct a_form *a_form_ref(struct a_form *self);

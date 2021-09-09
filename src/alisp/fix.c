@@ -14,7 +14,7 @@ int64_t a_pow(uint8_t scale) {
   return POW[scale];
 }
 
-struct a_fix a_fix(int64_t val, uint8_t scale) {
+struct a_fix a_fix_new(int64_t val, uint8_t scale) {
   return (struct a_fix) {.val = val, .scale = scale};
 }
 
@@ -33,13 +33,13 @@ void a_fix_dump(struct a_fix self) {
 struct a_fix a_fix_add(struct a_fix left, struct a_fix right) {
   uint8_t ls = left.scale, rs = right.scale, s = a_max(ls, rs);
   int64_t lv = left.val, rv = right.val;
-  return a_fix(((ls == s) ? lv : lv*a_pow(s)/a_pow(ls)) + ((rs == s) ? rv : rv*a_pow(s)/a_pow(rs)), s);
+  return a_fix_new(((ls == s) ? lv : lv*a_pow(s)/a_pow(ls)) + ((rs == s) ? rv : rv*a_pow(s)/a_pow(rs)), s);
 }
 
 struct a_fix a_fix_sub(struct a_fix left, struct a_fix right) {
   uint8_t ls = left.scale, rs = right.scale, s = a_max(ls, rs);
   int64_t lv = left.val, rv = right.val;
-  return a_fix(((ls == s) ? lv : lv*a_pow(s)/a_pow(ls)) - ((rs == s) ? rv : rv*a_pow(s)/a_pow(rs)), s);
+  return a_fix_new(((ls == s) ? lv : lv*a_pow(s)/a_pow(ls)) - ((rs == s) ? rv : rv*a_pow(s)/a_pow(rs)), s);
 }
 
 enum a_order a_fix_compare(struct a_fix left, struct a_fix right) {

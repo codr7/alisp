@@ -2,7 +2,7 @@
 #include "alisp/pair.h"
 #include "alisp/val.h"
 
-struct a_pair a_pair(struct a_val *left, struct a_val *right) {
+struct a_pair a_pair_new(struct a_val *left, struct a_val *right) {
   return (struct a_pair){.left = left, .right = right};
 }
 

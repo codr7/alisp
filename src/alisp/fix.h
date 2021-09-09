@@ -12,7 +12,7 @@ struct a_fix {
 
 int64_t a_pow(uint8_t scale);
 
-struct a_fix a_fix(int64_t val, uint8_t scale);
+struct a_fix a_fix_new(int64_t val, uint8_t scale);
 int64_t a_fix_trunc(struct a_fix self);
 int64_t a_fix_frac(struct a_fix self);
 void a_fix_dump(struct a_fix self);

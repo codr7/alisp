@@ -32,10 +32,10 @@ static enum a_order mem_compare(const void *x, const void *y) {
   return A_EQ;
 }
 
-struct a_func *a_func(struct a_vm *vm,
-		      struct a_string *name,
-		      struct a_args args,
-		      struct a_rets rets) {
+struct a_func *a_func_new(struct a_vm *vm,
+			  struct a_string *name,
+			  struct a_args args,
+			  struct a_rets rets) {
   return a_func_init(a_pool_alloc(&vm->func_pool), name, args, rets);
 }
 
@@ -134,7 +134,7 @@ a_pc_t a_func_call(struct a_func *self, struct a_vm *vm, enum a_call_flags flags
       a_ls_init(&mem->args);
       
       for (int i = 0; i < self->args.count && sp != &vm->stack; i++, sp = sp->prev) {
-	struct a_val *src = a_baseof(sp, struct a_val, ls), *dst = a_val(src->type);
+	struct a_val *src = a_baseof(sp, struct a_val, ls), *dst = a_val_new(src->type);
 	a_copy(dst, src);
 	a_ls_push(mem->args.next, &dst->ls);
       }
@@ -186,7 +186,7 @@ void a_func_mem(struct a_func *self, struct a_vm *vm, struct a_func_mem *mem) {
   a_ls_init(&mem->rets);
 
   for (int i = 0; i < self->rets.count; i++, sp = sp->prev) {
-    struct a_val *src = a_baseof(sp, struct a_val, ls), *dst = a_val(src->type);
+    struct a_val *src = a_baseof(sp, struct a_val, ls), *dst = a_val_new(src->type);
     a_copy(dst, src);
     a_ls_push(mem->rets.next, &dst->ls);
   }

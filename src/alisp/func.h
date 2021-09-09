@@ -65,10 +65,10 @@ struct a_func_mem {
   struct a_ls rets;
 };
 
-struct a_func *a_func(struct a_vm *vm,
-		      struct a_string *name,
-		      struct a_args args,
-		      struct a_rets rets);
+struct a_func *a_func_new(struct a_vm *vm,
+			  struct a_string *name,
+			  struct a_args args,
+			  struct a_rets rets);
 
 struct a_func *a_func_init(struct a_func *self,
 			   struct a_string *name,

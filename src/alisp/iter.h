@@ -17,7 +17,7 @@ struct a_iter {
   a_ref_count_t ref_count;
 };
 
-struct a_iter *a_iter(struct a_vm *vm, a_iter_body_t body);
+struct a_iter *a_iter_new(struct a_vm *vm, a_iter_body_t body);
 struct a_iter *a_iter_init(struct a_iter *self, a_iter_body_t body);
 struct a_iter *a_iter_ref(struct a_iter *self);
 bool a_iter_deref(struct a_iter *self, struct a_vm *vm);

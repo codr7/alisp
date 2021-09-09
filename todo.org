@@ -1,6 +1,5 @@
-* implement iter_val for Int
-* add map iter
 * add for prim
+* add map iter
 * --
 * bayes
 ** build/x.lisp

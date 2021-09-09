@@ -266,7 +266,7 @@ static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_str
     frets.count++;
   }
   
-  struct a_func *f = a_func(vm, name, fargs, frets);
+  struct a_func *f = a_func_new(vm, name, fargs, frets);
 
   if (name) {
     struct a_scope *s = a_scope(vm);
@@ -367,6 +367,13 @@ static a_pc_t is_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   a_push(vm, &vm->abc.bool_type)->as_bool = a_is(x, y);
   a_val_free(x, vm);
   a_val_free(y, vm);
+  return ret;
+}
+
+static a_pc_t iter_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *v = a_pop(vm);
+  a_push(vm, &vm->abc.iter_type)->as_iter = a_iter(v);
+  a_val_free(v, vm);
   return ret;
 }
 
@@ -543,13 +550,13 @@ static bool test_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
 
   for (;;) {
     if (src->type == &vm->abc.pair_type) {
-      struct a_val *dst = a_val(src->as_pair.left->type);
+      struct a_val *dst = a_val_new(src->as_pair.left->type);
       a_copy(dst, src->as_pair.left);
       a_ls_push(&op->stack, &dst->ls);
       src = src->as_pair.right;
     } else {
       if (src->type != &vm->abc.nil_type) {
-	struct a_val *dst = a_val(src->type);
+	struct a_val *dst = a_val_new(src->type);
 	a_copy(dst, src);
 	a_ls_push(&op->stack, &dst->ls);
       }
@@ -630,95 +637,100 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind(&self->lib, a_string(vm, "F"), &self->bool_type)->as_bool = false;
 
   a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, "="),
-			 A_ARG(vm,
-			       {a_string(vm, "x"), &vm->abc.any_type},
-			       {a_string(vm, "y"), &vm->abc.any_type}),
-			 A_RET(vm, &vm->abc.bool_type)))->body = equals_body;
+		  a_func_new(vm, a_string(vm, "="),
+			     A_ARG(vm,
+				   {a_string(vm, "x"), &vm->abc.any_type},
+				   {a_string(vm, "y"), &vm->abc.any_type}),
+			     A_RET(vm, &vm->abc.bool_type)))->body = equals_body;
 
   a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, "<"),
-			 A_ARG(vm,
-			       {a_string(vm, "x"), &vm->abc.any_type},
-			       {a_string(vm, "y"), &vm->abc.any_type}),
-			 A_RET(vm, &vm->abc.bool_type)))->body = lt_body;
+		  a_func_new(vm, a_string(vm, "<"),
+			     A_ARG(vm,
+				   {a_string(vm, "x"), &vm->abc.any_type},
+				   {a_string(vm, "y"), &vm->abc.any_type}),
+			     A_RET(vm, &vm->abc.bool_type)))->body = lt_body;
 
   a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, ">"),
-			 A_ARG(vm,
-			       {a_string(vm, "x"), &vm->abc.any_type},
-			       {a_string(vm, "y"), &vm->abc.any_type}),
-			 A_RET(vm, &vm->abc.bool_type)))->body = gt_body;
+		  a_func_new(vm, a_string(vm, ">"),
+			     A_ARG(vm,
+				   {a_string(vm, "x"), &vm->abc.any_type},
+				   {a_string(vm, "y"), &vm->abc.any_type}),
+			     A_RET(vm, &vm->abc.bool_type)))->body = gt_body;
 
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "bench"), 1, -1))->body = bench_body;
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "ceval"), 0, -1))->body = ceval_body;
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "d"), 0, 2))->body = d_body;
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "def"), 2, 2))->body = def_body;
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "do"), 0, -1))->body = do_body;
-
-  a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, "dump"),
-			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
-			 A_RET(vm)))->body = dump_body;
-
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "dup"), 0, 0))->body = dup_body;
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "func"), 3, -1))->body = func_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "bench"), 1, -1))->body = bench_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "ceval"), 0, -1))->body = ceval_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "d"), 0, 2))->body = d_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "def"), 2, 2))->body = def_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "do"), 0, -1))->body = do_body;
 
   a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, "head"),
-			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
-			 A_RET(vm, &vm->abc.any_type)))->body = head_any_body;
+		  a_func_new(vm, a_string(vm, "dump"),
+			     A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
+			     A_RET(vm)))->body = dump_body;
+
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "dup"), 0, 0))->body = dup_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "func"), 3, -1))->body = func_body;
 
   a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, "head"),
-			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.pair_type}),
-			 A_RET(vm, &vm->abc.any_type)))->body = head_pair_body;
-
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "if"), 2, 3))->body = if_body;
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "include"), 0, -1))->body = include_body;
+		  a_func_new(vm, a_string(vm, "head"),
+			     A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
+			     A_RET(vm, &vm->abc.any_type)))->body = head_any_body;
 
   a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, "is"),
-			 A_ARG(vm,
-			       {a_string(vm, "x"), &vm->abc.any_type},
-			       {a_string(vm, "y"), &vm->abc.any_type}),
-			 A_RET(vm, &vm->abc.bool_type)))->body = is_body;
+		  a_func_new(vm, a_string(vm, "head"),
+			     A_ARG(vm, {a_string(vm, "val"), &vm->abc.pair_type}),
+			     A_RET(vm, &vm->abc.any_type)))->body = head_pair_body;
 
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "lambda"), 2, -1))->body = lambda_body;
-
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "let"), 1, -1))->body = let_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "if"), 2, 3))->body = if_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "include"), 0, -1))->body = include_body;
 
   a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, "nil?"),
-			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
-			 A_RET(vm, &vm->abc.bool_type)))->body = nil_any_body;
+		  a_func_new(vm, a_string(vm, "is"),
+			     A_ARG(vm,
+				   {a_string(vm, "x"), &vm->abc.any_type},
+				   {a_string(vm, "y"), &vm->abc.any_type}),
+			     A_RET(vm, &vm->abc.bool_type)))->body = is_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func_new(vm, a_string(vm, "iter"),
+			     A_ARG(vm, {a_string(vm, "val"), &vm->abc.seq_type}),
+			     A_RET(vm, &vm->abc.iter_type)))->body = iter_body;
+
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "lambda"), 2, -1))->body = lambda_body;
+
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "let"), 1, -1))->body = let_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func_new(vm, a_string(vm, "nil?"),
+			     A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
+			     A_RET(vm, &vm->abc.bool_type)))->body = nil_any_body;
   
   a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, "nil?"),
-			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.nil_type}),
-			 A_RET(vm, &vm->abc.bool_type)))->body = nil_body;
+		  a_func_new(vm, a_string(vm, "nil?"),
+			     A_ARG(vm, {a_string(vm, "val"), &vm->abc.nil_type}),
+			     A_RET(vm, &vm->abc.bool_type)))->body = nil_body;
 
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "reset"), 0, 0))->body = reset_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "reset"), 0, 0))->body = reset_body;
 			 
   a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, "reverse"),
-			 A_ARG(vm, {a_string(vm, "lst"), &vm->abc.list_type}),
-			 A_RET(vm, &vm->abc.list_type)))->body = reverse_body;
+		  a_func_new(vm, a_string(vm, "reverse"),
+			     A_ARG(vm, {a_string(vm, "lst"), &vm->abc.list_type}),
+			     A_RET(vm, &vm->abc.list_type)))->body = reverse_body;
 
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "swap"), 0, 0))->body = swap_body;
-
-  a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, "tail"),
-			 A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
-			 A_RET(vm, &vm->abc.nil_type)))->body = tail_any_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "swap"), 0, 0))->body = swap_body;
 
   a_lib_bind_func(&self->lib,
-		  a_func(vm, a_string(vm, "tail"), A_ARG(vm, {a_string(vm, "val"), &vm->abc.pair_type}),
-			 A_RET(vm, &vm->abc.any_type)))->body = tail_pair_body;
+		  a_func_new(vm, a_string(vm, "tail"),
+			     A_ARG(vm, {a_string(vm, "val"), &vm->abc.any_type}),
+			     A_RET(vm, &vm->abc.nil_type)))->body = tail_any_body;
 
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "test"), 2, -1))->body = test_body;
+  a_lib_bind_func(&self->lib,
+		  a_func_new(vm, a_string(vm, "tail"), A_ARG(vm, {a_string(vm, "val"), &vm->abc.pair_type}),
+			     A_RET(vm, &vm->abc.any_type)))->body = tail_pair_body;
 
-  a_lib_bind_prim(&self->lib, a_prim(vm, a_string(vm, "unbind"), 1, 1))->body = unbind_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "test"), 2, -1))->body = test_body;
+
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "unbind"), 1, 1))->body = unbind_body;
 
   return self;
 }

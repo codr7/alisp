@@ -4,9 +4,9 @@
 #include "alisp/string.h"
 #include "alisp/vm.h"
 
-struct a_prim *a_prim(struct a_vm *vm,
-		      struct a_string *name,
-		      int8_t min_args, int8_t max_args) {
+struct a_prim *a_prim_new(struct a_vm *vm,
+			  struct a_string *name,
+			  int8_t min_args, int8_t max_args) {
   return a_prim_init(a_pool_alloc(&vm->prim_pool), name, min_args, max_args);
 }
 

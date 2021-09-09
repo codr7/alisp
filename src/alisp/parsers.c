@@ -133,7 +133,7 @@ struct a_form *a_parse_fix(struct a_parser *self, int64_t trunc) {
   int scale = self->pos.column - fpos.column - 1;
   struct a_form *f = a_parser_push(self, A_LIT_FORM, fpos);
   if (trunc < 0) { v = -v; }
-  a_val_init(&f->as_lit.val, &self->vm->math.fix_type)->as_fix = a_fix(trunc*a_pow(scale) + v, scale);
+  a_val_init(&f->as_lit.val, &self->vm->math.fix_type)->as_fix = a_fix_new(trunc*a_pow(scale) + v, scale);
   return f;  
 }
 

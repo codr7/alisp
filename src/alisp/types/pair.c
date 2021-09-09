@@ -31,8 +31,8 @@ static bool deref_val(struct a_val *val) {
   struct a_pair *self = &val->as_pair;
   bool l = a_deref(self->left), r = a_deref(self->right);
   if (l && r) { return true; }
-  if (l) { self->left = a_val(&val->type->vm->abc.nil_type); }
-  if (r) { self->right = a_val(&val->type->vm->abc.nil_type); }
+  if (l) { self->left = a_val_new(&val->type->vm->abc.nil_type); }
+  if (r) { self->right = a_val_new(&val->type->vm->abc.nil_type); }
   return false;
 }
 
