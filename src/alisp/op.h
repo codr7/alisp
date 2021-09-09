@@ -9,9 +9,11 @@ enum a_op_type {
   A_BENCH_OP, A_BRANCH_OP,
   A_CALL_OP, 
   A_DROP_OP, A_DUP_OP,
-  A_FENCE_OP, A_GOTO_OP, A_LOAD_OP, A_PUSH_OP,
+  A_FENCE_OP, A_FOR_OP,
+  A_GOTO_OP, A_LOAD_OP, A_PUSH_OP,
   A_RESET_OP, A_RET_OP,
-  A_STORE_OP, A_SWAP_OP, A_TEST_OP, A_ZIP_OP};
+  A_STORE_OP, A_SWAP_OP,
+  A_TEST_OP, A_ZIP_OP};
 
 struct a_bench_op {
   int reps;
@@ -33,6 +35,10 @@ struct a_drop_op {
 
 struct a_dup_op {
   int8_t offset;
+};
+
+struct a_for_op {
+  a_pc_t end_pc;
 };
 
 struct a_goto_op {
@@ -77,6 +83,7 @@ struct a_op {
     struct a_call_op as_call;
     struct a_drop_op as_drop;
     struct a_dup_op as_dup;
+    struct a_for_op as_for;
     struct a_goto_op as_goto;
     struct a_load_op as_load;
     struct a_push_op as_push;

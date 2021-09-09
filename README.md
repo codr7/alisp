@@ -19,7 +19,7 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v11
+Welcome to aLisp v12
 
 Return on empty line evaluates,
 (reset) clears the stack and Ctrl+D exits.
@@ -329,6 +329,34 @@ The canonical tail recursive transformation goes something like this:
   [1 2 3].(map ([Int] [Int] _.(+ 1)))
 
 [2:3:4]
+```
+### iterators
+`for` may be used to iterate any sequence.
+
+```
+  (for 3)
+
+[0 1 2]
+```
+
+When a variable is specified, it is automatically bound for each iteration.
+
+```
+  (for i:3 i)
+
+[0 1 2]
+```
+
+`iter` may be used to obtain an iterator for any sequence.
+
+```
+  (iter 3)
+
+[Iter(0x7ff5010e6020)]
+
+  (for _)
+
+[0 1 2]
 ```
 
 ### functions

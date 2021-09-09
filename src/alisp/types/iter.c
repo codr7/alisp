@@ -10,7 +10,7 @@ static bool deref_val(struct a_val *val) { return a_iter_deref(val->as_iter, val
 
 static void dump_val(struct a_val *val) { printf("Iter(%p)", val->as_iter); }
 
-static struct a_iter *iter_val(struct a_val *val) { return val->as_iter; }
+static struct a_iter *iter_val(struct a_val *val) { return a_iter_ref(val->as_iter); }
 
 struct a_type *a_iter_type_init(struct a_type *self,
 				struct a_vm *vm,

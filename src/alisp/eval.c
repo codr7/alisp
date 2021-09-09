@@ -2,6 +2,7 @@
 #include "alisp/fail.h"
 #include "alisp/frame.h"
 #include "alisp/func.h"
+#include "alisp/iter.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
 #include "alisp/timer.h"
@@ -22,7 +23,8 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     &&BENCH, &&BRANCH,
     &&CALL,
     &&DROP, &&DUP,
-    &&FENCE, &&GOTO, &&LOAD, &&PUSH,
+    &&FENCE, &&FOR,
+    &&GOTO, &&LOAD, &&PUSH,
     &&RESET, &&RET,
     &&STORE, &&SWAP,
     &&TEST, &&ZIP
@@ -136,6 +138,28 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
  FENCE: {
     A_TRACE(FENCE);
     A_DISPATCH(pc);
+  }
+
+ FOR: {
+    A_TRACE(FOR);
+    struct a_val *in = a_pop(self);
+
+    if (!a_isa(in->type, &self->abc.seq_type)) {
+      a_fail("Invalid sequence: %s", in->type->name->data);
+      return false;
+    }
+
+    struct a_iter *it = a_iter(in);
+    struct a_val *v = NULL;
+
+    while ((v = a_iter_next(it, self))) {
+      a_ls_push(&self->stack, &v->ls);
+      a_eval(self, pc);
+    }
+    
+    a_val_free(in, self);
+    a_iter_deref(it, self);
+    A_DISPATCH(a_baseof(pc, struct a_op, pc)->as_for.end_pc);
   }
   
  GOTO: {

@@ -36,8 +36,8 @@ static struct a_iter *iter_val(struct a_val *val) {
   i->as_int = 0;
   max->as_int = val->as_int;
   struct a_iter *it = a_iter_new(vm, iter_body);
-  a_ls_push(&it->data, &max->ls);
   a_ls_push(&it->data, &i->ls);
+  a_ls_push(&it->data, &max->ls);
   return it;
 }
 

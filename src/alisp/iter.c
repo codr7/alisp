@@ -13,6 +13,7 @@ struct a_iter *a_iter_new(struct a_vm *vm, a_iter_body_t body) {
 struct a_iter *a_iter_init(struct a_iter *self, a_iter_body_t body) {
   a_ls_init(&self->data);
   self->body = body;
+  self->ref_count = 1;
   return self;
 }
 

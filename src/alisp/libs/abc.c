@@ -182,6 +182,39 @@ static bool dup_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
   return true;
 }
 
+static bool for_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_ls *a = args;
+  struct a_form *in = a_baseof((a = a->next), struct a_form, ls);
+  a_reg_t bind_reg = -1;
+  struct a_scope *scope = a_scope(vm);
+
+  if (in->type == A_PAIR_FORM) {
+    struct a_pair_form *p = &in->as_pair;
+
+    if (p->left->type != A_ID_FORM) {
+      a_fail("Invalid identifier: %d", p->left->type);
+      return false;
+    }
+    
+    scope = a_begin(vm);
+    bind_reg = a_scope_bind_reg(scope, p->left->as_id.name);
+    in = p->right;
+  }
+
+  if (!a_form_emit(in, vm)) { return false; }
+  struct a_op *op = a_emit(vm, A_FOR_OP);
+  if (bind_reg != -1) { a_emit(vm, A_STORE_OP)->as_store.reg = bind_reg; }
+  
+  while ((a = a->next) != args) {
+    if (!a_form_emit(a_baseof(a, struct a_form, ls), vm)) { return false; }
+  }
+
+  a_emit(vm, A_STOP_OP);
+  op->as_for.end_pc = a_pc(vm);
+  if (bind_reg != -1) { a_end(vm); }
+  return true;
+}
+
 static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_string *name, struct a_vm *vm) {
   struct a_form *args_form = a_baseof(a, struct a_form, ls);
 
@@ -669,6 +702,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 			     A_RET(vm)))->body = dump_body;
 
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "dup"), 0, 0))->body = dup_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "for"), 1, -1))->body = for_body;
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "func"), 3, -1))->body = func_body;
 
   a_lib_bind_func(&self->lib,

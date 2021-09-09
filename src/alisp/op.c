@@ -29,6 +29,9 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
   case A_DUP_OP:
     self->as_dup.offset = 0;
     break;
+  case A_FOR_OP:
+    self->as_for.end_pc = NULL;
+    break;
   case A_GOTO_OP:
     self->as_goto.pc = NULL;
     break;
@@ -223,7 +226,6 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
     a_push(vm, &vm->abc.pair_type)->undef = true;
     break;
   }
-
     
   case A_FENCE_OP:
   case A_GOTO_OP:
@@ -234,6 +236,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
   }
     
   case A_BENCH_OP:
+  case A_FOR_OP:
   case A_TEST_OP:
     break;
   }
