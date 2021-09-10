@@ -375,7 +375,7 @@ When a variable is specified, it is automatically bound for each iteration.
 New functions may be defined using `func`.
 
 ```
-  (func foo [][Int] 42)
+  (func foo _ [Int] 42)
   (foo)
   
 [42]
@@ -384,8 +384,8 @@ New functions may be defined using `func`.
 Function definitions are lexically scoped.
 
 ```
-  (func foo [][]
-    (func bar [][] 42)
+  (func foo _ _
+    (func bar _ [Int] 42)
     (bar))
 
 []
@@ -403,7 +403,7 @@ Functions capture their defining environment.
 
 ```
   (let [bar 42]
-    (func foo [][Int] bar)
+    (func foo _ [Int] bar)
     foo)
   
 [42]
@@ -444,7 +444,7 @@ When multiple function definitions share the same name, the most specific one is
 Anonymous functions may be created by simply skipping the `func` keyword and name.
 
 ```
-  ([][Int] 42)
+  (_ [Int] 42)
 
 [Func(0x7fcecbc094f0)]
 
@@ -514,7 +514,7 @@ Testing fix sub...success!
 `ceval` may be used to evaluate forms at compile time and emit code to push their results.
 
 ```
-  (func foo [] [Int] (ceval (dump "here!") 35.(+ 7)))
+  (func foo _ [Int] (ceval (dump "here!") 35.(+ 7)))
 
 "here!"
 []

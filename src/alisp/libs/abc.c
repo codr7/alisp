@@ -219,85 +219,90 @@ static bool for_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
 static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_string *name, struct a_vm *vm) {
   struct a_form *args_form = a_baseof(a, struct a_form, ls);
 
-  if (args_form->type != A_LIST_FORM) {
+  if (args_form->type != A_LIST_FORM && args_form->type != A_NOP_FORM) {
     a_fail("Invalid function arguments: %d", args_form->type);
     return NULL;
   }
 
   struct a_form *rets_form = a_baseof((a = a->next), struct a_form, ls);
 
-  if (rets_form->type != A_LIST_FORM) {
+  if (rets_form->type != A_LIST_FORM && rets_form->type != A_NOP_FORM) {
     a_fail("Invalid function returns: %d", rets_form->type);
     return NULL;
   }
 
   struct a_args fargs = A_ARG(vm);
-  struct a_arg *fap = fargs.items;
-
-  a_ls_do(&args_form->as_list.items, als) {
-    struct a_form *af = a_baseof(als, struct a_form, ls);
-    fap->name = NULL;
+  if (args_form->type == A_LIST_FORM) {
+    struct a_arg *fap = fargs.items;
     
-    if (af->type == A_PAIR_FORM) {
-      struct a_form *nf = af->as_pair.left;
-
-      if (nf->type != A_ID_FORM) {
-	a_fail("Invalid argument name: %d", nf->type);
+    a_ls_do(&args_form->as_list.items, als) {
+      struct a_form *af = a_baseof(als, struct a_form, ls);
+      fap->name = NULL;
+      
+      if (af->type == A_PAIR_FORM) {
+	struct a_form *nf = af->as_pair.left;
+	
+	if (nf->type != A_ID_FORM) {
+	  a_fail("Invalid argument name: %d", nf->type);
+	  return NULL;
+	}
+	
+	fap->name = nf->as_id.name;
+	af = af->as_pair.right;
+      }
+      
+      if (af->type == A_ID_FORM) {
+	struct a_val *v = a_scope_find(a_scope(vm), af->as_id.name);
+	
+	if (!v) {
+	  a_fail("Unknown argument type: %s", af->as_id.name->data);
+	  return NULL;
+	}
+	
+	if (v->type != &vm->abc.meta_type) {
+	  a_fail("Invalid argument type: %s", v->type->name->data);
+	  return NULL;
+	}
+	
+	fap->type = v->as_meta;
+      } else {
+	a_fail("Invalid argument: %d", af->type);
 	return NULL;
       }
       
-      fap->name = nf->as_id.name;
-      af = af->as_pair.right;
+      fap++;
+      fargs.count++;
     }
-
-    if (af->type == A_ID_FORM) {
-      struct a_val *v = a_scope_find(a_scope(vm), af->as_id.name);
-
-      if (!v) {
-	a_fail("Unknown argument type: %s", af->as_id.name->data);
-	return NULL;
-      }
-	 
-      if (v->type != &vm->abc.meta_type) {
-	a_fail("Invalid argument type: %s", v->type->name->data);
-	return NULL;
-      }
-
-      fap->type = v->as_meta;
-    } else {
-      a_fail("Invalid argument: %d", af->type);
-      return NULL;
-    }
-
-    fap++;
-    fargs.count++;
   }
   
   struct a_rets frets = A_RET(vm);
-  struct a_type **frp = frets.items;
-  
-  a_ls_do(&rets_form->as_list.items, rls) {
-    struct a_form *rf = a_baseof(rls, struct a_form, ls);
+
+  if (rets_form->type == A_LIST_FORM) {
+    struct a_type **frp = frets.items;
     
-    if (rf->type != A_ID_FORM) {
-      a_fail("Invalid return: %d", rf->type);
-      return NULL;
+    a_ls_do(&rets_form->as_list.items, rls) {
+      struct a_form *rf = a_baseof(rls, struct a_form, ls);
+      
+      if (rf->type != A_ID_FORM) {
+	a_fail("Invalid return: %d", rf->type);
+	return NULL;
+      }
+      
+      struct a_val *v = a_scope_find(a_scope(vm), rf->as_id.name);
+      
+      if (!v) {
+	a_fail("Unknown return type: %s", rf->as_id.name->data);
+	return NULL;
+      }
+      
+      if (v->type != &vm->abc.meta_type) {
+	a_fail("Invalid return type: %s", v->type->name->data);
+	return NULL;
+      }
+      
+      *frp++ = v->as_meta;
+      frets.count++;
     }
-
-    struct a_val *v = a_scope_find(a_scope(vm), rf->as_id.name);
-
-    if (!v) {
-      a_fail("Unknown return type: %s", rf->as_id.name->data);
-      return NULL;
-    }
-
-    if (v->type != &vm->abc.meta_type) {
-      a_fail("Invalid return type: %s", v->type->name->data);
-      return NULL;
-    }
-    
-    *frp++ = v->as_meta;
-    frets.count++;
   }
   
   struct a_func *f = a_func_new(vm, name, fargs, frets);
