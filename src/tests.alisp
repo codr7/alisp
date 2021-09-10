@@ -6,3 +6,33 @@
 (test "fix sub" [2.25] 2.5.(- 0.25))
 
 (test "string is" [T] "foo".(is "foo"))
+
+(test "int iter" [0 1 2] (for 3))
+(test "list iter" [1 3 5] (for i:[1 3 5] i))
+
+(test "func" [42]
+  (func foo [] [Int] 42)
+  (foo))
+
+(test "func args" [42]
+  (func foo [n:Int] [Int] n.(+ 7))
+  35.(foo))
+
+(test "closure" [42]
+  (let [bar 42]
+    (func foo [] [Int] bar)
+    (foo)))
+
+(test "anon func" [42]
+  (\ [] [Int] 42)
+  (_))
+
+(test "tco" [[2 3 4]]
+  (func my-map [in:List t:Target] [List]
+    (func helper [in:Any out:Any] [List]
+      (if in.(nil?)
+        out.(reverse)
+        (helper:t in.(tail) (t in.(head)):out)))
+    (helper:t in NIL))
+
+  [1 2 3].(my-map (\ [Int] [Int] _.(+ 1))))

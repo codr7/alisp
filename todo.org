@@ -6,8 +6,10 @@
 ** eval in new thread
 ** add thread type
 ** add join func
-*** join thread
-** add chan
+*** join thread & push results
+* add chan from libcodr7
+** add vm.inbox
+** skip queue size
 * add break
 ** add vm.break_pc
 *** default NULL

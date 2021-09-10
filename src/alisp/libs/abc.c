@@ -219,90 +219,85 @@ static bool for_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
 static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_string *name, struct a_vm *vm) {
   struct a_form *args_form = a_baseof(a, struct a_form, ls);
 
-  if (args_form->type != A_LIST_FORM && args_form->type != A_NOP_FORM) {
+  if (args_form->type != A_LIST_FORM) {
     a_fail("Invalid function arguments: %d", args_form->type);
     return NULL;
   }
 
   struct a_form *rets_form = a_baseof((a = a->next), struct a_form, ls);
 
-  if (rets_form->type != A_LIST_FORM && rets_form->type != A_NOP_FORM) {
+  if (rets_form->type != A_LIST_FORM) {
     a_fail("Invalid function returns: %d", rets_form->type);
     return NULL;
   }
 
   struct a_args fargs = A_ARG(vm);
-  if (args_form->type == A_LIST_FORM) {
-    struct a_arg *fap = fargs.items;
+  struct a_arg *fap = fargs.items;
     
-    a_ls_do(&args_form->as_list.items, als) {
-      struct a_form *af = a_baseof(als, struct a_form, ls);
-      fap->name = NULL;
+  a_ls_do(&args_form->as_list.items, als) {
+    struct a_form *af = a_baseof(als, struct a_form, ls);
+    fap->name = NULL;
       
-      if (af->type == A_PAIR_FORM) {
-	struct a_form *nf = af->as_pair.left;
+    if (af->type == A_PAIR_FORM) {
+      struct a_form *nf = af->as_pair.left;
 	
-	if (nf->type != A_ID_FORM) {
-	  a_fail("Invalid argument name: %d", nf->type);
-	  return NULL;
-	}
-	
-	fap->name = nf->as_id.name;
-	af = af->as_pair.right;
-      }
-      
-      if (af->type == A_ID_FORM) {
-	struct a_val *v = a_scope_find(a_scope(vm), af->as_id.name);
-	
-	if (!v) {
-	  a_fail("Unknown argument type: %s", af->as_id.name->data);
-	  return NULL;
-	}
-	
-	if (v->type != &vm->abc.meta_type) {
-	  a_fail("Invalid argument type: %s", v->type->name->data);
-	  return NULL;
-	}
-	
-	fap->type = v->as_meta;
-      } else {
-	a_fail("Invalid argument: %d", af->type);
+      if (nf->type != A_ID_FORM) {
+	a_fail("Invalid argument name: %d", nf->type);
 	return NULL;
       }
-      
-      fap++;
-      fargs.count++;
+	
+      fap->name = nf->as_id.name;
+      af = af->as_pair.right;
     }
+      
+    if (af->type == A_ID_FORM) {
+      struct a_val *v = a_scope_find(a_scope(vm), af->as_id.name);
+	
+      if (!v) {
+	a_fail("Unknown argument type: %s", af->as_id.name->data);
+	return NULL;
+      }
+	
+      if (v->type != &vm->abc.meta_type) {
+	a_fail("Invalid argument type: %s", v->type->name->data);
+	return NULL;
+      }
+	
+      fap->type = v->as_meta;
+    } else {
+      a_fail("Invalid argument: %d", af->type);
+      return NULL;
+    }
+      
+    fap++;
+    fargs.count++;
   }
   
   struct a_rets frets = A_RET(vm);
-
-  if (rets_form->type == A_LIST_FORM) {
-    struct a_type **frp = frets.items;
+  struct a_type **frp = frets.items;
     
-    a_ls_do(&rets_form->as_list.items, rls) {
-      struct a_form *rf = a_baseof(rls, struct a_form, ls);
+  a_ls_do(&rets_form->as_list.items, rls) {
+    struct a_form *rf = a_baseof(rls, struct a_form, ls);
       
-      if (rf->type != A_ID_FORM) {
-	a_fail("Invalid return: %d", rf->type);
-	return NULL;
-      }
-      
-      struct a_val *v = a_scope_find(a_scope(vm), rf->as_id.name);
-      
-      if (!v) {
-	a_fail("Unknown return type: %s", rf->as_id.name->data);
-	return NULL;
-      }
-      
-      if (v->type != &vm->abc.meta_type) {
-	a_fail("Invalid return type: %s", v->type->name->data);
-	return NULL;
-      }
-      
-      *frp++ = v->as_meta;
-      frets.count++;
+    if (rf->type != A_ID_FORM) {
+      a_fail("Invalid return: %d", rf->type);
+      return NULL;
     }
+      
+    struct a_val *v = a_scope_find(a_scope(vm), rf->as_id.name);
+      
+    if (!v) {
+      a_fail("Unknown return type: %s", rf->as_id.name->data);
+      return NULL;
+    }
+      
+    if (v->type != &vm->abc.meta_type) {
+      a_fail("Invalid return type: %s", v->type->name->data);
+      return NULL;
+    }
+      
+    *frp++ = v->as_meta;
+    frets.count++;
   }
   
   struct a_func *f = a_func_new(vm, name, fargs, frets);
@@ -605,7 +600,8 @@ static bool test_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
     a_fail("Invalid stack: %s", stack->type->name->data);
     return false;
   }
-  
+
+  a_begin(vm);
   struct a_test_op *op = &a_emit(vm, A_TEST_OP)->as_test;
   op->desc = desc->as_string;
   
@@ -634,6 +630,7 @@ static bool test_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
 
   a_emit(vm, A_STOP_OP);
   op->end_pc = a_pc(vm);
+  a_end(vm);
   return true;
 }
 
@@ -763,7 +760,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 			     A_ARG(vm, {a_string(vm, "val"), &vm->abc.seq_type}),
 			     A_RET(vm, &vm->abc.iter_type)))->body = iter_body;
 
-  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "lambda"), 2, -1))->body = lambda_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "\\"), 2, -1))->body = lambda_body;
 
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "let"), 1, -1))->body = let_body;
 
