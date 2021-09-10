@@ -1,5 +1,21 @@
-* implement iter_val for pair/string/nil
+* add thread
+** add prim (thread ...)
+** create new vm
+** emit forms
+** analyze
+** eval in new thread
+** add thread type
+** add join func
+*** join thread
+** add chan
 * add map iter
+* add break
+** add vm.break_pc
+*** default NULL
+** backup/restore in frame
+** set in for-prim
+** add break prim
+*** goto break pc
 * bayes
 ** build/x.lisp
 ** add *(float int)
@@ -97,18 +113,4 @@
       for prob = (exp (- m)) then (* prob (/ m i))
       summing prob)
    1.0))
-
-        let src = try _env.pop(pos: _pos)        
-        if src.type.iterValue == nil { throw EvalError(_pos, "Value is not iterable: \(src.type.name)")}
-        let iter = src.type.iterValue!(src.value)
-        
-        while true {
-            let v = try iter(_pos)
-            if v == nil { break }
-            _env.push(v!)
-            try _env.eval(_pc+1)
-        }
-            
-        return _nextPc
-
 

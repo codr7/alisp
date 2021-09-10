@@ -6,7 +6,9 @@
 
 struct a_abc_lib {
   struct a_lib lib;
-  struct a_type any_type, bool_type, func_type,
+
+  struct a_type any_type,
+    bool_type, char_type, func_type,
     int_type, iter_type,
     list_type,
     meta_type, multi_type,

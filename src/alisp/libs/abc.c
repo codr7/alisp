@@ -631,7 +631,10 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 
   a_lib_bind_type(&self->lib, a_bool_type_init(&self->bool_type, vm, a_string(vm, "Bool"),
 					       A_SUPER(&self->any_type)));
-  
+
+  a_lib_bind_type(&self->lib, a_char_type_init(&self->char_type, vm, a_string(vm, "Char"),
+					       A_SUPER(&self->any_type)));
+
   a_lib_bind_type(&self->lib, a_func_type_init(&self->func_type, vm, a_string(vm, "Func"),
 					       A_SUPER(&self->target_type)));
 

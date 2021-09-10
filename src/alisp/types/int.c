@@ -21,10 +21,7 @@ static struct a_val *iter_body(struct a_iter *self, struct a_vm *vm) {
     *i = a_baseof(self->data.next, struct a_val, ls),
     *max = a_baseof(self->data.next->next, struct a_val, ls);
 
-  if (i->as_int == max->as_int) {
-    return NULL;
-  }
-
+  if (i->as_int == max->as_int) { return NULL; }
   struct a_val *out = a_val_new(&vm->abc.int_type);
   out->as_int = i->as_int++;
   return out;
@@ -32,10 +29,10 @@ static struct a_val *iter_body(struct a_iter *self, struct a_vm *vm) {
 
 static struct a_iter *iter_val(struct a_val *val) {
   struct a_vm *vm = val->type->vm;
+  struct a_iter *it = a_iter_new(vm, iter_body);
   struct a_val *i = a_val_new(&vm->abc.int_type), *max = a_val_new(&vm->abc.int_type);
   i->as_int = 0;
   max->as_int = val->as_int;
-  struct a_iter *it = a_iter_new(vm, iter_body);
   a_ls_push(&it->data, &i->ls);
   a_ls_push(&it->data, &max->ls);
   return it;

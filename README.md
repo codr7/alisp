@@ -342,21 +342,21 @@ The canonical tail recursive transformation goes something like this:
 When a variable is specified, it is automatically bound for each iteration.
 
 ```
-  (for i:3 i)
+  (for i:[1 3 5] i)
 
-[0 1 2]
+[1 3 5]
 ```
 
 `iter` may be used to obtain an iterator for any sequence.
 
 ```
-  (iter 3)
+  (iter "foo")
 
 [Iter(0x7ff5010e6020)]
 
   (for _)
 
-[0 1 2]
+[\f \o \o]
 ```
 
 ### functions
