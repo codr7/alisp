@@ -319,14 +319,14 @@ List literals may be specified by enclosing code in brackets.
 The canonical tail recursive transformation goes something like this:
 
 ```
-  (func map [in:List t:Target] [List]
+  (func my-map [in:List t:Target] [List]
     (func helper [in:Any out:Any] [List]
       (if in.(nil?)
         out.(reverse)
         (helper:t in.(tail) (t in.(head)):out)))
     (helper:t in NIL))
 
-  [1 2 3].(map ([Int] [Int] _.(+ 1)))
+  [1 2 3].(my-map ([Int] [Int] _.(+ 1)))
 
 [2:3:4]
 ```
@@ -350,7 +350,7 @@ When a variable is specified, it is automatically bound for each iteration.
 `map` may be used to apply specified function to specified sequence, it returns a new iterator.
 
 ```
-  (map ([Int][Int] _.(+ 7)) [1 2 3])
+  (map ([Int] [Int] _.(+ 7)) [1 2 3])
 
 [Iter(0x7fd2925e6020)]
 
@@ -375,7 +375,7 @@ When a variable is specified, it is automatically bound for each iteration.
 New functions may be defined using `func`.
 
 ```
-  (func foo [] [Int] 42)
+  (func foo [][Int] 42)
   (foo)
   
 [42]
@@ -384,8 +384,8 @@ New functions may be defined using `func`.
 Function definitions are lexically scoped.
 
 ```
-  (func foo [] []
-    (func bar [] [] 42)
+  (func foo [][]
+    (func bar [][] 42)
     (bar))
 
 []
@@ -403,7 +403,7 @@ Functions capture their defining environment.
 
 ```
   (let [bar 42]
-    (func foo [] [Int] bar)
+    (func foo [][Int] bar)
     foo)
   
 [42]
@@ -444,7 +444,7 @@ When multiple function definitions share the same name, the most specific one is
 Anonymous functions may be created by simply skipping the `func` keyword and name.
 
 ```
-  ([] [Int] 42)
+  ([][Int] 42)
 
 [Func(0x7fcecbc094f0)]
 
