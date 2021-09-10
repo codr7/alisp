@@ -8,7 +8,6 @@
 ** add join func
 *** join thread
 ** add chan
-* add map iter
 * add break
 ** add vm.break_pc
 *** default NULL

@@ -3,6 +3,7 @@
 #include "alisp/fail.h"
 #include "alisp/form.h"
 #include "alisp/func.h"
+#include "alisp/iter.h"
 #include "alisp/libs/abc.h"
 #include "alisp/multi.h"
 #include "alisp/prim.h"
@@ -472,6 +473,30 @@ static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
   return true;
 }
 
+static struct a_val *map_iter_body(struct a_iter *self, struct a_vm *vm) {
+  struct a_iter *in = a_baseof(self->data.next, struct a_val, ls)->as_iter;
+  struct a_val *v = a_iter_next(in, vm);
+  if (!v) { return NULL; }
+  a_ls_push(&vm->stack, &v->ls);
+  struct a_val *fn = a_baseof(self->data.next->next, struct a_val, ls);  
+  a_pc_t ret = a_pc(vm)->prev, pc = a_call(fn, A_CALL_CHECK, ret);
+  if (!pc) { return NULL; }
+  if (pc != ret && !a_eval(vm, pc)) { return NULL; }
+  return a_pop(vm);
+}
+
+static a_pc_t map_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *in = a_pop(vm), *fn = a_pop(vm);
+  struct a_iter *out = a_iter_new(vm, map_iter_body);
+  struct a_val *iv = a_val_new(&vm->abc.iter_type);
+  iv->as_iter = a_iter(in);
+  a_ls_push(&out->data, &iv->ls);
+  a_ls_push(&out->data, &fn->ls);
+  a_push(vm, &vm->abc.iter_type)->as_iter = out;
+  a_val_free(in, vm);
+  return ret;
+}
+
 static a_pc_t nil_any_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   struct a_val *v = a_peek(vm, 0);
   a_deref(v);
@@ -736,6 +761,13 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "lambda"), 2, -1))->body = lambda_body;
 
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "let"), 1, -1))->body = let_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func_new(vm, a_string(vm, "map"),
+			     A_ARG(vm,
+				   {a_string(vm, "fn"), &vm->abc.target_type},
+				   {a_string(vm, "in"), &vm->abc.seq_type}),
+			     A_RET(vm, &vm->abc.iter_type)))->body = map_body;
 
   a_lib_bind_func(&self->lib,
 		  a_func_new(vm, a_string(vm, "nil?"),

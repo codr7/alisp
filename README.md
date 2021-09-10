@@ -347,6 +347,18 @@ When a variable is specified, it is automatically bound for each iteration.
 [1 3 5]
 ```
 
+`map` may be used to apply specified function to specified sequence, it returns a new iterator.
+
+```
+  (map ([Int][Int] _.(+ 7)) [1 2 3])
+
+[Iter(0x7fd2925e6020)]
+
+  (for _)
+
+[8 9 10]
+```
+
 `iter` may be used to obtain an iterator for any sequence.
 
 ```
