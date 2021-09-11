@@ -36,3 +36,10 @@
     (helper:t in NIL))
 
   [1 2 3].(my-map (\ [Int] [Int] _.(+ 1))))
+
+(test "multiple dispatch" [Int Any]
+  (func md [x:Int] [Meta] Int)
+  (func md [x:Any] [Meta] Any)
+
+  42.(md)
+  T.(md))

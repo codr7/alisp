@@ -35,17 +35,21 @@ bool a_multi_add(struct a_multi *self, struct a_func *func) {
   return a_lset_add(&self->funcs, &func->ls, false);
 }
 
-struct a_func *a_multi_specialize(struct a_multi *self, struct a_vm *vm) {
+struct a_func *a_multi_specialize(struct a_multi *self, struct a_vm *vm, bool full) {
+  a_type_id_t w = 0;
+    
   a_ls_do(&self->funcs.items, ls) {
     struct a_func *f = a_baseof(ls, struct a_func, ls);
+    if (!full && f->weight < w) { break; }
     if (a_func_applicable(f, vm)) { return f; }
+    w = f->weight;
   }
 
   return NULL;
 }
 
 a_pc_t a_multi_call(struct a_multi *self, struct a_vm *vm, enum a_call_flags flags, a_pc_t ret) {
-  struct a_func *f = a_multi_specialize(self, vm);
+  struct a_func *f = a_multi_specialize(self, vm, true);
 
   if (!f) {
     a_fail("Not applicable: %s", self->name->data);

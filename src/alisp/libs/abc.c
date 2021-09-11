@@ -308,8 +308,10 @@ static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_str
 
     if (v) {
       if (v->type == &vm->abc.func_type) {
+	struct a_func *pf = v->as_func;
 	a_val_init(v, &vm->abc.multi_type);
 	v->as_multi = a_multi(vm, f->name, f->args.count);
+	a_multi_add(v->as_multi, pf);
 	a_multi_add(v->as_multi, f);
       } else if (v->type == &vm->abc.multi_type) {
 	a_multi_add(v->as_multi, f);      

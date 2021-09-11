@@ -118,7 +118,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 	  }
 	}
       } else if (op->target->type == &vm->abc.multi_type) {
-	struct a_func *f = a_multi_specialize(op->target->as_multi, vm);
+	struct a_func *f = a_multi_specialize(op->target->as_multi, vm, false);
 	
 	if (f) {
 	  a_deref(op->target);
