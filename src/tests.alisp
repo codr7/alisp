@@ -43,3 +43,6 @@
 
   42.(md)
   T.(md))
+
+(test "thread join" [42]
+  (join (thread [Int] 42)))
