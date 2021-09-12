@@ -459,7 +459,7 @@ Threads run in complete isolation as separate VM instances.
 ### types
 The following types are provided out of the box, adding more is trivial.
 
-- Any  - Any value
+- Any - Any value
 - Bool: Any - Boolean values
 - Fix: Num - Fix point values
 - Float: Num - Floating point values
@@ -477,6 +477,7 @@ The following types are provided out of the box, adding more is trivial.
 - Seq: Any - Sequence values
 - String: Seq - String values
 - Target: Any - Callable values
+- Thread: Any - Threads as values
 
 ### debugging
 `dump` may be used to dump any value to `stdout`.
