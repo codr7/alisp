@@ -92,7 +92,7 @@ void a_vm_deinit(struct a_vm *self) {
 a_pc_t a_pc(struct a_vm *self) { return self->code.prev; }
 
 struct a_op *a_emit(struct a_vm *self, enum a_op_type op_type) {
-  struct a_op *op = a_op_init(a_pool_alloc(&self->op_pool), op_type);
+  struct a_op *op = a_op_init(a_pool_alloc(&self->op_pool), op_type, self);
   a_ls_push(&self->code, &op->pc);
   return op;
 }

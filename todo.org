@@ -1,6 +1,3 @@
-* finish thread
-** add join func
-*** join thread & push results
 * add chan from libcodr7
 ** implement iter_val
 * add break

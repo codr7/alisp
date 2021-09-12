@@ -217,6 +217,41 @@ static bool for_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
   return true;
 }
 
+static bool parse_rets(struct a_rets *dst, struct a_form *src, struct a_vm *vm) {
+  if (src->type != A_LIST_FORM) {
+    a_fail("Invalid rets: %d", src->type);
+    return false;
+  }
+
+  struct a_type **rp = dst->items;
+
+  a_ls_do(&src->as_list.items, ls) {
+    struct a_form *f = a_baseof(ls, struct a_form, ls);
+      
+    if (f->type != A_ID_FORM) {
+      a_fail("Invalid return: %d", f->type);
+      return NULL;
+    }
+      
+    struct a_val *v = a_scope_find(a_scope(vm), f->as_id.name);
+      
+    if (!v) {
+      a_fail("Unknown return type: %s", f->as_id.name->data);
+      return NULL;
+    }
+      
+    if (v->type != &vm->abc.meta_type) {
+      a_fail("Invalid return type: %s", v->type->name->data);
+      return NULL;
+    }
+      
+    *rp++ = v->as_meta;
+    dst->count++;
+  }
+
+  return true;
+}
+
 static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_string *name, struct a_vm *vm) {
   struct a_form *args_form = a_baseof(a, struct a_form, ls);
 
@@ -226,11 +261,6 @@ static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_str
   }
 
   struct a_form *rets_form = a_baseof((a = a->next), struct a_form, ls);
-
-  if (rets_form->type != A_LIST_FORM) {
-    a_fail("Invalid function returns: %d", rets_form->type);
-    return NULL;
-  }
 
   struct a_args fargs = A_ARG(vm);
   struct a_arg *fap = fargs.items;
@@ -275,32 +305,7 @@ static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_str
   }
   
   struct a_rets frets = A_RET(vm);
-  struct a_type **frp = frets.items;
-    
-  a_ls_do(&rets_form->as_list.items, rls) {
-    struct a_form *rf = a_baseof(rls, struct a_form, ls);
-      
-    if (rf->type != A_ID_FORM) {
-      a_fail("Invalid return: %d", rf->type);
-      return NULL;
-    }
-      
-    struct a_val *v = a_scope_find(a_scope(vm), rf->as_id.name);
-      
-    if (!v) {
-      a_fail("Unknown return type: %s", rf->as_id.name->data);
-      return NULL;
-    }
-      
-    if (v->type != &vm->abc.meta_type) {
-      a_fail("Invalid return type: %s", v->type->name->data);
-      return NULL;
-    }
-      
-    *frp++ = v->as_meta;
-    frets.count++;
-  }
-  
+  if (!parse_rets(&frets, rets_form, vm)) { return NULL; }
   struct a_func *f = a_func_new(vm, name, fargs, frets);
 
   if (name) {
@@ -405,6 +410,15 @@ static a_pc_t is_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   a_val_free(x, vm);
   a_val_free(y, vm);
   return ret;
+}
+
+static bool join_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  a_ls_do(args, ls) {
+    if (!a_form_emit(a_baseof(ls, struct a_form, ls), vm)) { return false; }
+    a_emit(vm, A_JOIN_OP);
+  }
+
+  return true;
 }
 
 static bool lambda_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
@@ -639,8 +653,17 @@ static bool test_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
 }
 
 static bool thread_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_ls *a = args;
   struct a_thread_op *op = &a_emit(vm, A_THREAD_OP)->as_thread;
-  a_ls_do(args, a) { a_ls_push(&op->args, a_ls_pop(a)); }
+  parse_rets(&op->rets, a_baseof((a = a->next), struct a_form, ls), vm);
+  struct a_ls *next = a->next;
+
+  while ((a = next) != args) {
+    next = a->next;
+    a_ls_push(&op->args, a_ls_pop(a));
+  }
+  
+  a_ls_init(args);
   return true;
 }
 
@@ -768,8 +791,8 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 				   {a_string(vm, "y"), &vm->abc.any_type}),
 			     A_RET(vm, &vm->abc.bool_type)))->body = is_body;
 
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "join"), 1, -1))->body = join_body;
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "\\"), 2, -1))->body = lambda_body;
-
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "let"), 1, -1))->body = let_body;
 
   a_lib_bind_func(&self->lib,

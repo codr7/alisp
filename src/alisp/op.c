@@ -5,9 +5,10 @@
 #include "alisp/op.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
+#include "alisp/thread.h"
 #include "alisp/vm.h"
 
-struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
+struct a_op *a_op_init(struct a_op *self, enum a_op_type type, struct a_vm *vm) {
   self->type = type;
 
   switch (self->type) {
@@ -56,8 +57,10 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
     break;
   case A_THREAD_OP:
     a_ls_init(&self->as_thread.args);
+    self->as_thread.rets = A_RET(vm);
     break;
   case A_FENCE_OP:
+  case A_JOIN_OP:
   case A_PUSH_OP:
   case A_RESET_OP:
   case A_STOP_OP:
@@ -155,6 +158,24 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
     break;
   }
 
+  case A_JOIN_OP: {
+    struct a_val *tv = a_pop(vm);
+    
+    if (tv) {
+      if (!a_isa(&vm->abc.thread_type, tv->type)) {
+	a_fail("Invalid thread: %s", tv->type->name->data);
+	return NULL;
+      }
+
+      struct a_thread *t = tv->as_thread;
+      for (struct a_type **r = t->rets.items; r < t->rets.items + t->rets.count; r++) { a_push(vm, *r)->undef = true; }
+    } else {
+      a_reset(vm);
+    }
+
+    break;
+  }
+    
   case A_PUSH_OP: {
     struct a_val *src = &self->as_push.val, *dst = a_push(vm, src->type);
     a_copy(dst, src);

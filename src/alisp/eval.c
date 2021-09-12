@@ -26,7 +26,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     &&CALL,
     &&DROP, &&DUP,
     &&FENCE, &&FOR,
-    &&GOTO, &&LOAD, &&PUSH,
+    &&GOTO, &&JOIN, &&LOAD, &&PUSH,
     &&RESET, &&RET,
     &&STORE, &&SWAP,
     &&TEST, &&THREAD,
@@ -170,6 +170,24 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     A_DISPATCH(a_baseof(pc, struct a_op, pc)->as_goto.pc);
   }
   
+ JOIN: {
+    A_TRACE(JOIN);
+    struct a_val *t = a_pop(self);
+
+    if (!t) {
+      a_fail("Missing thread");
+      return false;
+    }
+
+    if (t->type != &self->abc.thread_type) {
+      a_fail("Invalid thread: %s", t->type->name->data);
+      return false;
+    }
+
+    if (!a_thread_join(t->as_thread)) { return false; }
+    A_DISPATCH(pc);
+  }
+
  LOAD: {
     A_TRACE(LOAD);
     struct a_val *v = self->regs[a_baseof(pc, struct a_op, pc)->as_load.reg];
@@ -287,7 +305,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
  THREAD: {
     A_TRACE(THREAD);
     struct a_thread_op *op = &a_baseof(pc, struct a_op, pc)->as_thread;
-    struct a_thread *t = a_thread_new(self);
+    struct a_thread *t = a_thread_new(self, op->rets);
 
     if (!a_thread_emit(t, &op->args) || !a_thread_start(t)) {
       a_thread_deref(t);

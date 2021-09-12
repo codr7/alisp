@@ -22,6 +22,6 @@ struct a_prim *a_prim_init(struct a_prim *self,
 			   int8_t min_args, int8_t max_args);
 
 bool a_prim_applicable(struct a_prim *self);
-bool a_prim_call(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count);
+bool a_prim_call(struct a_prim *self, struct a_vm *vm, struct a_ls *args);
 
 #endif

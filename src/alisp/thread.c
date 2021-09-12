@@ -1,19 +1,21 @@
 #include <assert.h>
 #include "alisp/fail.h"
 #include "alisp/form.h"
+#include "alisp/stack.h"
 #include "alisp/thread.h"
 
-struct a_thread *a_thread_new(struct a_vm *owner) {
+struct a_thread *a_thread_new(struct a_vm *owner, struct a_rets rets) {
   struct a_thread *f = a_ls_null(&owner->free_threads)
     ? a_pool_alloc(&owner->thread_pool)
     : a_baseof(a_ls_pop(owner->free_threads.next), struct a_thread, ls);
   
-  return a_thread_init(f, owner);
+  return a_thread_init(f, owner, rets);
 }
 
-struct a_thread *a_thread_init(struct a_thread *self, struct a_vm *owner) {
+struct a_thread *a_thread_init(struct a_thread *self, struct a_vm *owner, struct a_rets rets) {
   self->owner = owner;
   a_vm_init(&self->vm);
+  self->rets = rets;
   self->ref_count = 1;
   return self;
 }
@@ -56,6 +58,22 @@ bool a_thread_start(struct a_thread *self) {
   if (err) {
     a_fail("Failed starting thread: %d", err);
     return false;
+  }
+
+  return true;
+}
+
+bool a_thread_join(struct a_thread *self) {
+  int err = pthread_join(self->handle, NULL);
+
+  if (err) {
+    a_fail("Failed joining thread: %d", err);
+    return false;
+  }
+
+  a_ls_do(&self->vm.stack, ls) {
+    struct a_val *v = a_baseof(ls, struct a_val, ls);
+    a_clone(a_push(self->owner, a_type_clone(v->type, self->owner)), v);
   }
 
   return true;

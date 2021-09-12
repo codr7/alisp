@@ -23,7 +23,6 @@ struct a_form *a_form_init(struct a_form *self, enum a_form_type type, struct a_
   case A_CALL_FORM:
     self->as_call.target = NULL;
     a_ls_init(&self->as_call.args);
-    self->as_call.arg_count = 0;
     break;
   case A_ID_FORM:
     self->as_id.name = NULL;
@@ -224,7 +223,7 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
 	return false;
       }
       
-      return a_prim_call(t->as_prim, vm, &self->as_call.args, self->as_call.arg_count); 
+      return a_prim_call(t->as_prim, vm, &self->as_call.args); 
     } else {
       a_ls_do(&self->as_call.args, als) {
 	if (!a_form_emit(a_baseof(als, struct a_form, ls), vm)) { return false; }
@@ -320,7 +319,6 @@ struct a_form *a_form_clone(struct a_form *self, struct a_vm *dst_vm, struct a_v
   case A_CALL_FORM: {
     struct a_call_form *src = &self->as_call, *dst = &f->as_call;
     dst->target = a_form_clone(src->target, dst_vm, src_vm);
-    dst->arg_count = src->arg_count;
     a_ls_do(&src->args, ls) { a_ls_push(&dst->args, &a_form_clone(a_baseof(ls, struct a_form, ls), dst_vm, src_vm)->ls); }
     break;
   }

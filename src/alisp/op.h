@@ -2,6 +2,7 @@
 #define ALISP_OP_H
 
 #include "alisp/ls.h"
+#include "alisp/ret.h"
 #include "alisp/val.h"
 
 enum a_op_type {
@@ -10,7 +11,7 @@ enum a_op_type {
   A_CALL_OP, 
   A_DROP_OP, A_DUP_OP,
   A_FENCE_OP, A_FOR_OP,
-  A_GOTO_OP, A_LOAD_OP, A_PUSH_OP,
+  A_GOTO_OP, A_JOIN_OP, A_LOAD_OP, A_PUSH_OP,
   A_RESET_OP, A_RET_OP,
   A_STORE_OP, A_SWAP_OP,
   A_TEST_OP, A_THREAD_OP,
@@ -76,6 +77,7 @@ struct a_test_op {
 
 struct a_thread_op {
   struct a_ls args;
+  struct a_rets rets;
 };
 
 struct a_op {
@@ -100,7 +102,7 @@ struct a_op {
   };
 };
 
-struct a_op *a_op_init(struct a_op *self, enum a_op_type type);
+struct a_op *a_op_init(struct a_op *self, enum a_op_type type, struct a_vm *vm);
 a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm);
 
 #endif

@@ -445,7 +445,7 @@ Anonymous functions may be created by simply skipping the `func` keyword and nam
 Threads run in complete isolation as separate VM instances.
 
 ```
-  (thread
+  (thread [Int]
     (sleep 1000)
     42)
 

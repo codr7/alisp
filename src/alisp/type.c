@@ -27,7 +27,7 @@ struct a_type *a_type_init(struct a_type *self, struct a_vm *vm, struct a_string
   for (struct a_type **st = super; *st; st++) {
     for (a_type_id_t id = 0; id <= (*st)->id; id++) {
       struct a_type *t = (*st)->super[id];
-      if (t) { self->super[t->id] = t; }
+      if (t && !self->super[t->id]) { self->super[t->id] = t; }
     }
   }
   

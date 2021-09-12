@@ -5,6 +5,7 @@
 #include <string.h>
 #include "alisp/limits.h"
 #include "alisp/lset.h"
+#include "alisp/ret.h"
 #include "alisp/types.h"
 
 #define A_ARG(vm, ...)							\
@@ -14,15 +15,6 @@
     args.count = sizeof(items) / sizeof(struct a_arg);			\
     memcpy(args.items, items, sizeof(items));				\
     args;								\
-  })
-
-#define A_RET(vm, ...)							\
-  ({									\
-    struct a_type *items[] = {__VA_ARGS__};				\
-    struct a_rets rets;							\
-    rets.count = sizeof(items) / sizeof(struct a_type *);		\
-    memcpy(rets.items, items, sizeof(items));				\
-    rets;								\
   })
 
 struct a_vm;
@@ -36,11 +28,6 @@ struct a_arg {
 struct a_args {
   uint8_t count;
   struct a_arg items[A_MAX_ARGS];
-};
-
-struct a_rets {
-  uint8_t count;
-  struct a_type *items[A_MAX_RETS];
 };
 
 typedef a_type_id_t a_func_weight_t;

@@ -60,7 +60,6 @@ struct a_form *a_parse_call(struct a_parser *self) {
     }
 
     a_ls_push(&cf->as_call.args, &f->ls);
-    cf->as_call.arg_count++;
   }
 
   a_ls_push(&self->forms, &cf->ls);
@@ -90,7 +89,7 @@ struct a_form *a_parse_dot(struct a_parser *self) {
   }
 
   call->pos = fpos;
-  a_ls_push(call->as_call.args.next, &arg->ls); 
+  a_ls_push(call->as_call.args.next, &arg->ls);
   return call;
 }
 
