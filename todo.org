@@ -1,14 +1,11 @@
-* add queue type
-** implement iter_val
-* add send func
-* add inbox func
-* add send/iter example
-* --
-* implement multi clone
+* implement queue iter_val
+** add send/iter example
+* implement queue clone_val
+* implement multi clone_val
 ** clone funcs
 ** handle case where func exists in a_func_clone
-* implement pair clone
-* implement list clone
+* implement pair clone_val
+* implement list clone_val
 * add or/and prims
 * add break
 ** add vm.break_pc

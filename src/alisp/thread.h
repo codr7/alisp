@@ -10,6 +10,7 @@ struct a_thread {
   struct a_vm *owner, vm;
   pthread_t handle;
   struct a_rets rets;
+  struct a_queue inbox;
   a_ref_count_t ref_count;
 };
 

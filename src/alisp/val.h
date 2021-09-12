@@ -10,6 +10,7 @@ struct a_func;
 struct a_iter;
 struct a_multi;
 struct a_prim;
+struct a_queue;
 struct a_string;
 struct a_thread;
 struct a_type;
@@ -33,6 +34,7 @@ struct a_val {
     struct a_multi *as_multi;
     struct a_pair as_pair;
     struct a_prim *as_prim;
+    struct a_queue *as_queue;
     a_reg_t as_reg;
     struct a_string *as_string;
     struct a_thread *as_thread;

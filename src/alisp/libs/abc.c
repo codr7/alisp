@@ -10,6 +10,7 @@
 #include "alisp/prim.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
+#include "alisp/thread.h"
 #include "alisp/utils.h"
 #include "alisp/vm.h"
 
@@ -520,6 +521,15 @@ static a_pc_t nil_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
+static a_pc_t pop_queue_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *q = a_pop(vm);
+  struct a_val *v = a_queue_pop(q->as_queue);
+  a_val_free(q, vm);
+  if (!v) { return NULL; }
+  a_ls_push(&vm->stack, &v->ls);
+  return ret;
+}
+
 static bool reset_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   a_emit(vm, A_RESET_OP);
   return true;
@@ -561,6 +571,13 @@ static a_pc_t reverse_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   }
 
   a_free(vm, vs);
+  return ret;
+}
+
+static a_pc_t send_thread_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *v = a_pop(vm), *t = a_pop(vm);
+  a_queue_push(&t->as_thread->inbox, v);
+  a_val_free(t, vm);
   return ret;
 }
 
@@ -716,6 +733,9 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_type(&self->lib, a_pair_type_init(&self->pair_type, vm, a_string(vm, "Pair"),
 					       A_SUPER(&self->list_type)));
 
+  a_lib_bind_type(&self->lib, a_queue_type_init(&self->queue_type, vm, a_string(vm, "Queue"),
+						A_SUPER(&self->seq_type)));
+
   a_lib_bind_type(&self->lib, a_reg_type_init(&self->reg_type, vm, a_string(vm, "Reg"),
 					      A_SUPER(&self->any_type)));
 
@@ -815,9 +835,21 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "reset"), 0, 0))->body = reset_body;
 			 
   a_lib_bind_func(&self->lib,
+		  a_func_new(vm, a_string(vm, "pop"),
+			     A_ARG(vm, {a_string(vm, "queue"), &vm->abc.queue_type}),
+			     A_RET(vm, &vm->abc.any_type)))->body = pop_queue_body;
+
+  a_lib_bind_func(&self->lib,
 		  a_func_new(vm, a_string(vm, "reverse"),
 			     A_ARG(vm, {a_string(vm, "lst"), &vm->abc.list_type}),
 			     A_RET(vm, &vm->abc.list_type)))->body = reverse_body;
+
+  a_lib_bind_func(&self->lib,
+		  a_func_new(vm, a_string(vm, "send"),
+			     A_ARG(vm,
+				   {a_string(vm, "thread"), &vm->abc.thread_type},
+				   {a_string(vm, "val"), &vm->abc.any_type}),
+			     A_RET(vm)))->body = send_thread_body;
 
   a_lib_bind_func(&self->lib,
 		  a_func_new(vm, a_string(vm, "sleep"),

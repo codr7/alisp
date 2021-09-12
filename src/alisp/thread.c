@@ -2,6 +2,7 @@
 #include "alisp/fail.h"
 #include "alisp/form.h"
 #include "alisp/stack.h"
+#include "alisp/string.h"
 #include "alisp/thread.h"
 
 struct a_thread *a_thread_new(struct a_vm *owner, struct a_rets rets) {
@@ -15,6 +16,11 @@ struct a_thread *a_thread_new(struct a_vm *owner, struct a_rets rets) {
 struct a_thread *a_thread_init(struct a_thread *self, struct a_vm *owner, struct a_rets rets) {
   self->owner = owner;
   a_vm_init(&self->vm);
+  a_queue_init(&self->inbox, &self->vm, A_INBOX_CAP);
+
+  a_scope_bind(&self->vm.main, a_string(&self->vm, "inbox"), &self->vm.abc.queue_type)->as_queue =
+    a_queue_ref(&self->inbox);
+
   self->rets = rets;
   self->ref_count = 1;
   return self;

@@ -53,8 +53,6 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_lib_import(&self->abc.lib);
   a_math_lib_init(&self->math, self);
   a_lib_import(&self->math.lib);
-
-  a_queue_init(&self->inbox, self, A_INBOX_CAP);
   return self;
 }
 

@@ -19,7 +19,7 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v13
+Welcome to aLisp v14
 
 Return on empty line evaluates,
 (reset) clears the stack and Ctrl+D exits.
@@ -453,6 +453,25 @@ Threads run in complete isolation as separate VM instances.
 
   _.(join)
   
+[42]
+```
+
+Each thread comes with a built-in queue.
+
+```
+  (thread [] inbox.(dump)).(join)
+
+Queue(0x7fe86902d810)
+[]
+```
+
+`send` may be used to push items to a thread's inbox.
+
+```
+  (let [t (thread [Int] inbox.(pop))]
+    t.(send 42)
+    t.(join))
+
 [42]
 ```
 
