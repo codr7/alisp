@@ -359,18 +359,6 @@ When a variable is specified, it is automatically bound for each iteration.
 [8 9 10]
 ```
 
-`iter` may be used to obtain an iterator for any sequence.
-
-```
-  (iter "foo")
-
-[Iter(0x7ff5010e6020)]
-
-  (for _)
-
-[\f \o \o]
-```
-
 ### functions
 New functions may be defined using `func`.
 

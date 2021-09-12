@@ -407,13 +407,6 @@ static a_pc_t is_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
-static a_pc_t iter_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *v = a_pop(vm);
-  a_push(vm, &vm->abc.iter_type)->as_iter = a_iter(v);
-  a_val_free(v, vm);
-  return ret;
-}
-
 static bool lambda_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   struct a_func *f = parse_func(args, args->next, NULL, vm);
   if (!f) { return false; }
@@ -774,11 +767,6 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 				   {a_string(vm, "x"), &vm->abc.any_type},
 				   {a_string(vm, "y"), &vm->abc.any_type}),
 			     A_RET(vm, &vm->abc.bool_type)))->body = is_body;
-
-  a_lib_bind_func(&self->lib,
-		  a_func_new(vm, a_string(vm, "iter"),
-			     A_ARG(vm, {a_string(vm, "val"), &vm->abc.seq_type}),
-			     A_RET(vm, &vm->abc.iter_type)))->body = iter_body;
 
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "\\"), 2, -1))->body = lambda_body;
 
