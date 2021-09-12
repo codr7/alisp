@@ -8,6 +8,7 @@
 #include "alisp/lset.h"
 #include "alisp/op.h"
 #include "alisp/pool.h"
+#include "alisp/queue.h"
 #include "alisp/scope.h"
 #include "alisp/val.h"
 
@@ -15,12 +16,15 @@
 
 struct a_vm {
   a_type_id_t next_type_id;
-  struct a_pool form_pool, func_pool, iter_pool, multi_pool, op_pool, prim_pool, thread_pool, type_pool, val_pool;
+  struct a_pool form_pool, func_pool,
+    iter_pool, multi_pool, op_pool, prim_pool, queue_pool,
+    thread_pool, type_pool,
+    val_pool;
 
   struct a_abc_lib abc;
   struct a_math_lib math;
   
-  struct a_ls code, free_forms, free_iters, free_threads, free_vals;
+  struct a_ls code, free_forms, free_iters, free_queues, free_threads, free_vals;
   struct a_ls scopes;
   struct a_ls stack;
   struct a_lset strings;
@@ -31,6 +35,7 @@ struct a_vm {
   uint16_t frame_count;
   
   struct a_val *regs[A_REG_COUNT];
+  struct a_queue inbox;
 };
 
 struct a_vm *a_vm_init(struct a_vm *self);

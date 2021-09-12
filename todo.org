@@ -1,8 +1,14 @@
-* add chan from libcodr7
+* add queue type
 ** implement iter_val
-* add multi clone
+* add send func
+* add inbox func
+* add send/iter example
+* --
+* implement multi clone
 ** clone funcs
 ** handle case where func exists in a_func_clone
+* implement pair clone
+* implement list clone
 * add or/and prims
 * add break
 ** add vm.break_pc
@@ -107,4 +113,8 @@
       for prob = (exp (- m)) then (* prob (/ m i))
       summing prob)
    1.0))
+
+
+
+
 
