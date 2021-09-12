@@ -502,16 +502,27 @@ Actual:   [3]
 []
 ```
 
-aLisp includes a modest but growing [test suite](https://github.com/codr7/alisp/blob/main/src/tests.alisp).
+aLisp includes a modest but growing [test suite](https://github.com/codr7/alisp/blob/main/test/all.alisp).
 
 ```
 $ cd alisp/build
-$ ./alisp ../src/tests.alisp
+$ ./alisp ../test/all.alisp
 Testing int add...success!
 Testing int sub...success!
 Testing fix...success!
 Testing fix add...success!
 Testing fix sub...success!
+Testing string is...success!
+Testing int iter...success!
+Testing list iter...success!
+Testing func...success!
+Testing func args...success!
+Testing closure...success!
+Testing anon func...success!
+Testing tco...success!
+Testing multiple dispatch...success!
+Testing thread join...success!
+0
 ```
 
 ### compile time evaluation
