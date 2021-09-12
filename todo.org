@@ -1,5 +1,9 @@
 * add chan from libcodr7
 ** implement iter_val
+* add multi clone
+** clone funcs
+** handle case where func exists in a_func_clone
+* add or/and prims
 * add break
 ** add vm.break_pc
 *** default NULL
@@ -17,7 +21,6 @@
 ** don't include anything automatically in scripts
 ** change a_lib_import to take single string arg
 *** extract a_lib_import_all
-* add or/and prims
 * add io.open
 ** add enums
 *** (enum OpenMode RD RW RD-OW APP RD-APP)

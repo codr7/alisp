@@ -1,3 +1,5 @@
+(bench 1
+
 (test "int add" [42] 35.(+ 7))
 (test "int sub" [35] 42.(- 7))
 
@@ -46,3 +48,5 @@
 
 (test "thread join" [42]
   (join (thread [Int] 42)))
+
+).(dump)
