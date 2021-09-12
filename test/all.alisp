@@ -49,4 +49,9 @@
 (test "thread join" [42]
   (join (thread [Int] 42)))
 
+(test "thread send" [42]
+  (let [t (thread [Int] inbox.(pop))]
+    t.(send 42)
+    t.(join)))
+
 ).(dump)

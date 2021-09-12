@@ -7,6 +7,7 @@
 * implement pair clone_val
 * implement list clone_val
 * figure out how to free pushed queue vals
+* --
 * add or/and prims
 * add break
 ** add vm.break_pc
