@@ -325,14 +325,7 @@ struct a_form *a_form_clone(struct a_form *self, struct a_vm *dst_vm, struct a_v
 
   case A_ID_FORM: {
     struct a_id_form *src = &self->as_id, *dst = &f->as_id;
-    struct a_val *found = a_scope_find(a_scope(src_vm), src->name);
     dst->name = a_string(dst_vm, src->name->data);
-    
-    if (found && found->type != &dst_vm->abc.reg_type) {
-      struct a_val *bound = a_scope_bind(&dst_vm->main, dst->name, a_type_clone(found->type, dst_vm));
-      if (bound) { a_clone(bound, found); }
-    }
-
     break;
   }
 
