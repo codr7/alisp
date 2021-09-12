@@ -492,6 +492,7 @@ The following types are provided out of the box, adding more is trivial.
 - Num: Any - Numeric values
 - Pair: List - Pair values
 - Prim: Any - Primitives as values
+- Queue: Seq - Queue values
 - Reg: Any - Registers as values
 - Seq: Any - Sequence values
 - String: Seq - String values

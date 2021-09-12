@@ -30,13 +30,6 @@
 ** add enums
 *** (enum OpenMode RD RW RD-OW APP RD-APP)
 ** add R/W/RWFile
-* add tasks
-** struct a_task
-** bool done
-** ls args
-** func body
-** add vm.tasks
-** add yield prim
 * add type-of/isa prims
 ** readme/types
 * add quoting
