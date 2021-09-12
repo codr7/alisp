@@ -6,6 +6,7 @@
 ** handle case where func exists in a_func_clone
 * implement pair clone_val
 * implement list clone_val
+* figure out how to free pushed queue vals
 * add or/and prims
 * add break
 ** add vm.break_pc
