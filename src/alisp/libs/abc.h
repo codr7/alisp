@@ -16,7 +16,7 @@ struct a_abc_lib {
     pair_type, prim_type,
     reg_type,
     seq_type, string_type,
-    target_type,
+    target_type, thread_type,
     undef_type;
 };
 

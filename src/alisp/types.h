@@ -59,4 +59,6 @@ struct a_type *a_reg_type_init(struct a_type *self, struct a_vm *vm, struct a_st
 
 struct a_type *a_string_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 
+struct a_type *a_thread_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
+
 #endif

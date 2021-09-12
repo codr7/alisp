@@ -60,6 +60,35 @@ struct a_func *a_func_init(struct a_func *self,
   return self;
 }
 
+struct a_func *a_func_clone(struct a_func *self, struct a_vm *dst_vm, struct a_vm *src_vm) {
+  a_check(self->body, "Clone not supported");
+  struct a_string *dn = a_string(dst_vm, self->name->data);
+  struct a_val *found = a_scope_find(&dst_vm->main, dn);
+
+  if (found) {
+    assert(found->type == &dst_vm->abc.func_type);
+    return found->as_func;
+  }
+
+  struct a_func *dst = a_func_new(dst_vm, dn, A_ARG(dst_vm), A_RET(dst_vm));
+
+  for (struct a_arg *s = self->args.items, *d = dst->args.items; s < self->args.items + self->args.count; s++, d++) {
+    d->name = a_string(dst_vm, s->name->data);
+    d->type = a_type_clone(s->type, dst_vm);
+    d->reg = s->reg;
+    dst->args.count++;
+  }
+
+  for (struct a_type **s = self->rets.items, **d = dst->rets.items; s < self->rets.items + self->rets.count; s++, d++) {
+    *d = a_type_clone(*s, dst_vm);
+    dst->rets.count++;
+  }
+
+  dst->body = self->body;
+  a_scope_bind(&dst_vm->main, dst->name, &dst_vm->abc.func_type)->as_func = dst;
+  return dst;
+}
+
 static a_reg_t push_reg(struct a_func *self, a_reg_t reg) {
   self->regs[self->reg_count++] = reg;
   return reg;

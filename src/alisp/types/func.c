@@ -9,12 +9,18 @@
 static a_pc_t call_val(struct a_val *val, enum a_call_flags flags, a_pc_t ret) {
   struct a_vm *vm = val->type->vm;
   struct a_func *f = val->as_func;
+
   if ((flags & A_CALL_CHECK) && !a_func_applicable(f, vm)) {
     a_stack_dump(&vm->stack);
     a_fail("Func not applicable: %s", f->name->data);
     return NULL;
   }
+
   return a_func_call(f, vm, flags, ret);
+}
+
+static void clone_val(struct a_val *dst, struct a_val *src) {
+  dst->as_func = a_func_clone(src->as_func, dst->type->vm, src->type->vm);
 }
 
 static void copy_val(struct a_val *dst, struct a_val *src) { dst->as_func = src->as_func; }
@@ -27,6 +33,7 @@ struct a_type *a_func_type_init(struct a_type *self,
 				struct a_type *super[]) {
   a_type_init(self, vm, name, super);
   self->call_val = call_val;
+  self->clone_val = clone_val;
   self->copy_val = copy_val;
   self->dump_val = dump_val;
   return self;

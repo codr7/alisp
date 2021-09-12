@@ -19,7 +19,7 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v12
+Welcome to aLisp v13
 
 Return on empty line evaluates,
 (reset) clears the stack and Ctrl+D exits.
@@ -454,12 +454,14 @@ Anonymous functions may be created by simply skipping the `func` keyword and nam
 ```
 
 ### threads
+Threads run in complete isolation as separate VM instances.
+
 ```
   (thread
-    (for 20 _.(fibrec:d))
+    (sleep 1000)
     42)
 
-[]
+[Thread(0x7fc6b9000020)]
 
   _.(join)
   

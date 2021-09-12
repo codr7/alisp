@@ -30,6 +30,13 @@ a_pc_t a_call(struct a_val *self, enum a_call_flags flags, a_pc_t ret) {
   return self->type->call_val(self, flags, ret);
 }
 
+struct a_val *a_clone(struct a_val *self, struct a_val *source) {
+  assert(!self->undef);
+  assert(self->type->clone_val);
+  self->type->clone_val(self, source);
+  return self;
+}
+
 enum a_order a_compare(struct a_val *self, struct a_val *other) {
   assert(self->type == other->type);
   assert(!self->undef);

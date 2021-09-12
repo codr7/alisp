@@ -312,3 +312,58 @@ bool a_form_eval(struct a_form *self, struct a_vm *vm) {
   if (!a_eval(vm, pc)) { return false; }
   return true;
 }
+
+struct a_form *a_form_clone(struct a_form *self, struct a_vm *dst_vm, struct a_vm *src_vm) {
+  struct a_form *f = a_form_new(dst_vm, self->type, self->pos);
+
+  switch (self->type) {
+  case A_CALL_FORM: {
+    struct a_call_form *src = &self->as_call, *dst = &f->as_call;
+    dst->target = a_form_clone(src->target, dst_vm, src_vm);
+    dst->arg_count = src->arg_count;
+    a_ls_do(&src->args, ls) { a_ls_push(&dst->args, &a_form_clone(a_baseof(ls, struct a_form, ls), dst_vm, src_vm)->ls); }
+    break;
+  }
+
+  case A_ID_FORM: {
+    struct a_id_form *src = &self->as_id, *dst = &f->as_id;
+    struct a_val *found = a_scope_find(a_scope(src_vm), src->name);
+    dst->name = a_string(dst_vm, src->name->data);
+    
+    if (found && found->type != &dst_vm->abc.reg_type) {
+      struct a_val *bound = a_scope_bind(&dst_vm->main, dst->name, a_type_clone(found->type, dst_vm));
+      if (bound) { a_clone(bound, found); }
+    }
+
+    break;
+  }
+
+  case A_LIST_FORM: {
+    struct a_list_form *src = &self->as_list, *dst = &f->as_list;
+
+    a_ls_do(&src->items, ls) {
+      a_ls_push(&dst->items, &a_form_clone(a_baseof(ls, struct a_form, ls), dst_vm, src_vm)->ls);
+    }
+    
+    break;
+  }
+
+  case A_LIT_FORM: {
+    struct a_lit_form *src = &self->as_lit, *dst = &f->as_lit;
+    a_clone(a_val_init(&dst->val, a_type_clone(src->val.type, dst_vm)), &src->val);
+    break;
+  }
+
+  case A_PAIR_FORM: {
+    struct a_pair_form *src = &self->as_pair, *dst = &f->as_pair;
+    dst->left = a_form_clone(src->left, dst_vm, src_vm);
+    dst->right = a_form_clone(src->right, dst_vm, src_vm);
+    break;
+  }
+
+  case A_NOP_FORM:
+    break;
+  }
+
+  return f;
+}

@@ -54,6 +54,9 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type) {
     a_ls_init(&self->as_test.stack);
     self->as_test.end_pc = NULL;
     break;
+  case A_THREAD_OP:
+    a_ls_init(&self->as_thread.args);
+    break;
   case A_FENCE_OP:
   case A_PUSH_OP:
   case A_RESET_OP:
@@ -238,6 +241,7 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
   case A_BENCH_OP:
   case A_FOR_OP:
   case A_TEST_OP:
+  case A_THREAD_OP:
     break;
   }
 

@@ -1,5 +1,6 @@
 #include <assert.h>
 #include <stdio.h>
+#include <time.h>
 #include "alisp/fail.h"
 #include "alisp/form.h"
 #include "alisp/func.h"
@@ -556,6 +557,14 @@ static a_pc_t reverse_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
+static a_pc_t sleep_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
+  struct a_val *ms = a_pop(vm);
+  struct timespec t = {.tv_sec=ms->as_int / 1000, .tv_nsec=ms->as_int % 1000 * 1000000};
+  a_val_free(ms, vm);
+  nanosleep(&t, NULL);
+  return ret;
+}
+
 static bool swap_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   a_emit(vm, A_SWAP_OP);
   return true;
@@ -636,6 +645,12 @@ static bool test_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
   return true;
 }
 
+static bool thread_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+  struct a_thread_op *op = &a_emit(vm, A_THREAD_OP)->as_thread;
+  a_ls_do(args, a) { a_ls_push(&op->args, a_ls_pop(a)); }
+  return true;
+}
+
 static bool unbind_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
   struct a_form *id = a_baseof(args->next, struct a_form, ls);
 
@@ -694,6 +709,9 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_type(&self->lib, a_prim_type_init(&self->prim_type, vm, a_string(vm, "Prim"),
 					       A_SUPER(&self->any_type)));
 
+  a_lib_bind_type(&self->lib, a_thread_type_init(&self->thread_type, vm, a_string(vm, "Thread"),
+						 A_SUPER(&self->any_type)));
+  
   a_lib_bind_type(&self->lib, a_type_init(&self->undef_type, vm, a_string(vm, "Undef"), A_SUPER(NULL)));
 
   a_lib_bind(&self->lib, a_string(vm, "ALISP-VERSION"), &self->int_type)->as_int = A_VERSION;
@@ -790,6 +808,11 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 			     A_ARG(vm, {a_string(vm, "lst"), &vm->abc.list_type}),
 			     A_RET(vm, &vm->abc.list_type)))->body = reverse_body;
 
+  a_lib_bind_func(&self->lib,
+		  a_func_new(vm, a_string(vm, "sleep"),
+			     A_ARG(vm, {a_string(vm, "ms"), &vm->abc.int_type}),
+			     A_RET(vm)))->body = sleep_body;
+
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "swap"), 0, 0))->body = swap_body;
 
   a_lib_bind_func(&self->lib,
@@ -802,7 +825,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 			     A_RET(vm, &vm->abc.any_type)))->body = tail_pair_body;
 
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "test"), 2, -1))->body = test_body;
-
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "thread"), 0, -1))->body = thread_body;
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "unbind"), 1, 1))->body = unbind_body;
 
   return self;

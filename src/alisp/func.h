@@ -75,6 +75,8 @@ struct a_func *a_func_init(struct a_func *self,
 			   struct a_args args,
 			   struct a_rets rets);
 
+struct a_func *a_func_clone(struct a_func *self, struct a_vm *dst_vm, struct a_vm *src_vm);
+
 void a_func_begin(struct a_func *self, struct a_vm *vm);
 void a_func_end(struct a_func *self, struct a_vm *vm);
 

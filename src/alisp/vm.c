@@ -13,6 +13,7 @@
 #include "alisp/scope.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
+#include "alisp/thread.h"
 #include "alisp/utils.h"
 #include "alisp/vm.h"
 
@@ -27,10 +28,13 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_pool_init(&self->multi_pool, self, A_MULTI_PAGE_SIZE, sizeof(struct a_multi));
   a_pool_init(&self->op_pool, self, A_OP_PAGE_SIZE, sizeof(struct a_op));
   a_pool_init(&self->prim_pool, self, A_PRIM_PAGE_SIZE, sizeof(struct a_prim));
+  a_pool_init(&self->thread_pool, self, A_THREAD_PAGE_SIZE, sizeof(struct a_thread));
+  a_pool_init(&self->type_pool, self, A_TYPE_PAGE_SIZE, sizeof(struct a_type));
   a_pool_init(&self->val_pool, self, A_VAL_PAGE_SIZE, sizeof(struct a_val));
   a_ls_init(&self->code);
   a_ls_init(&self->free_forms);
   a_ls_init(&self->free_iters);
+  a_ls_init(&self->free_threads);
   a_ls_init(&self->free_vals);
   a_lset_init(&self->strings, strings_key, strings_compare);
 
@@ -46,7 +50,6 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   a_lib_import(&self->abc.lib);
   a_math_lib_init(&self->math, self);
   a_lib_import(&self->math.lib);
-
   return self;
 }
 
@@ -73,6 +76,8 @@ void a_vm_deinit(struct a_vm *self) {
   }
 
   a_pool_deinit(&self->val_pool);
+  a_pool_deinit(&self->type_pool);
+  a_pool_deinit(&self->thread_pool);
   a_pool_deinit(&self->prim_pool);
   a_pool_deinit(&self->op_pool);
   a_pool_deinit(&self->iter_pool);

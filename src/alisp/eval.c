@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include "alisp/fail.h"
+#include "alisp/form.h"
 #include "alisp/frame.h"
 #include "alisp/func.h"
 #include "alisp/iter.h"
 #include "alisp/stack.h"
 #include "alisp/string.h"
+#include "alisp/thread.h"
 #include "alisp/timer.h"
 #include "alisp/vm.h"
 
@@ -27,7 +29,8 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     &&GOTO, &&LOAD, &&PUSH,
     &&RESET, &&RET,
     &&STORE, &&SWAP,
-    &&TEST, &&ZIP
+    &&TEST, &&THREAD,
+    &&ZIP
   };
   
   A_DISPATCH(pc);
@@ -279,6 +282,20 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     a_reset(self);
     self->stack = stack;
     A_DISPATCH(op->end_pc);
+  }
+
+ THREAD: {
+    A_TRACE(THREAD);
+    struct a_thread_op *op = &a_baseof(pc, struct a_op, pc)->as_thread;
+    struct a_thread *t = a_thread_new(self);
+
+    if (!a_thread_emit(t, &op->args) || !a_thread_start(t)) {
+      a_thread_deref(t);
+      return false;
+    }
+    
+    a_push(self, &self->abc.thread_type)->as_thread = t;
+    A_DISPATCH(pc);
   }
 
  ZIP: {
