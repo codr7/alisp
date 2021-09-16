@@ -29,6 +29,8 @@ Return on empty line evaluates,
   10.(fibrec)
 [55]
 ```
+### binaries
+Prebuild binaries for macOS may be found [here](https://github.com/codr7/alisp/blob/main/bin).
 
 ### the stack
 aLisp exposes the stack to a greater extent than usual among Lisps.
