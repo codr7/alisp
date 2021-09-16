@@ -10,7 +10,7 @@ aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom 
 - Infix calls are supported with `.` between first argument and call.
 
 ### setup
-aLisp requires CMake and a C compiler to build.
+aLisp requires CMake and a C compiler to build, rlwrap is highly recommended for running the REPL.
 
 ```
 $ cd alisp
@@ -18,7 +18,7 @@ $ mkdir build
 $ cd build
 $ cmake ..
 $ make
-$ ./alisp
+$ rlwrap ./alisp
 Welcome to aLisp v15
 
 Return on empty line evaluates,
