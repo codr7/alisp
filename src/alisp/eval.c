@@ -22,7 +22,7 @@
 
 bool a_eval(struct a_vm *self, a_pc_t pc) {
   static const void* dispatch[] = {&&STOP,
-    &&BENCH, &&BRANCH,
+    &&BENCH, &&BRANCH, &&BREAK,
     &&CALL,
     &&DROP, &&DUP,
     &&FENCE, &&FOR,
@@ -64,6 +64,12 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     }
 
     A_DISPATCH(a_true(c) ? pc : a_baseof(pc, struct a_op, pc)->as_branch.right_pc);
+  }
+
+ BREAK: {
+    A_TRACE(BREAK);
+    self->break_depth++;
+    A_DISPATCH(pc);    
   }
   
  CALL: {
@@ -158,6 +164,11 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     while ((v = a_iter_next(it, self))) {
       a_ls_push(&self->stack, &v->ls);
       a_eval(self, pc);
+      
+      if (self->break_depth) {
+	self->break_depth--;
+	break;
+      }
     }
     
     a_val_free(in, self);

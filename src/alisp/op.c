@@ -59,6 +59,7 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type, struct a_vm *vm) 
     a_ls_init(&self->as_thread.args);
     self->as_thread.rets = A_RET(vm);
     break;
+  case A_BREAK_OP:
   case A_FENCE_OP:
   case A_JOIN_OP:
   case A_PUSH_OP:
@@ -250,7 +251,8 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
     a_push(vm, &vm->abc.pair_type)->undef = true;
     break;
   }
-    
+
+  case A_BREAK_OP:
   case A_FENCE_OP:
   case A_GOTO_OP:
   case A_RESET_OP:

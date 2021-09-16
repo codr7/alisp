@@ -48,7 +48,8 @@ struct a_vm *a_vm_init(struct a_vm *self) {
   self->frame_count = 0;
   a_ls_init(&self->stack);
   memset(self->regs, 0, sizeof(self->regs));
-
+  self->break_depth = 0;
+  
   a_abc_lib_init(&self->abc, self);
   a_lib_import(&self->abc.lib);
   a_math_lib_init(&self->math, self);

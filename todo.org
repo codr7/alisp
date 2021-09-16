@@ -20,13 +20,6 @@
 ** implement iter_val
 *** push pairs
 * add or/and prims
-* add break
-** add vm.break_pc
-*** default NULL
-** backup/restore in frame
-** set in for-prim
-** add break prim
-*** goto break pc
 * bayes
 ** build/x.lisp
 ** add *(float int)

@@ -352,6 +352,14 @@ When a variable is specified, it is automatically bound for each iteration.
 [1 3 5]
 ```
 
+`break` may be used to end the loop prematurely, any arguments are simply pushed on the stack.
+
+```
+  (for 3 (if (dup).(= 1) (break)))
+
+[0 1]
+```
+
 `map` may be used to apply specified function to specified sequence, it returns a lazy iterator.
 
 ```

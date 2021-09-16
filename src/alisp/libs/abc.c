@@ -38,7 +38,7 @@ static a_pc_t gt_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
-static bool bench_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool bench_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   struct a_ls *a = args;
   struct a_form *reps_form = a_baseof((a = a->next), struct a_form, ls);
   struct a_val *reps = a_form_val(reps_form, vm);
@@ -65,7 +65,16 @@ static bool bench_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, 
   return true;
 }
 
-static bool ceval_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool break_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
+  a_ls_do(args, ls) {
+    if (!a_form_emit(a_baseof(ls, struct a_form, ls), vm)) { return false; }
+  }
+  
+  a_emit(vm, A_BREAK_OP);
+  return true;
+}
+
+static bool ceval_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   struct a_goto_op *skip = &a_emit(vm, A_GOTO_OP)->as_goto;
   a_pc_t pc = a_pc(vm);
 
@@ -91,7 +100,7 @@ static bool ceval_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, 
   return true;
 }
 
-static bool d_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool d_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   struct a_ls *a = args;
   int offset = 0;
 
@@ -137,7 +146,7 @@ static bool d_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint
   return true;
 }
 
-static bool def_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool def_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   struct a_ls *a = args;
   struct a_form *kf = a_baseof((a = a->next), struct a_form, ls);
   
@@ -164,7 +173,7 @@ static bool def_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, ui
   return true;
 }
 
-static bool do_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool do_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   a_ls_do(args, a) {
     if (!a_form_emit(a_baseof(a, struct a_form, ls), vm)) { return false; }
   }
@@ -180,12 +189,12 @@ static a_pc_t dump_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
-static bool dup_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool dup_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   a_emit(vm, A_DUP_OP);
   return true;
 }
 
-static bool for_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool for_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   struct a_ls *a = args;
   struct a_form *in = a_baseof((a = a->next), struct a_form, ls);
   a_reg_t bind_reg = -1;
@@ -342,7 +351,7 @@ static struct a_func *parse_func(struct a_ls *args, struct a_ls *a, struct a_str
   return f;
 }
 
-static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool func_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   struct a_ls *a = args->next;
   struct a_form *name_form = a_baseof(a, struct a_form, ls);
 
@@ -365,7 +374,7 @@ static a_pc_t head_pair_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
-static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   struct a_ls *a = args->next;
   struct a_form *cond = a_baseof(a, struct a_form, ls);
   if (!a_form_emit(cond, vm)) { return false; }
@@ -389,7 +398,7 @@ static bool if_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uin
   return true;
 }
 
-static bool include_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool include_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   a_ls_do(args, a) {
     struct a_form *f = a_baseof(a, struct a_form, ls);
     struct a_val *v = a_form_val(f, vm);
@@ -413,7 +422,7 @@ static a_pc_t is_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
-static bool join_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool join_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   a_ls_do(args, ls) {
     if (!a_form_emit(a_baseof(ls, struct a_form, ls), vm)) { return false; }
     a_emit(vm, A_JOIN_OP);
@@ -422,7 +431,7 @@ static bool join_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
   return true;
 }
 
-static bool lambda_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool lambda_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   struct a_func *f = parse_func(args, args->next, NULL, vm);
   if (!f) { return false; }
   f->name = a_format(vm, "%p", f);
@@ -430,7 +439,7 @@ static bool lambda_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args,
   return true;
 }
 
-static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool let_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   struct a_form *bsf = a_baseof(args->next, struct a_form, ls);
 
   if (bsf->type != A_LIST_FORM) {
@@ -530,7 +539,7 @@ static a_pc_t pop_queue_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
-static bool reset_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool reset_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   a_emit(vm, A_RESET_OP);
   return true;
 }
@@ -589,7 +598,7 @@ static a_pc_t sleep_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
-static bool swap_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool swap_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   a_emit(vm, A_SWAP_OP);
   return true;
 }
@@ -608,7 +617,7 @@ static a_pc_t tail_pair_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
   return ret;
 }
 
-static bool test_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool test_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   struct a_ls *a = args;
   struct a_form *desc_form = a_baseof((a = a->next), struct a_form, ls);
   struct a_val *desc = a_form_val(desc_form, vm);
@@ -669,7 +678,7 @@ static bool test_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, u
   return true;
 }
 
-static bool thread_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool thread_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   struct a_ls *a = args;
   struct a_thread_op *op = &a_emit(vm, A_THREAD_OP)->as_thread;
   parse_rets(&op->rets, a_baseof((a = a->next), struct a_form, ls), vm);
@@ -684,7 +693,7 @@ static bool thread_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args,
   return true;
 }
 
-static bool unbind_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count) {
+static bool unbind_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
   struct a_form *id = a_baseof(args->next, struct a_form, ls);
 
   if (id->type != A_ID_FORM) {
@@ -777,6 +786,7 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
 			     A_RET(vm, &vm->abc.bool_type)))->body = gt_body;
 
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "bench"), 1, -1))->body = bench_body;
+  a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "break"), 0, -1))->body = break_body;
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "ceval"), 0, -1))->body = ceval_body;
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "d"), 0, 2))->body = d_body;
   a_lib_bind_prim(&self->lib, a_prim_new(vm, a_string(vm, "def"), 2, 2))->body = def_body;

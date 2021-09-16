@@ -35,6 +35,7 @@ struct a_vm {
   uint16_t frame_count;
   
   struct a_val *regs[A_REG_COUNT];
+  uint16_t break_depth;
 };
 
 struct a_vm *a_vm_init(struct a_vm *self);

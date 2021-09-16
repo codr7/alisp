@@ -7,7 +7,7 @@
 
 enum a_op_type {
   A_STOP_OP=0,
-  A_BENCH_OP, A_BRANCH_OP,
+  A_BENCH_OP, A_BRANCH_OP, A_BREAK_OP,
   A_CALL_OP, 
   A_DROP_OP, A_DUP_OP,
   A_FENCE_OP, A_FOR_OP,

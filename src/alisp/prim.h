@@ -10,7 +10,7 @@ struct a_vm;
 struct a_prim {
   struct a_string *name;
   int8_t min_args, max_args;
-  bool (*body)(struct a_prim *self, struct a_vm *vm, struct a_ls *args, uint8_t arg_count);
+  bool (*body)(struct a_prim *self, struct a_vm *vm, struct a_ls *args);
 };
 
 struct a_prim *a_prim_new(struct a_vm *vm,

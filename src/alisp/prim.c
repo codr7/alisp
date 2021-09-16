@@ -30,5 +30,5 @@ bool a_prim_call(struct a_prim *self, struct a_vm *vm, struct a_ls *args) {
     return false;
   }
 
-  return self->body(self, vm, args, arg_count);
+  return self->body(self, vm, args);
 }
