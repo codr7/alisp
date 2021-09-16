@@ -10,7 +10,7 @@ set_target_properties(lib_static PROPERTIES OUTPUT_NAME alisp)
 target_include_directories(lib_static PUBLIC src/)
 
 add_executable(alisp ${sources} src/main.c)
-target_compile_options(alisp PUBLIC -g)
+target_compile_options(alisp PUBLIC -g -O2)
 target_include_directories(alisp PUBLIC src/)
 
 add_executable(tests ${sources} src/tests.c)

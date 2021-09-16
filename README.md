@@ -3,7 +3,7 @@
 [![Liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/andreas7/donate)
 
 ### intro
-aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom Lisp implemented in portable C. The current version weighs in at 5 kloc and supports all features described in this document.
+aLisp aims to become a hackable, embeddable, reasonably fast interpreted custom Lisp implemented in portable C. The current version weighs in at 6 kloc and supports all features described in this document.
 
 ### quirks
 - Parens are used for calls, brackets for lists.
@@ -169,7 +169,7 @@ Unknown id: +
 [F]
 ```
 
-`=` returns `T` only if both arguments are equal.
+`=` is more relaxed and returns `T` if its arguments are deep equal.
 
 ```
   [].=([])
@@ -363,7 +363,7 @@ When a variable is specified, it is automatically bound for each iteration.
 `break` may be used to end the loop prematurely, any arguments are simply pushed on the stack.
 
 ```
-  (for 3 (if (dup).(= 1) (break)))
+  (for 3 (if (dup).(is 1) (break)))
 
 [0 1]
 ```
@@ -499,7 +499,7 @@ Queue(0x7fe86902d810)
 Queues are iterable, which makes it convient to implement worker threads as for loops.
 
 ```
-  (let [t (thread [Int] (for m:inbox (if m.(= 'stop) (break) m.(dump))))]
+  (let [t (thread [Int] (for m:inbox (if m.(is 'stop) (break) m.(dump))))]
     t.(send 'foo)
     t.(send 'bar)
     t.(send 'stop)
@@ -633,7 +633,7 @@ Note that the number of repetitions increased by four orders of magnitude to get
     (if n.(< 2) n n.(- 1).(fibrec-m:m).(+ n.(- 2).(fibrec-m:m))))
   (bench 1000000 (fibrec-m:d 20))
 
-[323]
+[549]
 ```
 
 Let's switch to a tail recursive implementation to get more data.
@@ -648,7 +648,7 @@ $ python3 fibtail.py
 
 ```
   (func fibtail [n:Int a:Int b:Int] [Int]
-    (if n.(= 0) a (if n.(= 1) b (fibtail:t n.(- 1) b a.(+ b)))))
+    (if n.(is 0) a (if n.(is 1) b (fibtail:t n.(- 1) b a.(+ b)))))
   (bench 10000 (fibtail:d 70 0 1))
 
 [224]
@@ -658,7 +658,7 @@ When combining TCO with memoization, only memoized frames are skipped.
 
 ```
   (func fibtail-m [n:Int a:Int b:Int] [Int]
-    (if n.(= 0) a (if n.(= 1) b (fibtail-m:m:t n.(- 1) b a.(+ b)))))
+    (if n.(is 0) a (if n.(is 1) b (fibtail-m:m:t n.(- 1) b a.(+ b)))))
   (bench 10000 (fibtail-m:d 70 0 1))
 
 [6]

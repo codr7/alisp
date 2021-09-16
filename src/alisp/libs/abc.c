@@ -15,25 +15,28 @@
 #include "alisp/vm.h"
 
 static a_pc_t equals_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_pop(vm);
-  a_push(vm, &vm->abc.bool_type)->as_bool = a_equals(x, y);
-  a_val_free(x, vm);
+  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
+  bool result = a_equals(x, y);
+  a_deref(x);
+  a_val_init(x, &vm->abc.bool_type)->as_bool = result;
   a_val_free(y, vm);
   return ret;
 }
 
 static a_pc_t lt_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_pop(vm);
-  a_push(vm, &vm->abc.bool_type)->as_bool = a_compare(x, y) == A_LT;
-  a_val_free(x, vm);
+  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
+  bool result = a_compare(x, y) == A_LT;
+  a_deref(x);
+  a_val_init(x, &vm->abc.bool_type)->as_bool = result;
   a_val_free(y, vm);
   return ret;
 }
 
 static a_pc_t gt_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_pop(vm);
-  a_push(vm, &vm->abc.bool_type)->as_bool = a_compare(x, y) == A_GT;
-  a_val_free(x, vm);
+  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
+  bool result = a_compare(x, y) == A_GT;
+  a_deref(x);
+  a_val_init(x, &vm->abc.bool_type)->as_bool = result;
   a_val_free(y, vm);
   return ret;
 }
@@ -415,9 +418,10 @@ static bool include_body(struct a_prim *self, struct a_vm *vm, struct a_ls *args
 }
 
 static a_pc_t is_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_pop(vm);
-  a_push(vm, &vm->abc.bool_type)->as_bool = a_is(x, y);
-  a_val_free(x, vm);
+  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
+  bool result = a_is(x, y);
+  a_deref(x);
+  a_val_init(x, &vm->abc.bool_type)->as_bool = result;
   a_val_free(y, vm);
   return ret;
 }

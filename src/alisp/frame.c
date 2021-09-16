@@ -14,18 +14,28 @@ struct a_frame *a_frame_init(struct a_frame *self,
   self->flags = flags;
   self->mem = mem;
   self->ret = ret;
-
-  for (a_reg_t *reg = func->regs; reg < func->regs + func->reg_count; reg++) {
-    struct a_val *src = vm->regs[*reg];
-    if (src) { self->regs[*reg] = a_copy(a_val_new(src->type), src); }
+  a_reg_t reg = func->min_reg;
+  
+  for (struct a_val **src = vm->regs + reg, **dst = self->regs + reg; reg <= func->max_reg; reg++, src++, dst++) {
+      *dst = *src;
+      *src = NULL;
   }
   
   return self;
 }
 
 void a_frame_restore(struct a_frame *self, struct a_vm *vm) {
-  for (a_reg_t *reg = self->func->regs; reg < self->func->regs + self->func->reg_count; reg++) {
-    struct a_val *v = self->regs[*reg];
-    if (v) { a_store(vm, *reg, v); }
+  a_reg_t reg = self->func->min_reg;
+  
+  for (struct a_val **src = self->regs + reg, **dst = vm->regs + reg; reg <= self->func->max_reg; reg++, src++, dst++) {
+    struct a_val *v = self->regs[reg];
+
+    if (*src) {
+      if (*dst) {
+	a_store(vm, reg, v);
+      } else {
+	*dst = *src;
+      }
+    }
   }
 }

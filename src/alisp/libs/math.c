@@ -71,29 +71,29 @@ static a_pc_t float_fix_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 }
 
 static a_pc_t float_add_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
-  x->as_float += y->as_float;
+  struct a_val *y = a_pop(vm);
+  a_peek(vm, 0)->as_float += y->as_float;
   a_val_free(y, vm);
   return ret;
 }
 
 static a_pc_t float_sub_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
-  x->as_float -= y->as_float;
+  struct a_val *y = a_pop(vm);
+  a_peek(vm, 0)->as_float -= y->as_float;
   a_val_free(y, vm);
   return ret;
 }
 
 static a_pc_t float_mul_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
-  x->as_float *= y->as_float;
+  struct a_val *y = a_pop(vm);
+  a_peek(vm, 0)->as_float *= y->as_float;
   a_val_free(y, vm);
   return ret;
 }
 
 static a_pc_t float_div_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
-  x->as_float /= y->as_float;
+  struct a_val *y = a_pop(vm);
+  a_peek(vm, 0)->as_float /= y->as_float;
   a_val_free(y, vm);
   return ret;
 }
@@ -111,22 +111,22 @@ static a_pc_t int_float_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
 }
 
 static a_pc_t int_add_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
-  x->as_int += y->as_int;
+  struct a_val *y = a_pop(vm);
+  a_peek(vm, 0)->as_int += y->as_int;
   a_val_free(y, vm);
   return ret;
 }
 
 static a_pc_t int_sub_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
-  x->as_int -= y->as_int;
+  struct a_val *y = a_pop(vm);
+  a_peek(vm, 0)->as_int -= y->as_int;
   a_val_free(y, vm);
   return ret;
 }
 
 static a_pc_t int_mul_body(struct a_func *self, struct a_vm *vm, a_pc_t ret) {
-  struct a_val *y = a_pop(vm), *x = a_peek(vm, 0);
-  x->as_int *= y->as_int;
+  struct a_val *y = a_pop(vm);
+  a_peek(vm, 0)->as_int *= y->as_int;
   a_val_free(y, vm);
   return ret;
 }

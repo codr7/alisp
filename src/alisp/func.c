@@ -49,7 +49,7 @@ struct a_func *a_func_init(struct a_func *self,
   a_lset_init(&self->mem, mem_key, mem_compare);
   self->start_pc = NULL;
   self->scope = NULL;
-  self->reg_count = 0;
+  self->min_reg = self->max_reg = -1;
   self->body = NULL;
   self->weight = 0;
   
@@ -89,16 +89,14 @@ struct a_func *a_func_clone(struct a_func *self, struct a_vm *dst_vm, struct a_v
   return dst;
 }
 
-static a_reg_t push_reg(struct a_func *self, a_reg_t reg) {
-  self->regs[self->reg_count++] = reg;
-  return reg;
-}
+static a_reg_t push_reg(struct a_func *self, a_reg_t reg) { return (self->max_reg = reg); }
 
 void a_func_begin(struct a_func *self, struct a_vm *vm) {
   a_emit(vm, A_GOTO_OP);
   self->start_pc = a_pc(vm);
   self->scope = a_begin(vm);
-
+  self->min_reg = self->scope->next_reg;
+  
   for (struct a_arg *a = self->args.items; a < self->args.items+self->args.count; a++) {
     if (a->name) { a->reg = push_reg(self, a_scope_bind_reg(self->scope, a->name)); }
   }
