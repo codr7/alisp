@@ -16,6 +16,7 @@
 
 struct a_vm {
   a_type_id_t next_type_id;
+  
   struct a_pool form_pool, func_pool,
     iter_pool, multi_pool, op_pool, prim_pool, queue_pool,
     thread_pool, type_pool,
@@ -25,6 +26,7 @@ struct a_vm {
   struct a_math_lib math;
   
   struct a_ls code, free_forms, free_iters, free_queues, free_threads, free_vals;
+  
   struct a_ls scopes;
   struct a_ls stack;
   struct a_lset strings;

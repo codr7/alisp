@@ -161,15 +161,12 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     struct a_iter *it = a_iter(in);
     struct a_val *v = NULL;
 
-    while ((v = a_iter_next(it, self))) {
+    while (!self->break_depth && (v = a_iter_next(it, self))) {
       a_ls_push(&self->stack, &v->ls);
-      a_eval(self, pc);
-      
-      if (self->break_depth) {
-	self->break_depth--;
-	break;
-      }
+      a_eval(self, pc);      
     }
+
+    if (self->break_depth) { self->break_depth--; }
     
     a_val_free(in, self);
     a_iter_deref(it, self);
