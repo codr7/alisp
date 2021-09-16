@@ -129,7 +129,17 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
 	  }
 	}
       } else if (op->target->type == &vm->abc.multi_type) {
-	struct a_func *f = a_multi_specialize(op->target->as_multi, vm, false);
+	uint8_t n = op->target->as_multi->arg_count;
+	bool full = true;
+	
+	for (struct a_ls *v = vm->stack.prev; n; n--, v = v->prev) {
+	  if (a_baseof(v, struct a_val, ls)->type == &vm->abc.undef_type) {
+	    full = false;
+	    break;
+	  }
+	}
+	
+	struct a_func *f = a_multi_specialize(op->target->as_multi, vm, full);
 	
 	if (f) {
 	  a_deref(op->target);

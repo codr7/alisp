@@ -130,7 +130,6 @@ bool a_func_applicable(struct a_func *self, struct a_vm *vm) {
   struct a_ls *s = vm->stack.prev;
   
   for (struct a_arg *a = self->args.items + self->args.count-1; a >= self->args.items; a--, s = s->prev) {
-    if (s == &vm->stack) { return false; }
     if (!a_isa(a_baseof(s, struct a_val, ls)->type, a->type)) { return false; }
   }
   

@@ -612,7 +612,7 @@ Around twice as slow at the moment.
     (if n.(< 2) n n.(- 1).(fibrec).(+ n.(- 2).(fibrec))))
   (bench 100 (fibrec:d 20))
 
-[401]
+[436]
 ```
 
 Dropping the binding and dealing directly with the stack is slightly faster.
@@ -622,7 +622,7 @@ Dropping the binding and dealing directly with the stack is slightly faster.
     (if (dup).(< 2) _ (do _.(- 1) (dup).(fibrec-s).(+ (swap).(- 1).(fibrec-s)))))
   (bench 100 (fibrec-s:d 20))
 
-[344]
+[349]
 ```
 
 Memoization is a nice solution for these kinds of problems, `:m` may be used to memoize calls.
@@ -633,7 +633,7 @@ Note that the number of repetitions increased by four orders of magnitude to get
     (if n.(< 2) n n.(- 1).(fibrec-m:m).(+ n.(- 2).(fibrec-m:m))))
   (bench 1000000 (fibrec-m:d 20))
 
-[549]
+[507]
 ```
 
 Let's switch to a tail recursive implementation to get more data.
@@ -651,7 +651,7 @@ $ python3 fibtail.py
     (if n.(is 0) a (if n.(is 1) b (fibtail:t n.(- 1) b a.(+ b)))))
   (bench 10000 (fibtail:d 70 0 1))
 
-[224]
+[213]
 ```
 
 When combining TCO with memoization, only memoized frames are skipped.
@@ -661,5 +661,5 @@ When combining TCO with memoization, only memoized frames are skipped.
     (if n.(is 0) a (if n.(is 1) b (fibtail-m:m:t n.(- 1) b a.(+ b)))))
   (bench 10000 (fibtail-m:d 70 0 1))
 
-[6]
+[10]
 ```
