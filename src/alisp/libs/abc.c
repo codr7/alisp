@@ -751,6 +751,9 @@ struct a_abc_lib *a_abc_lib_init(struct a_abc_lib *self, struct a_vm *vm) {
   a_lib_bind_type(&self->lib, a_string_type_init(&self->string_type, vm, a_string(vm, "String"),
 						 A_SUPER(&self->seq_type)));
 
+  a_lib_bind_type(&self->lib, a_sym_type_init(&self->sym_type, vm, a_string(vm, "Sym"),
+					      A_SUPER(&self->any_type)));
+
   a_lib_bind_type(&self->lib, a_prim_type_init(&self->prim_type, vm, a_string(vm, "Prim"),
 					       A_SUPER(&self->any_type)));
 

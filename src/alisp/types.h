@@ -20,37 +20,20 @@ typedef uint16_t a_type_id_t;
 struct a_type *a_bool_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 struct a_type *a_char_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 struct a_type *a_fix_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
-
-struct a_type *a_float_type_init(struct a_type *self,
-				 struct a_vm *vm,
-				 struct a_string *name,
-				 struct a_type *super[]);
-
-struct a_type *a_func_type_init(struct a_type *self,
-				struct a_vm *vm,
-				struct a_string *name,
-				struct a_type *super[]);
-
+struct a_type *a_float_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
+struct a_type *a_func_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 struct a_type *a_int_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 struct a_type *a_iter_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 struct a_type *a_ls_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 struct a_type *a_meta_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 struct a_type *a_multi_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 struct a_type *a_nil_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
-
-struct a_type *a_pair_type_init(struct a_type *self,
-				struct a_vm *vm,
-				struct a_string *name,
-				struct a_type *super[]);
-
-struct a_type *a_prim_type_init(struct a_type *self,
-				struct a_vm *vm,
-				struct a_string *name,
-				struct a_type *super[]);
-
+struct a_type *a_pair_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
+struct a_type *a_prim_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 struct a_type *a_queue_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 struct a_type *a_reg_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 struct a_type *a_string_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
+struct a_type *a_sym_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 struct a_type *a_thread_type_init(struct a_type *self, struct a_vm *vm, struct a_string *name, struct a_type *super[]);
 
 #endif

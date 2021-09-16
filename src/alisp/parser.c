@@ -15,6 +15,7 @@ struct a_parser *a_parser_init(struct a_parser *self, struct a_vm *vm, struct a_
   a_parser_add_prefix(self, a_parse_call);
   a_parser_add_prefix(self, a_parse_string);  
   a_parser_add_prefix(self, a_parse_list);
+  a_parser_add_prefix(self, a_parse_quote);
   a_parser_add_prefix(self, a_parse_id);
   a_parser_add_suffix(self, a_parse_dot);
   a_parser_add_suffix(self, a_parse_pair);

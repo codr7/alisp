@@ -26,7 +26,7 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     &&CALL,
     &&DROP, &&DUP,
     &&FENCE, &&FOR,
-    &&GOTO, &&JOIN, &&LOAD, &&PUSH,
+    &&GOTO, &&JOIN, &&LOAD, &&PUSH, &&QUOTE,
     &&RESET, &&RET,
     &&STORE, &&SWAP,
     &&TEST, &&THREAD,
@@ -217,6 +217,20 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     A_DISPATCH(pc);
   }
 
+ QUOTE: {
+    A_TRACE(QUOTE);
+    struct a_form *f = a_baseof(pc, struct a_op, pc)->as_quote.form;
+    struct a_val *v = a_form_quote(f, self);
+
+    if (!v) {
+      a_fail("Quote not supported: %d", f->type);
+      return false;
+    }
+    
+    a_ls_push(&self->stack, &v->ls);
+    A_DISPATCH(pc);
+  }
+
  RESET: {
     A_TRACE(RESET);
     a_reset(self);
@@ -300,12 +314,12 @@ bool a_eval(struct a_vm *self, a_pc_t pc) {
     if (ok) {
       printf("success!\n");
     } else {
-	printf("failure!\n");
-	printf("Expected: ");
-	a_stack_dump(&op->stack);
-	printf("\nActual:   ");
-	a_stack_dump(&self->stack);
-	putc('\n', stdout);
+      printf("failure!\n");
+      printf("Expected: ");
+      a_stack_dump(&op->stack);
+      printf("\nActual:   ");
+      a_stack_dump(&self->stack);
+      putc('\n', stdout);
     }
     
     a_reset(self);

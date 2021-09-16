@@ -35,6 +35,9 @@ struct a_form *a_form_init(struct a_form *self, enum a_form_type type, struct a_
     self->as_pair.left = self->as_pair.right = NULL;
     self->as_pair.val = NULL;
     break;
+  case A_QUOTE_FORM:
+    self->as_quote.form = NULL;
+    break;
   case A_LIT_FORM:
   case A_NOP_FORM:
     break;
@@ -74,7 +77,12 @@ bool a_form_deref(struct a_form *self, struct a_vm *vm) {
     if (v) { a_val_free(v, vm); }
     break;
   }
-    
+
+  case A_QUOTE_FORM: {
+    a_form_deref(self->as_quote.form, vm);
+    break;
+  }
+
   case A_ID_FORM:
   case A_NOP_FORM:
     break;
@@ -159,6 +167,9 @@ struct a_val *a_form_val(struct a_form *self, struct a_vm *vm) {
     
     break;
   }
+
+  case A_QUOTE_FORM:
+    return a_form_quote(self, vm);
     
   case A_CALL_FORM:
   case A_NOP_FORM:
@@ -292,6 +303,11 @@ bool a_form_emit(struct a_form *self, struct a_vm *vm) {
     a_emit(vm, A_ZIP_OP);
     break;
   }  
+
+  case A_QUOTE_FORM: {
+    a_emit(vm, A_QUOTE_OP)->as_quote.form = a_form_ref(self);
+    break;
+  }
     
   case A_NOP_FORM:
     break;
@@ -352,9 +368,38 @@ struct a_form *a_form_clone(struct a_form *self, struct a_vm *dst_vm, struct a_v
     break;
   }
 
+  case A_QUOTE_FORM: {
+    struct a_quote_form *src = &self->as_quote, *dst = &f->as_quote;
+    dst->form = a_form_clone(src->form, dst_vm, src_vm);
+    break;
+  }
+
   case A_NOP_FORM:
     break;
   }
 
   return f;
 }
+
+struct a_val *a_form_quote(struct a_form *self, struct a_vm *vm) {
+  switch (self->type) {
+  case A_ID_FORM: {
+    struct a_val *v = a_val_new(&vm->abc.sym_type);
+    v->as_sym = self->as_id.name;
+    return v;
+  }
+
+  case A_QUOTE_FORM:
+    return a_form_quote(self->as_quote.form, vm);
+
+  case A_CALL_FORM:
+  case A_LIST_FORM:
+  case A_LIT_FORM:
+  case A_NOP_FORM:
+  case A_PAIR_FORM:
+    break;
+  }
+
+  return NULL;
+}
+

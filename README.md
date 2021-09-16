@@ -19,7 +19,7 @@ $ cd build
 $ cmake ..
 $ make
 $ ./alisp
-Welcome to aLisp v14
+Welcome to aLisp v15
 
 Return on empty line evaluates,
 (reset) clears the stack and Ctrl+D exits.
@@ -46,9 +46,9 @@ Values are pushed on the stack.
 `_` may be specified where values are expected to pop the stack.
 
 ```
-  42 (if _ 1 2)
+  42 (if _ 'true 'false)
   
-[1]
+['true]
 ```
 
 `d` may be used to drop values.
@@ -291,6 +291,14 @@ Strings are immutable and unique, two strings with the same contents will always
 [T]
 ```
 
+### symbols
+Quoted identifiers are represented as symbols.
+
+```
+  + '+
+[Multi(+) '+]
+```
+
 ### pairs
 Pairs may be formed using `:`.
 
@@ -488,6 +496,21 @@ Queue(0x7fe86902d810)
 [42]
 ```
 
+Queues are iterable, which makes it convient to implement worker threads as for loops.
+
+```
+  (let [t (thread [Int] (for m:inbox (if m.(= 'stop) (break) m.(dump))))]
+    t.(send 'foo)
+    t.(send 'bar)
+    t.(send 'stop)
+    t.(join))
+
+'foo
+'bar
+
+[]
+```
+
 ### types
 The following types are provided out of the box, adding more is trivial.
 
@@ -509,6 +532,7 @@ The following types are provided out of the box, adding more is trivial.
 - Reg: Any - Registers as values
 - Seq: Any - Sequence values
 - String: Seq - String values
+- Sym: Any - Quoted identifiers
 - Target: Any - Callable values
 - Thread: Any - Threads as values
 

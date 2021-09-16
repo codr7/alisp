@@ -1,14 +1,14 @@
 * add fib tests
-* implement queue iter_val
-** add send/iter example
-* implement queue clone_val
 * implement multi clone_val
 ** clone funcs
 ** handle case where func exists in a_func_clone
 * implement pair clone_val
 * implement list clone_val
 * figure out how to free pushed queue vals
-* --
+* drop lib->vm field
+** add args
+* drop type->vm field
+** add args
 * add map type
 ** {'foo 42 'bar "baz"}
 ** store pair vals in a_lset
@@ -36,20 +36,6 @@
 ** add R/W/RWFile
 * add type-of/isa prims
 ** readme/types
-* add quoting
-** add a_form_dump
-** add a_val *a_form_quote(form, vm)
-*** form_val if available
-*** default quote form
-**** add form type
-**** add A_QUOTE_FORM
-*** sym if id
-**** add a_sym_type
-**** add lset vm.syms
-***** check in a_sym()
-** add '-parser
-** add string refcounting
-*** switch pos source to sym
 * add separate func stacks
 ** store in frame
 ** move args on call

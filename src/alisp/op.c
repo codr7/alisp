@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "alisp/fail.h"
+#include "alisp/form.h"
 #include "alisp/func.h"
 #include "alisp/multi.h"
 #include "alisp/op.h"
@@ -39,6 +40,9 @@ struct a_op *a_op_init(struct a_op *self, enum a_op_type type, struct a_vm *vm) 
   case A_LOAD_OP:
     self->as_load.reg = -1;
     self->as_load.type = NULL;
+    break;
+  case A_QUOTE_OP:
+    self->as_quote.form = NULL;
     break;
   case A_RET_OP:
     self->as_ret.func = NULL;
@@ -188,6 +192,18 @@ a_pc_t a_op_analyze(struct a_op *self, struct a_vm *vm) {
     break;
   }
 
+  case A_QUOTE_OP: {
+    struct a_val *v = a_form_quote(self->as_quote.form, vm);
+
+    if (v) {
+      a_ls_push(&vm->stack, &v->ls);
+    } else {
+      a_push(vm, &vm->abc.undef_type)->undef = true;
+    }
+    
+    break;
+  }
+    
   case A_RET_OP: {
     struct a_ret_op *op = &self->as_ret;
     struct a_func *f = op->func;

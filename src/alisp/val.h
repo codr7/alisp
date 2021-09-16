@@ -37,6 +37,7 @@ struct a_val {
     struct a_queue *as_queue;
     a_reg_t as_reg;
     struct a_string *as_string;
+    struct a_string *as_sym;
     struct a_thread *as_thread;
   };
 };

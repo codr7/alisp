@@ -54,4 +54,11 @@
     t.(send 42)
     t.(join)))
 
+(test "queue iter" ['foo 'bar]
+  (let [t (thread [Int]	(for m:inbox (if m.(is 'stop) (break) m)))]
+    t.(send 'foo)
+    t.(send 'bar)
+    t.(send 'stop)
+    t.(join)))
+
 ).(dump)

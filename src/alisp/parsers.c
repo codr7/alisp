@@ -291,3 +291,18 @@ struct a_form *a_parse_string(struct a_parser *self) {
   a_stream_deinit(&out);
   return f;
 }
+
+struct a_form *a_parse_quote(struct a_parser *self) {
+  struct a_pos fpos = self->pos;
+  if (!a_parser_check(self, '\'')) { return NULL; }
+  struct a_form *f = a_parser_pop_next(self);
+
+  if (!f) {
+    a_fail("Missing quoted form");
+    return NULL;
+  }
+
+  struct a_form *qf = a_parser_push(self, A_QUOTE_FORM, fpos);
+  qf->as_quote.form = f;
+  return qf;
+}

@@ -11,7 +11,7 @@ enum a_op_type {
   A_CALL_OP, 
   A_DROP_OP, A_DUP_OP,
   A_FENCE_OP, A_FOR_OP,
-  A_GOTO_OP, A_JOIN_OP, A_LOAD_OP, A_PUSH_OP,
+  A_GOTO_OP, A_JOIN_OP, A_LOAD_OP, A_PUSH_OP, A_QUOTE_OP,
   A_RESET_OP, A_RET_OP,
   A_STORE_OP, A_SWAP_OP,
   A_TEST_OP, A_THREAD_OP,
@@ -56,6 +56,10 @@ struct a_push_op {
   struct a_val val;
 };
 
+struct a_quote_op {
+  struct a_form *form;
+};
+
 struct a_ret_op {
   struct a_func *func;
   bool check;
@@ -94,6 +98,7 @@ struct a_op {
     struct a_goto_op as_goto;
     struct a_load_op as_load;
     struct a_push_op as_push;
+    struct a_quote_op as_quote;
     struct a_ret_op as_ret;
     struct a_store_op as_store;
     struct a_swap_op as_swap;
