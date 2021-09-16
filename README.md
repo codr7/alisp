@@ -98,7 +98,7 @@ Values are pushed on the stack.
 [1 3 2]
 ```
 ### scripts
-`alisp` will load and evaluate the contents of the file pointed to by it's first argument if any.
+`alisp` will load and evaluate the contents of its first argument if any.
 
 ./test.alisp
 ```
@@ -109,7 +109,7 @@ $ ./alisp test.alisp
 42
 ```
 
-`include` may be used to inline the contents of additional files.
+`include` may be used to inline the contents of additional scripts.
 
 ```
   "test.alisp".(include)
@@ -136,6 +136,9 @@ Values may be bound to identifiers at runtime using `let`.
 
 [42]
 ```
+
+Which means it may be used to create type aliases and more.
+
 ```
   (def Foo Int)
   Foo
@@ -143,7 +146,7 @@ Values may be bound to identifiers at runtime using `let`.
 [Int]
 ```
 
-Bindings may be removed from the current scope using `unbind`.
+Bindings may be removed using `unbind`.
 
 ```
   +
@@ -319,11 +322,11 @@ List literals may be specified by enclosing code in brackets.
 The canonical tail recursive transformation goes something like this:
 
 ```
-  (func my-map [in:List t:Target] [List]
+  (func my-map [in:List tr:Target] [List]
     (func helper [in:Any out:Any] [List]
       (if in.(nil?)
         out.(reverse)
-        (helper:t in.(tail) (t in.(head)):out)))
+        (helper:t in.(tail) tr.(in.(head)):out)))
     (helper:t in NIL))
 
   [1 2 3].(my-map (\ [Int] [Int] _.(+ 1)))
@@ -347,7 +350,7 @@ When a variable is specified, it is automatically bound for each iteration.
 [1 3 5]
 ```
 
-`map` may be used to apply specified function to specified sequence, it returns a new iterator.
+`map` may be used to apply specified function to specified sequence, it returns a lazy iterator.
 
 ```
   (map (\ [Int] [Int] _.(+ 7)) [1 2 3])
@@ -369,7 +372,7 @@ New functions may be defined using `func`.
 [42]
 ```
 
-Function definitions are lexically scoped.
+Functions are lexically scoped.
 
 ```
   (func foo [] []
@@ -387,7 +390,7 @@ Function definitions are lexically scoped.
 Unknown call target: bar
 ```
 
-Functions capture their defining environment.
+Functions capture their environment.
 
 ```
   (let [bar 42]
@@ -397,7 +400,7 @@ Functions capture their defining environment.
 [42]
 ```
 
-Anonymous arguments are left on stack.
+Anonymous arguments are left on the stack.
 
 ```
   (func foo [Int] [Int] _.(+ 7))
@@ -406,7 +409,7 @@ Anonymous arguments are left on stack.
 [42]
 ```
 
-Named arguments are bound and removed from the stack.
+Named arguments are bound before evaluating the body.
 
 ```
   (func foo [n:Int] [Int] n.(+ 7))
@@ -429,7 +432,7 @@ When multiple function definitions share the same name, the most specific one is
 ```
 
 ### anonymous functions
-Anonymous functions may be created by simply skipping the `func` keyword and name.
+Anonymous functions may be created by simply replacing `func` and the name with `\`.
 
 ```
   (\ [] [Int] 42)
@@ -511,7 +514,7 @@ The following types are provided out of the box, adding more is trivial.
 
 ### testing
 
-`test` runs the specified body and checks the stack against specified suffix, it fails with specified message on mismatch.
+`test` runs the body and checks the stack against the specified suffix.
 
 ```
   (test "insanity" [4] 1.(+ 2))

@@ -1,3 +1,4 @@
+* add fib tests
 * implement queue iter_val
 ** add send/iter example
 * implement queue clone_val
@@ -8,6 +9,16 @@
 * implement list clone_val
 * figure out how to free pushed queue vals
 * --
+* add map type
+** {'foo 42 'bar "baz"}
+** store pair vals in a_lset
+** add sym type
+** add map form
+** support dot access
+*** m.foo
+*** convert to func call (get m 'foo)
+** implement iter_val
+*** push pairs
 * add or/and prims
 * add break
 ** add vm.break_pc
@@ -105,8 +116,3 @@
       for prob = (exp (- m)) then (* prob (/ m i))
       summing prob)
    1.0))
-
-
-
-
-
