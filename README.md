@@ -46,9 +46,9 @@ Values are pushed on the stack.
 `_` may be specified where values are expected to pop the stack.
 
 ```
-  42 (if _ 'true 'false)
+  42 (if _ T F)
   
-['true]
+[T]
 ```
 
 `d` may be used to drop values.

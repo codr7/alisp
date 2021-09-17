@@ -24,12 +24,11 @@
 ** build/x.lisp
 ** add *(float int)
 ** add /(float int)
-* add import prim
+* add use prim
 ** add lib type
 ** bind abc/math
 ** don't include anything automatically in scripts
-** change a_lib_import to take single string arg
-*** extract a_lib_import_all
+** change a_lib_use to take single optional string arg
 * add io.open
 ** add enums
 *** (enum OpenMode RD RW RD-OW APP RD-APP)
